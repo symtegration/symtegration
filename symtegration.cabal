@@ -31,14 +31,16 @@ library
       OverloadedStrings
   ghc-options: -Wall -Werror
   build-depends:
-      base >=4.7 && <5
-    , text >=2 && <2.2
+      base ==4.18.*
+    , containers ==0.6.*
+    , text ==2.0.*
   default-language: GHC2021
 
 test-suite symtegration-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Symtegration.Symbolic.Arbitrary
       Paths_symtegration
   hs-source-dirs:
       test
@@ -46,7 +48,10 @@ test-suite symtegration-test
       OverloadedStrings
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      QuickCheck ==2.14.*
+    , base ==4.18.*
+    , containers ==0.6.*
+    , hspec ==2.11.*
     , symtegration
-    , text >=2 && <2.2
+    , text ==2.0.*
   default-language: GHC2021
