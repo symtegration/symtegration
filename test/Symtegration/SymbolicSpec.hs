@@ -3,13 +3,20 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.SymbolicSpec where
 
+import Data.Map (Map)
+import Data.Map qualified as M
 import Data.Ratio (denominator, numerator)
 import Data.String (fromString)
+import Data.Text (Text)
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
+
+-- | Same as 'evaluate', except specialized to 'Double'.
+evaluate' :: Expression -> Map Text Double -> Maybe Double
+evaluate' = evaluate
 
 spec :: Spec
 spec = do
@@ -106,3 +113,10 @@ spec = do
 
       prop "atanh" $
         \(Simple x) -> atanh x `shouldBe` UnaryApply Atanh x
+
+  describe "Expression evaluates as" $ do
+    prop "number" $
+      \n m -> evaluate' (Number n) m `shouldBe` Just (fromInteger n)
+
+    prop "symbol" $
+      \s x m -> evaluate' (Symbol s) (M.insert s x m) `shouldBe` Just x

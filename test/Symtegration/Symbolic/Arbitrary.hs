@@ -14,7 +14,7 @@ import Test.QuickCheck
 import Test.QuickCheck.Instances.Text ()
 
 deriving via
-  (GenericArbitraryRec '[1, 1, 1, 1] `AndShrinking` Expression)
+  (GenericArbitraryRec '[1, 1, 4, 4] `AndShrinking` Expression)
   instance
     Arbitrary Expression
 
