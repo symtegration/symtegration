@@ -133,6 +133,52 @@ spec = do
          in fmap EvaluateDouble (evaluate' (BinaryApply func e1 e2) m)
               `shouldBe` fmap EvaluateDouble (f <$> evaluate' e1 m <*> evaluate' e2 m)
 
+  describe "unary functions are correctly mapped for" $ do
+    mapM_
+      ( \(func, f) -> prop (show func) $
+          \x ->
+            EvaluateDouble (getUnaryFunction func x)
+              `shouldBe` EvaluateDouble (f x)
+      )
+      ( [ (Negate, negate),
+          (Abs, abs),
+          (Signum, signum),
+          (Exp, exp),
+          (Log, log),
+          (Sqrt, sqrt),
+          (Sin, sin),
+          (Cos, cos),
+          (Tan, tan),
+          (Asin, asin),
+          (Acos, acos),
+          (Atan, atan),
+          (Sinh, sinh),
+          (Cosh, cosh),
+          (Tanh, tanh),
+          (Asinh, asinh),
+          (Acosh, acosh),
+          (Atanh, atanh)
+        ] ::
+          [(UnaryFunction, Double -> Double)]
+      )
+
+  describe "binary functions are correctly mapped for" $ do
+    mapM_
+      ( \(func, f) -> prop (show func) $
+          \x y ->
+            EvaluateDouble (getBinaryFunction func x y)
+              `shouldBe` EvaluateDouble (f x y)
+      )
+      ( [ (Add, (+)),
+          (Multiply, (*)),
+          (Subtract, (-)),
+          (Divide, (/)),
+          (Power, (**)),
+          (LogBase, logBase)
+        ] ::
+          [(BinaryFunction, Double -> Double -> Double)]
+      )
+
 -- | Wrapper type over 'Double' so that the same return values are compared as equal.
 -- In other words, the same NaN compared to itself will be considered equal.
 -- Used for confirming that 'evaluate' returns the expected results,
