@@ -6,7 +6,8 @@
 -- Support for converting symbolic representations of mathematical expressions
 -- into equivalent Haskell code.
 module Symtegration.Symbolic.Haskell
-  ( toText,
+  ( toHaskellText,
+
     -- * Support functions
     getUnaryFunctionText,
     getBinaryFunctionText,
@@ -22,25 +23,25 @@ import TextShow (showt)
 
 -- | Converts an 'Expression' into an equivalent Haskell expression.
 --
--- >>> toText $ BinaryApply Add (Number 1) (Number 3)
+-- >>> toHaskellText $ BinaryApply Add (Number 1) (Number 3)
 -- "1 + 3"
--- >>> toText $ 1 + 3
+-- >>> toHaskellText $ 1 + 3
 -- "1 + 3"
 --
 -- Symbols are included without quotation.
 --
--- >>> toText $ ("x" + "y") * 4
+-- >>> toHaskellText $ ("x" + "y") * 4
 -- "(x + y) * 4"
-toText :: Expression -> Text
-toText (Number n) = showt n
-toText (Symbol t) = t
-toText (UnaryApply fun x) = funcText <> " " <> asArg x
+toHaskellText :: Expression -> Text
+toHaskellText (Number n) = showt n
+toHaskellText (Symbol t) = t
+toHaskellText (UnaryApply fun x) = funcText <> " " <> asArg x
   where
     funcText = getUnaryFunctionText fun
-toText (BinaryApply LogBase x y) = funcText <> " " <> asArg x <> " " <> asArg y
+toHaskellText (BinaryApply LogBase x y) = funcText <> " " <> asArg x <> " " <> asArg y
   where
     funcText = getBinaryFunctionText LogBase
-toText (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
+toHaskellText (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
   where
     opText = getBinaryFunctionText op
 
@@ -48,9 +49,9 @@ toText (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
 -- In other words, show numbers and symbols as is, while surrounding everything
 -- else in parentheses.
 asArg :: Expression -> Text
-asArg x@(Number _) = toText x
-asArg x@(Symbol _) = toText x
-asArg x = "(" <> toText x <> ")"
+asArg x@(Number _) = toHaskellText x
+asArg x@(Symbol _) = toHaskellText x
+asArg x = "(" <> toHaskellText x <> ")"
 
 -- | Returns the corresponding Haskell function name.
 getUnaryFunctionText :: UnaryFunction -> Text

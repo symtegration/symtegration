@@ -14,7 +14,11 @@ module Symtegration
   ( -- * Symbolic representation
     Expression,
     evaluate,
+
+    -- * Conversion
+    toHaskellText,
   )
 where
 
-import Symtegration.Symbolic
+import Symtegration.Symbolic (Expression, evaluate)
+import Symtegration.Symbolic.Haskell (toHaskellText)

@@ -9,14 +9,13 @@ import Data.String (fromString)
 import Symtegration.Symbolic
 import Test.QuickCheck
 
--- | QuickCheck modifier for generating symbolic mathematical expressions with a particular value.
--- Specically, mathematical expressions representing a single symbol or a single number will
--- be generated.
-newtype Value = Value Expression deriving (Eq, Show)
+-- | QuickCheck modifier for generating simple symbolic mathematical expressions.
+-- Specically, those which represent a single symbol or a single number.
+newtype Simple = Simple Expression deriving (Eq, Show)
 
-instance Arbitrary Value where
+instance Arbitrary Simple where
   arbitrary =
     oneof
-      [ Value . Number <$> arbitrary,
-        Value . Symbol . fromString <$> listOf arbitraryPrintableChar
+      [ Simple . Number <$> arbitrary,
+        Simple . Symbol . fromString <$> listOf arbitraryPrintableChar
       ]
