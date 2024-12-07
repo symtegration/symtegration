@@ -1,0 +1,9 @@
+# HLint configuration file
+# https://github.com/ndmitchell/hlint
+##########################
+
+# Specify additional command line arguments
+- arguments: [-XGHC2021, -XOverloadedStrings]
+
+# Warn on use of partial functions
+- group: {name: partial, enabled: true}
