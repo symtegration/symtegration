@@ -45,7 +45,7 @@ data UnaryFunction
   | Asinh
   | Acosh
   | Atanh
-  deriving (Eq, Ord, Show, Read)
+  deriving (Eq, Ord, Enum, Bounded, Show, Read)
 
 data BinaryFunction
   = Add
@@ -54,7 +54,7 @@ data BinaryFunction
   | Divide
   | Power
   | LogBase
-  deriving (Eq, Ord, Show, Read)
+  deriving (Eq, Ord, Enum, Bounded, Show, Read)
 
 instance IsString Expression where
   fromString = Symbol . fromString
