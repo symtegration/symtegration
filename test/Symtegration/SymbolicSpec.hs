@@ -1,3 +1,6 @@
+-- |
+-- Description: Tests for Symtegration.SymbolicSpec
+-- Maintainer: dev@chungyc.org
 module Symtegration.SymbolicSpec where
 
 import Data.Ratio (denominator, numerator)

@@ -1,7 +1,14 @@
+-- |
+-- Module: Symtegration.Symbolic
+-- Description: Library for symbolically representing mathematical expressions.
+-- Maintainer: dev@chungyc.org
 module Symtegration.Symbolic
-  ( Expression (..),
+  ( -- * Representation
+    Expression (..),
     UnaryFunction (..),
     BinaryFunction (..),
+
+    -- * Computation
     getUnaryFunction,
     getBinaryFunction,
     evaluate,
@@ -14,46 +21,79 @@ import Data.Ratio
 import Data.String (IsString, fromString)
 import Data.Text
 
--- |
+-- | Symbolic representation of a mathematical expression.
 --
--- >>> import Numeric.AD
--- >>> diff (\x -> x + 1) ("x" :: Expression)
--- Number 1
+-- >>> 2 :: Expression
+-- Number 2
+-- >>> "x" :: Expression
+-- Symbol "x"
+-- >>> 2 + sin "x" :: Expression
+-- BinaryApply Add (Number 2) (UnaryApply Sin (Symbol "x"))
 data Expression
-  = Number Integer
-  | Symbol Text
-  | UnaryApply UnaryFunction Expression
-  | BinaryApply BinaryFunction Expression Expression
+  = -- | Represents a concrete number.
+    Number Integer
+  | -- | Represents a symbol, which could either be a variable or a constant.
+    Symbol Text
+  | -- | Represents the application of an unary function.
+    UnaryApply UnaryFunction Expression
+  | -- | Represents the application of a binary function.
+    BinaryApply BinaryFunction Expression Expression
   deriving (Eq, Ord, Show, Read)
 
+-- | Symbolic representation for unary functions.
 data UnaryFunction
-  = Negate
-  | Abs
-  | Signum
-  | Exp
-  | Log
-  | Sqrt
-  | Sin
-  | Cos
-  | Tan
-  | Asin
-  | Acos
-  | Atan
-  | Sinh
-  | Cosh
-  | Tanh
-  | Asinh
-  | Acosh
-  | Atanh
+  = -- | 'negate'
+    Negate
+  | -- | 'abs'
+    Abs
+  | -- | 'signum'
+    Signum
+  | -- | 'exp'
+    Exp
+  | -- | 'log'
+    Log
+  | -- | 'sqrt'
+    Sqrt
+  | -- | 'sin'
+    Sin
+  | -- | 'cos'
+    Cos
+  | -- | 'tan'
+    Tan
+  | -- | 'asin'
+    Asin
+  | -- | 'acos'
+    Acos
+  | -- | 'atan'
+    Atan
+  | -- | 'sinh'
+    Sinh
+  | -- | 'cosh'
+    Cosh
+  | -- | 'tanh'
+    Tanh
+  | -- | 'asinh'
+    Asinh
+  | -- | 'acosh'
+    Acosh
+  | -- | 'atanh'
+    Atanh
   deriving (Eq, Ord, Enum, Bounded, Show, Read)
 
+-- | Symbolic representation for binary functions.
 data BinaryFunction
-  = Add
-  | Multiply
-  | Subtract
-  | Divide
-  | Power
-  | LogBase
+  = -- | '(+)'
+    Add
+  | -- | '(*)'
+    Multiply
+  | -- | '(-)'
+    Subtract
+  | -- | '(/)'
+    Divide
+  | -- | '(**)'
+    Power
+  | -- | 'logBase'
+    LogBase
   deriving (Eq, Ord, Enum, Bounded, Show, Read)
 
 instance IsString Expression where
@@ -95,6 +135,10 @@ instance Floating Expression where
   acosh = UnaryApply Acosh
   atanh = UnaryApply Atanh
 
+-- | Returns a function corresponding to the symbolic representation of an unary function.
+--
+-- >>> (getUnaryFunction Cos) pi == (cos pi :: Double)
+-- True
 getUnaryFunction :: (Floating a) => UnaryFunction -> (a -> a)
 getUnaryFunction Negate = negate
 getUnaryFunction Abs = abs
@@ -115,6 +159,10 @@ getUnaryFunction Asinh = asinh
 getUnaryFunction Acosh = acosh
 getUnaryFunction Atanh = atanh
 
+-- | Returns a function corresponding to the symbolic representation of a binary function.
+--
+-- >>> (getBinaryFunction Add) 2 5 == (2 + 5 :: Double)
+-- True
 getBinaryFunction :: (Floating a) => BinaryFunction -> (a -> a -> a)
 getBinaryFunction Add = (+)
 getBinaryFunction Multiply = (*)
@@ -123,14 +171,34 @@ getBinaryFunction Divide = (/)
 getBinaryFunction Power = (**)
 getBinaryFunction LogBase = logBase
 
--- |
+-- | Calculates the value for a mathematical expression for a given assignment of values to symbols.
+--
+-- For example, when \(x=5\), then \(2x+1=11\).
 --
 -- >>> import Data.Map qualified as M
--- >>> evaluate (2 * "x" + 1) M.empty
--- Nothing
 -- >>> evaluate (2 * "x" + 1) (M.singleton "x" 5)
 -- Just 11.0
-evaluate :: (Floating a) => Expression -> Map Text a -> Maybe a
+--
+-- All symbols except for @"pi"@ in a mathematical expression must be assigned a value.
+-- Otherwise, a value cannot be computed.
+--
+-- >>> evaluate (2 * "x" + 1) M.empty
+-- Nothing
+--
+-- The symbol @"pi"@ is always used to represent \(\pi\),
+-- and any assignment to @"pi"@ will be ignored.
+-- For example, the following is \(\pi - \pi\), not \(100 - \pi\).
+--
+-- >>> evaluate ("pi" - pi) (M.singleton "pi" 100)
+-- Just 0.0
+evaluate ::
+  (Floating a) =>
+  -- | Mathematical expression to evaluate.
+  Expression ->
+  -- | Map of symbols to concrete values.
+  Map Text a ->
+  -- | Evaluation result.
+  Maybe a
 evaluate (Number n) _ = Just $ fromInteger n
 evaluate (Symbol "pi") _ = Just pi
 evaluate (Symbol x) m = M.lookup x m
