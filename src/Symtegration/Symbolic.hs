@@ -70,7 +70,6 @@ instance Num Expression where
 
 instance Fractional Expression where
   (/) = BinaryApply Divide
-  recip = BinaryApply Divide 1
   fromRational q = BinaryApply Divide n d
     where
       n = Number $ numerator q
@@ -139,8 +138,7 @@ evaluate (UnaryApply fun expr) m = fmap f v
   where
     f = getUnaryFunction fun
     v = evaluate expr m
-evaluate (BinaryApply fun expr1 expr2) m =
-  f <$> v1 <*> v2
+evaluate (BinaryApply fun expr1 expr2) m = f <$> v1 <*> v2
   where
     f = getBinaryFunction fun
     v1 = evaluate expr1 m

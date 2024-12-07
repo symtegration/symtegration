@@ -58,6 +58,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Symtegration.Symbolic.Arbitrary
+      Symtegration.SymbolicSpec
       Paths_symtegration
   hs-source-dirs:
       test
