@@ -24,6 +24,7 @@ library
   exposed-modules:
       Symtegration
       Symtegration.Symbolic
+      Symtegration.Symbolic.Haskell
   other-modules:
       Paths_symtegration
   hs-source-dirs:
@@ -35,6 +36,7 @@ library
       base ==4.18.*
     , containers ==0.6.*
     , text ==2.0.*
+    , text-show ==3.10.*
   default-language: GHC2021
 
 test-suite examples
@@ -52,6 +54,7 @@ test-suite examples
     , doctest-parallel ==0.3.*
     , symtegration
     , text ==2.0.*
+    , text-show ==3.10.*
   default-language: GHC2021
 
 test-suite spec
@@ -73,4 +76,5 @@ test-suite spec
     , hspec ==2.11.*
     , symtegration
     , text ==2.0.*
+    , text-show ==3.10.*
   default-language: GHC2021
