@@ -120,3 +120,26 @@ spec = do
 
     prop "symbol" $
       \s x m -> evaluate' (Symbol s) (M.insert s x m) `shouldBe` Just x
+
+    prop "unary function" $
+      \(Complete e m) func ->
+        fmap EvaluateDouble (evaluate' (UnaryApply func e) m)
+          `shouldBe` fmap (EvaluateDouble . getUnaryFunction func) (evaluate' e m)
+
+    prop "binary function" $
+      \(Complete e1 m1) (Complete e2 m2) func ->
+        let m = M.union m1 m2
+            f = getBinaryFunction func
+         in fmap EvaluateDouble (evaluate' (BinaryApply func e1 e2) m)
+              `shouldBe` fmap EvaluateDouble (f <$> evaluate' e1 m <*> evaluate' e2 m)
+
+-- | Wrapper type over 'Double' so that the same return values are compared as equal.
+-- In other words, the same NaN compared to itself will be considered equal.
+-- Used for confirming that 'evaluate' returns the expected results,
+-- including when it returns NaN.
+newtype EvaluateDouble = EvaluateDouble Double deriving (Show)
+
+instance Eq EvaluateDouble where
+  (EvaluateDouble x) == (EvaluateDouble y)
+    | isNaN x && isNaN y = True
+    | otherwise = x == y
