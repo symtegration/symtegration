@@ -73,7 +73,9 @@ test-suite spec
       QuickCheck ==2.14.*
     , base ==4.18.*
     , containers ==0.6.*
+    , generic-random ==1.5.*
     , hspec ==2.11.*
+    , quickcheck-instances ==0.3.*
     , symtegration
     , text ==2.0.*
     , text-show ==3.10.*

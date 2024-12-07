@@ -46,7 +46,9 @@ tests:
     dependencies:
     - symtegration
     - containers >= 0.6 && < 0.7
+    - generic-random >= 1.5 && < 1.6
     - hspec >= 2.11 && < 2.12
+    - quickcheck-instances >= 0.3 && < 0.4
     - QuickCheck >= 2.14 && < 2.15
 
     when:

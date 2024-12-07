@@ -16,6 +16,7 @@ module Symtegration.Symbolic
 where
 
 import Data.Map (Map)
+import GHC.Generics (Generic)
 import Data.Map qualified as M
 import Data.Ratio
 import Data.String (IsString, fromString)
@@ -38,7 +39,7 @@ data Expression
     UnaryApply UnaryFunction Expression
   | -- | Represents the application of a binary function.
     BinaryApply BinaryFunction Expression Expression
-  deriving (Eq, Ord, Show, Read)
+  deriving (Eq, Ord, Show, Read, Generic)
 
 -- | Symbolic representation for unary functions.
 data UnaryFunction
@@ -78,7 +79,7 @@ data UnaryFunction
     Acosh
   | -- | 'atanh'
     Atanh
-  deriving (Eq, Ord, Enum, Bounded, Show, Read)
+  deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic)
 
 -- | Symbolic representation for binary functions.
 data BinaryFunction
@@ -94,7 +95,7 @@ data BinaryFunction
     Power
   | -- | 'logBase'
     LogBase
-  deriving (Eq, Ord, Enum, Bounded, Show, Read)
+  deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic)
 
 instance IsString Expression where
   fromString = Symbol . fromString
