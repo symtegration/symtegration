@@ -14,6 +14,11 @@ import Data.Ratio
 import Data.String (IsString, fromString)
 import Data.Text
 
+-- |
+--
+-- >>> import Numeric.AD
+-- >>> diff (\x -> x + 1) ("x" :: Expression)
+-- Number 1
 data Expression
   = Number Integer
   | Symbol Text

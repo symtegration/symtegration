@@ -61,4 +61,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - symtegration
+    - ad >= 4.5 && < 4.6
     - doctest-parallel >= 0.3 && < 0.4
