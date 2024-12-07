@@ -133,6 +133,9 @@ spec = do
          in fmap EvaluateDouble (evaluate' (BinaryApply func e1 e2) m)
               `shouldBe` fmap EvaluateDouble (f <$> evaluate' e1 m <*> evaluate' e2 m)
 
+    prop "nothing" $
+      \(Complete e m) -> not (M.null m) ==> evaluate' e M.empty `shouldBe` Nothing
+
   describe "unary functions are correctly mapped for" $ do
     mapM_
       ( \(func, f) -> prop (show func) $
