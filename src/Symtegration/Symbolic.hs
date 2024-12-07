@@ -124,6 +124,13 @@ getBinaryFunction Divide = (/)
 getBinaryFunction Power = (**)
 getBinaryFunction LogBase = logBase
 
+-- |
+--
+-- >>> import Data.Map qualified as M
+-- >>> evaluate (2 * "x" + 1) M.empty
+-- Nothing
+-- >>> evaluate (2 * "x" + 1) (M.singleton "x" 5)
+-- Just 11.0
 evaluate :: (Floating a) => Expression -> Map Text a -> Maybe a
 evaluate (Number n) _ = Just $ fromInteger n
 evaluate (Symbol "pi") _ = Just pi
