@@ -36,7 +36,23 @@ library
     , text ==2.0.*
   default-language: GHC2021
 
-test-suite symtegration-test
+test-suite examples
+  type: exitcode-stdio-1.0
+  main-is: test/Examples.hs
+  other-modules:
+      Paths_symtegration
+  default-extensions:
+      OverloadedStrings
+  ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base ==4.18.*
+    , containers ==0.6.*
+    , doctest-parallel ==0.3.*
+    , symtegration
+    , text ==2.0.*
+  default-language: GHC2021
+
+test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:

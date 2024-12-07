@@ -35,7 +35,7 @@ library:
   source-dirs: src
 
 tests:
-  symtegration-test:
+  spec:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -47,3 +47,18 @@ tests:
     - containers >= 0.6 && < 0.7
     - hspec >= 2.11 && < 2.12
     - QuickCheck >= 2.14 && < 2.15
+
+    when:
+      condition: false
+      other-modules:
+      - Examples  # Don't include the doctest runner.
+
+  examples:
+    main:                test/Examples.hs
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - symtegration
+    - doctest-parallel >= 0.3 && < 0.4
