@@ -3,6 +3,7 @@ module Symtegration.SymbolicSpec where
 import Data.Ratio (denominator, numerator)
 import Data.String (fromString)
 import Symtegration.Symbolic
+import Symtegration.Symbolic.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
@@ -102,12 +103,3 @@ spec = do
 
       prop "atanh" $
         \(Value x) -> atanh x `shouldBe` UnaryApply Atanh x
-
-newtype Value = Value Expression deriving (Eq, Show)
-
-instance Arbitrary Value where
-  arbitrary =
-    oneof
-      [ Value . Number <$> arbitrary,
-        Value . Symbol . fromString <$> listOf arbitraryPrintableChar
-      ]
