@@ -25,16 +25,3 @@ spec = modifyMaxSuccess (* 100) $ do
               counterexample ("simplify e = " <> show (toHaskellText e')) $
                 maybe False isFinite v && maybe False isFinite v' ==>
                   fmap Near v' `shouldBe` fmap Near v
-
--- | Wrapper type for comparing whether 'Double' return values are close enough.
--- Simplification can change the exact functions applied, so floating-point errors are expected.
-newtype Near = Near FiniteDouble deriving (Show)
-
-instance Eq Near where
-  (==) (Near (FiniteDouble x)) (Near (FiniteDouble y))
-    | isNaN x && isNaN y = True
-    | isInfinite x || isInfinite y = x == y
-    | x == 0 || y == 0 || x == (-0) || y == (-0) = x - y < threshold
-    | otherwise = (x - y) / y < threshold
-    where
-      threshold = 1e-5

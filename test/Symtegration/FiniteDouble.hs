@@ -25,7 +25,7 @@
 --     @d / (0 - (cosh (exp ((logBase f c) / 0))))@
 --
 -- *   @tanh (s ** (f / (0 * k)))@ and @tanh (s ** (f / 0))@
-module Symtegration.FiniteDouble (FiniteDouble (..), isFinite) where
+module Symtegration.FiniteDouble (FiniteDouble (..), isFinite, Near (..)) where
 
 -- | A variant of 'Double' which only allows finite
 newtype FiniteDouble = FiniteDouble Double
@@ -94,3 +94,17 @@ unaryOp op (FiniteDouble x)
   where
     v = op x
     nan = 0 / 0
+
+-- | Wrapper type for comparing whether 'FiniteDouble' values are close enough.
+-- Intended for testing whether two supposedly equivalent functions return
+-- values which are close enough.
+newtype Near = Near FiniteDouble deriving (Show)
+
+instance Eq Near where
+  (==) (Near (FiniteDouble x)) (Near (FiniteDouble y))
+    | isNaN x && isNaN y = True
+    | isInfinite x || isInfinite y = x == y
+    | x == 0 || y == 0 || x == (-0) || y == (-0) = x - y < threshold
+    | otherwise = (x - y) / y < threshold
+    where
+      threshold = 1e-5
