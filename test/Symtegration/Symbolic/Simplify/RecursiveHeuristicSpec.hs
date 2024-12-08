@@ -13,7 +13,6 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
-{- ORMOLU_DISABLE -}
 spec :: Spec
 spec = modifyMaxSuccess (* 100) $ do
   describe "simplify" $ do
@@ -23,10 +22,9 @@ spec = modifyMaxSuccess (* 100) $ do
             v = evaluate e (M.map FiniteDouble m)
             v' = evaluate e' (M.map FiniteDouble m)
          in counterexample ("e = " <> show (toHaskellText e)) $
-            counterexample ("simplify e = " <> show (toHaskellText e')) $
-            maybe False isFinite v && maybe False isFinite v' ==>
-            fmap Near v' `shouldBe` fmap Near v
-{- ORMOLU_ENABLE -}
+              counterexample ("simplify e = " <> show (toHaskellText e')) $
+                maybe False isFinite v && maybe False isFinite v' ==>
+                  fmap Near v' `shouldBe` fmap Near v
 
 -- | Wrapper type for comparing whether 'Double' return values are close enough.
 -- Simplification can change the exact functions applied, so floating-point errors are expected.
