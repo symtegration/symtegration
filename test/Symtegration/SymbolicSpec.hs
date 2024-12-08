@@ -1,7 +1,7 @@
 -- |
 -- Description: Tests for Symtegration.SymbolicSpec
 -- Maintainer: dev@chungyc.org
-module Symtegration.SymbolicSpec where
+module Symtegration.SymbolicSpec (spec) where
 
 import Data.Map (Map)
 import Data.Map qualified as M
@@ -123,15 +123,15 @@ spec = do
 
     prop "unary function" $
       \(Complete e m) func ->
-        fmap EvaluateDouble (evaluate' (UnaryApply func e) m)
-          `shouldBe` fmap (EvaluateDouble . getUnaryFunction func) (evaluate' e m)
+        fmap Exact (evaluate' (UnaryApply func e) m)
+          `shouldBe` fmap (Exact . getUnaryFunction func) (evaluate' e m)
 
     prop "binary function" $
       \(Complete e1 m1) (Complete e2 m2) func ->
         let m = M.union m1 m2
             f = getBinaryFunction func
-         in fmap EvaluateDouble (evaluate' (BinaryApply func e1 e2) m)
-              `shouldBe` fmap EvaluateDouble (f <$> evaluate' e1 m <*> evaluate' e2 m)
+         in fmap Exact (evaluate' (BinaryApply func e1 e2) m)
+              `shouldBe` fmap Exact (f <$> evaluate' e1 m <*> evaluate' e2 m)
 
     prop "nothing" $
       \(Complete e m) -> not (M.null m) ==> evaluate' e M.empty `shouldBe` Nothing
@@ -139,9 +139,7 @@ spec = do
   describe "unary functions are correctly mapped for" $ do
     mapM_
       ( \(func, f) -> prop (show func) $
-          \x ->
-            EvaluateDouble (getUnaryFunction func x)
-              `shouldBe` EvaluateDouble (f x)
+          \x -> Exact (getUnaryFunction func x) `shouldBe` Exact (f x)
       )
       ( [ (Negate, negate),
           (Abs, abs),
@@ -168,9 +166,7 @@ spec = do
   describe "binary functions are correctly mapped for" $ do
     mapM_
       ( \(func, f) -> prop (show func) $
-          \x y ->
-            EvaluateDouble (getBinaryFunction func x y)
-              `shouldBe` EvaluateDouble (f x y)
+          \x y -> Exact (getBinaryFunction func x y) `shouldBe` Exact (f x y)
       )
       ( [ (Add, (+)),
           (Multiply, (*)),
@@ -186,9 +182,9 @@ spec = do
 -- In other words, the same NaN compared to itself will be considered equal.
 -- Used for confirming that 'evaluate' returns the expected results,
 -- including when it returns NaN.
-newtype EvaluateDouble = EvaluateDouble Double deriving (Show)
+newtype Exact = Exact Double deriving (Show)
 
-instance Eq EvaluateDouble where
-  (EvaluateDouble x) == (EvaluateDouble y)
+instance Eq Exact where
+  (Exact x) == (Exact y)
     | isNaN x && isNaN y = True
     | otherwise = x == y

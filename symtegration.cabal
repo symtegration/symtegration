@@ -25,6 +25,7 @@ library
       Symtegration
       Symtegration.Symbolic
       Symtegration.Symbolic.Haskell
+      Symtegration.Symbolic.Simplify.RecursiveHeuristic
   other-modules:
       Paths_symtegration
   hs-source-dirs:
@@ -62,6 +63,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Symtegration.Symbolic.Arbitrary
+      Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec
       Symtegration.SymbolicSpec
       Paths_symtegration
   hs-source-dirs:

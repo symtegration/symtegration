@@ -16,12 +16,19 @@ import Test.QuickCheck
 import Test.QuickCheck.Instances.Text ()
 
 instance Arbitrary Expression where
-  arbitrary =
-    genericArbitraryRec (1 % 1 % 4 % 8 % ())
-      `withBaseCase` oneof
-        [ Number <$> arbitrary,
-          Symbol . fromString <$> listOf1 arbitraryPrintableChar
+  arbitrary = sized $ \n -> case n of
+    0 -> oneof [arbitraryNumber, arbitrarySymbol]
+    _ ->
+      frequency
+        [ (1, arbitraryNumber),
+          (1, arbitrarySymbol),
+          (4, resize (max 0 (n - 1)) $ UnaryApply <$> arbitrary <*> arbitrary),
+          (8, resize (n `div` 2) $ BinaryApply <$> arbitrary <*> arbitrary <*> arbitrary)
         ]
+    where
+      arbitraryNumber = Number <$> arbitrary
+      arbitrarySymbol = Symbol . fromString <$> listOf1 (choose ('a', 'z'))
+
   shrink = genericShrink
 
 instance Arbitrary UnaryFunction where
@@ -38,7 +45,7 @@ instance Arbitrary Simple where
   arbitrary =
     oneof
       [ Simple . Number <$> arbitrary,
-        Simple . Symbol . fromString <$> listOf1 arbitraryPrintableChar
+        Simple . Symbol . fromString <$> listOf1 (choose ('a', 'z'))
       ]
 
 -- | Generates arbitrary expressions with a complete assignment of numbers to symbols.
@@ -56,3 +63,5 @@ instance Arbitrary Complete where
       gather (Symbol s) = S.singleton s
       gather (UnaryApply _ x) = gather x
       gather (BinaryApply _ x y) = S.union (gather x) (gather y)
+
+  shrink (Complete e m) = [Complete e' m | e' <- genericShrink e]
