@@ -34,6 +34,7 @@ simplify (BinaryApply func x y)
   | Multiply <- func, Number 1 <- y' = x'
   | Subtract <- func, Number m <- x', Number n <- y' = Number (m - n)
   | Subtract <- func, Number 0 <- y' = x'
+  | Subtract <- func, x' == y' = Number 0
   | Divide <- func, Number 0 <- y' = BinaryApply Divide x' y'
   | Divide <- func, Number 1 <- y' = x'
   | Divide <- func,
