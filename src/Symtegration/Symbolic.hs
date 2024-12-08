@@ -16,11 +16,11 @@ module Symtegration.Symbolic
 where
 
 import Data.Map (Map)
-import GHC.Generics (Generic)
-import Data.Map qualified as M
+import Data.Map qualified as Map
 import Data.Ratio
 import Data.String (IsString, fromString)
 import Data.Text
+import GHC.Generics (Generic)
 
 -- | Symbolic representation of a mathematical expression.
 --
@@ -176,21 +176,21 @@ getBinaryFunction LogBase = logBase
 --
 -- For example, when \(x=5\), then \(2x+1=11\).
 --
--- >>> import Data.Map qualified as M
--- >>> evaluate (2 * "x" + 1) (M.singleton "x" 5)
+-- >>> import Data.Map qualified as Map
+-- >>> evaluate (2 * "x" + 1) (Map.singleton "x" 5)
 -- Just 11.0
 --
 -- All symbols except for @"pi"@ in a mathematical expression must be assigned a value.
 -- Otherwise, a value cannot be computed.
 --
--- >>> evaluate (2 * "x" + 1) M.empty
+-- >>> evaluate (2 * "x" + 1) Map.empty
 -- Nothing
 --
 -- The symbol @"pi"@ is always used to represent \(\pi\),
 -- and any assignment to @"pi"@ will be ignored.
 -- For example, the following is \(\pi - \pi\), not \(100 - \pi\).
 --
--- >>> evaluate ("pi" - pi) (M.singleton "pi" 100)
+-- >>> evaluate ("pi" - pi) (Map.singleton "pi" 100)
 -- Just 0.0
 evaluate ::
   (Floating a) =>
@@ -202,7 +202,7 @@ evaluate ::
   Maybe a
 evaluate (Number n) _ = Just $ fromInteger n
 evaluate (Symbol "pi") _ = Just pi
-evaluate (Symbol x) m = M.lookup x m
+evaluate (Symbol x) m = Map.lookup x m
 evaluate (UnaryApply fun expr) m = fmap f v
   where
     f = getUnaryFunction fun

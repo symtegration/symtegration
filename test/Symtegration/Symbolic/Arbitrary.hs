@@ -6,7 +6,7 @@
 module Symtegration.Symbolic.Arbitrary where
 
 import Data.Map (Map)
-import Data.Map qualified as M
+import Data.Map qualified as Map
 import Data.Set qualified as S
 import Data.String (fromString)
 import Data.Text (Text)
@@ -55,7 +55,7 @@ instance Arbitrary Complete where
     expr <- arbitrary
     vals <- infiniteList
     let symbols = gather expr
-    let assignment = M.fromList $ zip (S.toList symbols) vals
+    let assignment = Map.fromList $ zip (S.toList symbols) vals
     return $ Complete expr assignment
     where
       gather (Number _) = S.empty

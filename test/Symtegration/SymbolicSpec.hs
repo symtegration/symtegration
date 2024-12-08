@@ -4,7 +4,7 @@
 module Symtegration.SymbolicSpec (spec) where
 
 import Data.Map (Map)
-import Data.Map qualified as M
+import Data.Map qualified as Map
 import Data.Ratio (denominator, numerator)
 import Data.String (fromString)
 import Data.Text (Text)
@@ -119,7 +119,7 @@ spec = do
       \n m -> evaluate' (Number n) m `shouldBe` Just (fromInteger n)
 
     prop "symbol" $
-      \s x m -> evaluate' (Symbol s) (M.insert s x m) `shouldBe` Just x
+      \s x m -> evaluate' (Symbol s) (Map.insert s x m) `shouldBe` Just x
 
     prop "unary function" $
       \(Complete e m) func ->
@@ -128,13 +128,13 @@ spec = do
 
     prop "binary function" $
       \(Complete e1 m1) (Complete e2 m2) func ->
-        let m = M.union m1 m2
+        let m = Map.union m1 m2
             f = getBinaryFunction func
          in fmap Exact (evaluate' (BinaryApply func e1 e2) m)
               `shouldBe` fmap Exact (f <$> evaluate' e1 m <*> evaluate' e2 m)
 
     prop "nothing" $
-      \(Complete e m) -> not (M.null m) ==> evaluate' e M.empty `shouldBe` Nothing
+      \(Complete e m) -> not (Map.null m) ==> evaluate' e Map.empty `shouldBe` Nothing
 
   describe "unary functions are correctly mapped for" $ do
     mapM_
