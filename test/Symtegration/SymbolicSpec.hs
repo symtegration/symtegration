@@ -114,7 +114,7 @@ spec = do
       prop "atanh" $
         \(Simple x) -> atanh x `shouldBe` UnaryApply Atanh x
 
-  describe "Expression evaluates as" $ do
+  describe "Expression exactly evaluates as" $ do
     prop "number" $
       \n m -> evaluate' (Number n) m `shouldBe` Just (fromInteger n)
 
@@ -179,7 +179,7 @@ spec = do
       )
 
 -- | Wrapper type over 'Double' so that the same return values are compared as equal.
--- In other words, the same NaN compared to itself will be considered equal.
+-- In other words, a NaN compared to a NaN will be considered equal.
 -- Used for confirming that 'evaluate' returns the expected results,
 -- including when it returns NaN.
 newtype Exact = Exact Double deriving (Show)

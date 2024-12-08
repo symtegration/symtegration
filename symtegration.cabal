@@ -62,6 +62,7 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Symtegration.FiniteDouble
       Symtegration.Symbolic.Arbitrary
       Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec
       Symtegration.SymbolicSpec
