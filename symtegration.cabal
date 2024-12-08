@@ -6,7 +6,10 @@ cabal-version: 1.12
 
 name:           symtegration
 version:        0.1.0
-description:    Please see the README on GitHub at <https://github.com/chungyc/symtegration#readme>
+synopsis:       Library for symbolic integration of mathematical expressions.
+description:    Symtegration is a library providing symbolic integration of mathematical expressions.
+                See the [README](https://github.com/chungyc/symtegration#readme) on GitHub.
+category:       Math
 homepage:       https://github.com/chungyc/symtegration#readme
 bug-reports:    https://github.com/chungyc/symtegration/issues
 author:         Yoo Chung

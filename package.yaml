@@ -9,13 +9,15 @@ extra-source-files:
 - docs/CHANGELOG.md
 
 # Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
+synopsis:            Library for symbolic integration of mathematical expressions.
+category:            Mathematics
 
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/chungyc/symtegration#readme>
+description: |
+  Symtegration is a library providing symbolic integration of mathematical expressions.
+  See the [README](https://github.com/chungyc/symtegration#readme) on GitHub.
 
 language: GHC2021
 
