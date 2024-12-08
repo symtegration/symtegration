@@ -2,6 +2,10 @@
 -- Module: Symtegration.Symbolic.Simplify.RecursiveHeuristic
 -- Description: Simplification of mathematical expressions with recursive heuristics.
 -- Maintainer: dev@chungyc.org
+--
+-- Supports simplification of the symbolic representation of a mathematical expression
+-- using recursive heuristics.  This applies simple transformations to simplify
+-- mathematical expressions recursively on sub-terms, and is not very sophisticated.
 module Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify) where
 
 import Symtegration.Symbolic
