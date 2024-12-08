@@ -23,5 +23,5 @@ spec = modifyMaxSuccess (* 100) $ do
             v' = evaluate e' (M.map FiniteDouble m)
          in counterexample ("e = " <> show (toHaskellText e)) $
               counterexample ("simplify e = " <> show (toHaskellText e')) $
-                maybe False isFinite v && maybe False isFinite v' ==>
+                maybe False isFinite v ==>
                   fmap Near v' `shouldBe` fmap Near v

@@ -24,6 +24,7 @@ import Symtegration.Symbolic
 simplify :: Expression -> Expression
 simplify (UnaryApply func x)
   | Negate <- func, UnaryApply Negate x'' <- x' = x''
+  | Negate <- func, Number n <- x', n < 0 = Number (-n)
   | otherwise = UnaryApply func x'
   where
     x' = simplify x
