@@ -10,7 +10,6 @@ import Data.Map qualified as M
 import Data.Set qualified as S
 import Data.String (fromString)
 import Data.Text (Text)
-import Generic.Random
 import Symtegration.Symbolic
 import Test.QuickCheck
 import Test.QuickCheck.Instances.Text ()
@@ -32,10 +31,10 @@ instance Arbitrary Expression where
   shrink = genericShrink
 
 instance Arbitrary UnaryFunction where
-  arbitrary = genericArbitraryU
+  arbitrary = chooseEnum (minBound, maxBound)
 
 instance Arbitrary BinaryFunction where
-  arbitrary = genericArbitraryU
+  arbitrary = chooseEnum (minBound, maxBound)
 
 -- | QuickCheck modifier for generating simple symbolic mathematical expressions.
 -- Specically, those which represent a single symbol or a single number.

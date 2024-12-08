@@ -9,7 +9,7 @@ version:        0.1.0
 synopsis:       Library for symbolic integration of mathematical expressions.
 description:    Symtegration is a library providing symbolic integration of mathematical expressions.
                 See the [README](https://github.com/chungyc/symtegration#readme) on GitHub.
-category:       Math
+category:       Mathematics
 homepage:       https://github.com/chungyc/symtegration#readme
 bug-reports:    https://github.com/chungyc/symtegration/issues
 author:         Yoo Chung
@@ -79,7 +79,6 @@ test-suite spec
       QuickCheck ==2.14.*
     , base ==4.18.*
     , containers ==0.6.*
-    , generic-random ==1.5.*
     , hspec ==2.11.*
     , quickcheck-instances ==0.3.*
     , symtegration
