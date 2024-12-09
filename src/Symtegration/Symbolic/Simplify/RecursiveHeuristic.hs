@@ -49,6 +49,7 @@ simplify (BinaryApply func x y)
           x'' = Number $ m `div` d
           y'' = Number $ n `div` d
        in if n == d then x'' else BinaryApply Divide x'' y''
+  | Divide <- func, x' == y' = Number 1
   | otherwise = BinaryApply func x' y'
   where
     x' = simplify x
