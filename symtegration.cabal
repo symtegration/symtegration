@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Symtegration
+      Symtegration.Polynomial
       Symtegration.Symbolic
       Symtegration.Symbolic.Haskell
       Symtegration.Symbolic.Simplify.RecursiveHeuristic
