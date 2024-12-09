@@ -3,7 +3,16 @@
 -- |
 -- Description: QuickCheck Arbitrary instances for generating Symtegration.Symbolic values.
 -- Maintainer: dev@chungyc.org
-module Symtegration.Symbolic.Arbitrary where
+module Symtegration.Symbolic.Arbitrary
+  ( Simple (..),
+    Compound (..),
+    Complete (..),
+    arbitraryNumber,
+    arbitrarySymbol,
+    arbitraryUnaryFunction,
+    arbitraryBinaryFunction,
+  )
+where
 
 import Data.Map (Map)
 import Data.Map qualified as Map
@@ -21,12 +30,9 @@ instance Arbitrary Expression where
       frequency
         [ (1, arbitraryNumber),
           (1, arbitrarySymbol),
-          (4, resize (max 0 (n - 1)) $ UnaryApply <$> arbitrary <*> arbitrary),
-          (8, resize (n `div` 2) $ BinaryApply <$> arbitrary <*> arbitrary <*> arbitrary)
+          (4, resize (max 0 (n - 1)) arbitraryUnaryFunction),
+          (8, resize (n `div` 2) arbitraryBinaryFunction)
         ]
-    where
-      arbitraryNumber = Number <$> arbitrary
-      arbitrarySymbol = Symbol . fromString <$> listOf1 (choose ('a', 'z'))
 
   shrink = genericShrink
 
@@ -36,16 +42,24 @@ instance Arbitrary UnaryFunction where
 instance Arbitrary BinaryFunction where
   arbitrary = chooseEnum (minBound, maxBound)
 
--- | QuickCheck modifier for generating simple symbolic mathematical expressions.
+-- | Generates simple symbolic mathematical expressions.
 -- Specically, those which represent a single symbol or a single number.
 newtype Simple = Simple Expression deriving (Eq, Show)
 
 instance Arbitrary Simple where
-  arbitrary =
-    oneof
-      [ Simple . Number <$> arbitrary,
-        Simple . Symbol . fromString <$> listOf1 (choose ('a', 'z'))
-      ]
+  arbitrary = Simple <$> oneof [arbitraryNumber, arbitrarySymbol]
+
+-- | Generates a compound symbolic mathematical expression.
+-- Specifically, either a unary function application or a binary function application.
+newtype Compound = Compound Expression deriving (Eq, Show)
+
+instance Arbitrary Compound where
+  arbitrary = Compound <$> oneof [arbitraryUnaryFunction, arbitraryBinaryFunction]
+  shrink (Compound e) = Compound <$> filter isCompound (shrink e)
+    where
+      isCompound (Number _) = False
+      isCompound (Symbol _) = False
+      isCompound _ = True
 
 -- | Generates arbitrary expressions with a complete assignment of numbers to symbols.
 data Complete = Complete Expression (Map Text Double) deriving (Eq, Show)
@@ -64,3 +78,19 @@ instance Arbitrary Complete where
       gather (BinaryApply _ x y) = S.union (gather x) (gather y)
 
   shrink (Complete e m) = [Complete e' m | e' <- genericShrink e]
+
+-- | Generate a random number.
+arbitraryNumber :: Gen Expression
+arbitraryNumber = Number <$> arbitrary
+
+-- | Generate a random symbol with only letters.
+arbitrarySymbol :: Gen Expression
+arbitrarySymbol = Symbol . fromString <$> listOf1 (choose ('a', 'z'))
+
+-- | Generate a random expression with an unary function application.
+arbitraryUnaryFunction :: Gen Expression
+arbitraryUnaryFunction = UnaryApply <$> arbitrary <*> arbitrary
+
+-- | Generate a random expression with a binary function application.
+arbitraryBinaryFunction :: Gen Expression
+arbitraryBinaryFunction = BinaryApply <$> arbitrary <*> arbitrary <*> arbitrary

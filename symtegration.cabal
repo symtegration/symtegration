@@ -67,6 +67,7 @@ test-suite spec
   other-modules:
       Symtegration.FiniteDouble
       Symtegration.Symbolic.Arbitrary
+      Symtegration.Symbolic.HaskellSpec
       Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec
       Symtegration.SymbolicSpec
       Paths_symtegration

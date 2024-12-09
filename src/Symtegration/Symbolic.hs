@@ -1,3 +1,5 @@
+{-# LANGUAGE DerivingVia #-}
+
 -- |
 -- Module: Symtegration.Symbolic
 -- Description: Library for symbolically representing mathematical expressions.
@@ -21,6 +23,8 @@ import Data.Ratio
 import Data.String (IsString, fromString)
 import Data.Text
 import GHC.Generics (Generic)
+import TextShow (TextShow)
+import TextShow.Generic (FromGeneric(..))
 
 -- | Symbolic representation of a mathematical expression.
 --
@@ -40,6 +44,7 @@ data Expression
   | -- | Represents the application of a binary function.
     BinaryApply BinaryFunction Expression Expression
   deriving (Eq, Ord, Show, Read, Generic)
+  deriving TextShow via FromGeneric Expression
 
 -- | Symbolic representation for unary functions.
 data UnaryFunction
@@ -80,6 +85,7 @@ data UnaryFunction
   | -- | 'atanh'
     Atanh
   deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic)
+  deriving TextShow via FromGeneric UnaryFunction
 
 -- | Symbolic representation for binary functions.
 data BinaryFunction
@@ -96,6 +102,7 @@ data BinaryFunction
   | -- | 'logBase'
     LogBase
   deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic)
+  deriving TextShow via FromGeneric BinaryFunction
 
 instance IsString Expression where
   fromString = Symbol . fromString
