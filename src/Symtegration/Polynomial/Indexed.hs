@@ -9,6 +9,7 @@ import Data.IntMap qualified as IntMap
 import Data.List (intersperse)
 import Data.Maybe (fromMaybe)
 import Data.Ratio (denominator, numerator)
+import Data.Text (unpack)
 import Symtegration.Polynomial
 import TextShow
 
@@ -21,24 +22,7 @@ type IndexedPolynomial = P Int Rational
 newtype P a b = P (IntMap b) deriving (Eq)
 
 instance Show (P Int Rational) where
-  show (P m)
-    | IntMap.null m = "0"
-    | otherwise =
-        mconcat $
-          intersperse " + " $
-            map showTerm $
-              IntMap.toDescList m
-    where
-      showTerm (0, 1) = "1"
-      showTerm (0, c) = showCoefficient c
-      showTerm (1, c) = showCoefficient c <> "x"
-      showTerm (e, 1) = "x^" <> show e
-      showTerm (e, c) = showCoefficient c <> "x^" <> show e
-      showCoefficient r
-        | 1 <- r = mempty
-        | 1 <- denominator r, r > 0 = show $ numerator r
-        | 1 <- denominator r, r < 0 = "(" <> show (numerator r) <> ")"
-        | otherwise = "(" <> show r <> ")"
+  show = unpack . showt
 
 instance TextShow (P Int Rational) where
   showb (P m)
