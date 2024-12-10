@@ -14,6 +14,9 @@ module Symtegration.Symbolic
     getUnaryFunction,
     getBinaryFunction,
     evaluate,
+
+    -- * Pattern synonyms.
+    (:+:),
   )
 where
 
@@ -103,6 +106,8 @@ data BinaryFunction
     LogBase
   deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic)
   deriving TextShow via FromGeneric BinaryFunction
+
+pattern (:+:) = BinaryApply Add
 
 instance IsString Expression where
   fromString = Symbol . fromString
