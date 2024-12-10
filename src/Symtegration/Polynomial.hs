@@ -58,6 +58,7 @@ class (Integral e, Num c) => Polynomial p e c where
 
   -- | Fold the terms, i.e., the powers and coefficients, using the given monoid.
   -- Only terms with non-zero coefficients will be folded.
+  -- Folding is ordered from higher to lower terms.
   foldTerms :: (Monoid m) => (e -> c -> m) -> p e c -> m
 
   -- | Multiplies a polynomial by a scalar.
@@ -78,6 +79,16 @@ class (Integral e, Num c) => Polynomial p e c where
 
 fromExpression :: (Polynomial p e c, Fractional c) => Expression -> Maybe (p e c)
 fromExpression = undefined
+
+{-
+  where
+    toTerm (Number n) = Just $ fromInteger n
+    toTerm (UnaryApply Negate (Number n)) = Just $ negate $ fromInteger n
+    toTerm (BinaryApply Divide (Number n) (Number m)) = Just $ fromRational (n % m)
+    toTerm (UnaryApply Negate (BinaryApply Divide (Number n) (Number m))) =
+      Just $ negate $ fromRational (n % m)
+    toTerm _ = undefined
+-}
 
 toExpression :: (Polynomial p e c, Real c) => p e c -> Text -> Expression
 toExpression p s = getSum $ foldTerms convert p
