@@ -28,6 +28,7 @@ library
       Symtegration
       Symtegration.Polynomial
       Symtegration.Polynomial.Indexed
+      Symtegration.Polynomial.Symbolic
       Symtegration.Symbolic
       Symtegration.Symbolic.Haskell
       Symtegration.Symbolic.Simplify.RecursiveHeuristic

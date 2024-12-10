@@ -10,8 +10,6 @@
 module Symtegration.Polynomial
   ( -- * Polynomials
     Polynomial (..),
-    fromExpression,
-    toExpression,
 
     -- * Algorithms
     divide,
@@ -21,9 +19,6 @@ module Symtegration.Polynomial
 where
 
 import Data.Monoid (Sum (..))
-import Data.Ratio (denominator, numerator)
-import Data.Text (Text)
-import Symtegration.Symbolic
 
 -- $setup
 -- >>> import Data.Ratio ((%))
@@ -81,41 +76,6 @@ class (Integral e, Num c) => Polynomial p e c where
   -- >>> power 5 :: IndexedPolynomial
   -- x^5
   power :: e -> p e c
-
-fromExpression ::
-  (Polynomial p e c, Num (p e c), Integral e, Fractional c) =>
-  (Text -> Maybe (p e c)) ->
-  Expression ->
-  Maybe (p e c)
-fromExpression _ (Number n) = Just $ fromInteger n
-fromExpression _ ((Number n) :/: (Number m)) = Just $ scale (n' / m') 1
-  where
-    n' = fromInteger n
-    m' = fromInteger m
-fromExpression symbolize (Symbol x) = symbolize x
-fromExpression s (Negate' x) = negate <$> fromExpression s x
-fromExpression s (x :+: y) = (+) <$> fromExpression s x <*> fromExpression s y
-fromExpression s (x :-: y) = (-) <$> fromExpression s x <*> fromExpression s y
-fromExpression s (x :*: y) = (*) <$> fromExpression s x <*> fromExpression s y
-fromExpression s (x :**: (Number n))
-  | (z : _) <- drop n' $ iterate (\v -> (*) <$> v <*> x') (Just 1) = z
-  | otherwise = Nothing
-  where
-    x' = fromExpression s x
-    n' = fromInteger n
-fromExpression _ _ = Nothing
-
-toExpression :: (Polynomial p e c, Real c) => Text -> p e c -> Expression
-toExpression s p = getSum $ foldTerms convert p
-  where
-    convert e c
-      | d == 1 = Sum xpower
-      | otherwise = Sum $ (fromInteger n / fromInteger d) * xpower
-      where
-        xpower = Symbol s ** Number (fromIntegral e)
-        r = toRational c
-        n = fromIntegral $ numerator r
-        d = fromIntegral $ denominator r
 
 -- | Polynomial division.  It returns the quotient polynomial and the remainder polynomial.
 --
