@@ -82,18 +82,21 @@ class (Integral e, Num c) => Polynomial p e c where
   -- x^5
   power :: e -> p e c
 
-fromExpression :: (Polynomial p e c, Fractional c) => Expression -> Maybe (p e c)
-fromExpression = undefined
-
-{-
-  where
-    toTerm (Number n) = Just $ fromInteger n
-    toTerm (UnaryApply Negate (Number n)) = Just $ negate $ fromInteger n
-    toTerm (BinaryApply Divide (Number n) (Number m)) = Just $ fromRational (n % m)
-    toTerm (UnaryApply Negate (BinaryApply Divide (Number n) (Number m))) =
-      Just $ negate $ fromRational (n % m)
-    toTerm _ = undefined
--}
+fromExpression :: (Polynomial p e c, Num (p e c), Integral e, Fractional c) => Expression -> Text -> Maybe (p e c)
+fromExpression (Number n) _ = Just $ fromInteger n
+fromExpression (Negate' (Number n)) _ = Just $ negate $ fromInteger n
+fromExpression ((Number n) :/: (Number m)) _ = Just $ scale (fromInteger n / fromInteger m) (power 0)
+fromExpression (Symbol x) s
+  | x == s = Just $ power 0
+  | otherwise = Nothing
+fromExpression (Negate' x) s = negate <$> fromExpression x s
+fromExpression (x :+: y) s = (+) <$> fromExpression x s <*> fromExpression y s
+fromExpression (x :-: y) s = (-) <$> fromExpression x s <*> fromExpression y s
+fromExpression (x :*: y) s = (*) <$> fromExpression x s <*> fromExpression y s
+fromExpression ((Symbol x) :**: (Number n)) s
+  | x == s = Just $ power (fromInteger n)
+  | otherwise = Nothing
+fromExpression _ _ = Nothing
 
 toExpression :: (Polynomial p e c, Real c) => p e c -> Text -> Expression
 toExpression p s = getSum $ foldTerms convert p
