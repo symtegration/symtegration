@@ -2,7 +2,7 @@
 -- Module: Symtegration.Polynomial.Indexed
 -- Description: A polynomial representation mapping the power of each term to its coefficient.
 -- Maintainer: dev@chungyc.org
-module Symtegration.Polynomial.Indexed (IndexedPolynomial) where
+module Symtegration.Polynomial.Indexed (IndexedPolynomial, IndexedSymbolicPolynomial) where
 
 import Data.IntMap (IntMap)
 import Data.IntMap qualified as IntMap
@@ -12,6 +12,7 @@ import Data.Monoid (Dual (..))
 import Data.Ratio (denominator, numerator)
 import Data.Text (unpack)
 import Symtegration.Polynomial
+import Symtegration.Symbolic
 import TextShow
 
 -- | Polynomial representation which maps the power of each term to its coefficient.
@@ -19,7 +20,14 @@ import TextShow
 -- It is an instance of the 'Polynomial' typeclass.
 type IndexedPolynomial = P Int Rational
 
+-- | Polynomial representation which maps the power of each term to its coefficient.
+-- Exponents are represented with 'Int', while coefficients are represented with 'Expression'.
+-- It is an instance of the 'Polynomial' typeclass.
+type IndexedSymbolicPolynomial = P Int Expression
+
 -- | Type with two type parameters so that it can be an instance of 'Polynomial'.
+-- The first type parameter is not involved in the data constructor;
+-- it is used to set the exponent type for 'Polynomial'.
 newtype P a b = P (IntMap b) deriving (Eq)
 
 instance Show (P Int Rational) where

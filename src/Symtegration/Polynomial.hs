@@ -82,24 +82,31 @@ class (Integral e, Num c) => Polynomial p e c where
   -- x^5
   power :: e -> p e c
 
-fromExpression :: (Polynomial p e c, Num (p e c), Integral e, Fractional c) => Expression -> Text -> Maybe (p e c)
-fromExpression (Number n) _ = Just $ fromInteger n
-fromExpression (Negate' (Number n)) _ = Just $ negate $ fromInteger n
-fromExpression ((Number n) :/: (Number m)) _ = Just $ scale (fromInteger n / fromInteger m) (power 0)
-fromExpression (Symbol x) s
-  | x == s = Just $ power 0
+fromExpression ::
+  (Polynomial p e c, Num (p e c), Integral e, Fractional c) =>
+  (Text -> Maybe (p e c)) ->
+  Expression ->
+  Maybe (p e c)
+fromExpression _ (Number n) = Just $ fromInteger n
+fromExpression _ ((Number n) :/: (Number m)) = Just $ scale (n' / m') 1
+  where
+    n' = fromInteger n
+    m' = fromInteger m
+fromExpression symbolize (Symbol x) = symbolize x
+fromExpression s (Negate' x) = negate <$> fromExpression s x
+fromExpression s (x :+: y) = (+) <$> fromExpression s x <*> fromExpression s y
+fromExpression s (x :-: y) = (-) <$> fromExpression s x <*> fromExpression s y
+fromExpression s (x :*: y) = (*) <$> fromExpression s x <*> fromExpression s y
+fromExpression s (x :**: (Number n))
+  | (z : _) <- drop n' $ iterate (\v -> (*) <$> v <*> x') (Just 1) = z
   | otherwise = Nothing
-fromExpression (Negate' x) s = negate <$> fromExpression x s
-fromExpression (x :+: y) s = (+) <$> fromExpression x s <*> fromExpression y s
-fromExpression (x :-: y) s = (-) <$> fromExpression x s <*> fromExpression y s
-fromExpression (x :*: y) s = (*) <$> fromExpression x s <*> fromExpression y s
-fromExpression ((Symbol x) :**: (Number n)) s
-  | x == s = Just $ power (fromInteger n)
-  | otherwise = Nothing
+  where
+    x' = fromExpression s x
+    n' = fromInteger n
 fromExpression _ _ = Nothing
 
-toExpression :: (Polynomial p e c, Real c) => p e c -> Text -> Expression
-toExpression p s = getSum $ foldTerms convert p
+toExpression :: (Polynomial p e c, Real c) => Text -> p e c -> Expression
+toExpression s p = getSum $ foldTerms convert p
   where
     convert e c
       | d == 1 = Sum xpower
