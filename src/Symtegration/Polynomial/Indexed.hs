@@ -67,6 +67,7 @@ instance (Eq a, Num a) => Polynomial P Int a where
   degree (P m) = maybe 0 fst $ IntMap.lookupMax m
   coefficient (P m) k = fromMaybe 0 $ IntMap.lookup k m
   leadingCoefficient (P m) = maybe 0 snd $ IntMap.lookupMax m
+  foldTerms f (P m) = IntMap.foldMapWithKey f m
   scale 0 _ = P IntMap.empty
   scale x (P m) = P $ IntMap.map (* x) m
   power n = P $ IntMap.singleton (fromIntegral n) 1

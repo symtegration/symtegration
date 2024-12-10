@@ -10,12 +10,20 @@
 module Symtegration.Polynomial
   ( -- * Polynomials
     Polynomial (..),
+    fromExpression,
+    toExpression,
 
     -- * Algorithms
     divide,
     extendedEuclidean,
+    integrate,
   )
 where
+
+import Data.Monoid (Sum (..))
+import Data.Ratio (denominator, numerator)
+import Data.Text (Text)
+import Symtegration.Symbolic
 
 -- $setup
 -- >>> import Data.Ratio ((%))
@@ -48,6 +56,10 @@ class (Integral e, Num c) => Polynomial p e c where
   -- 6 % 1
   leadingCoefficient :: p e c -> c
 
+  -- | Fold the terms, i.e., the powers and coefficients, using the given monoid.
+  -- Only terms with non-zero coefficients will be folded.
+  foldTerms :: (Monoid m) => (e -> c -> m) -> p e c -> m
+
   -- | Multiplies a polynomial by a scalar.
   --
   -- The following divides \(6x + 2\) by 2:
@@ -63,6 +75,21 @@ class (Integral e, Num c) => Polynomial p e c where
   -- >>> power 5 :: IndexedPolynomial
   -- x^5
   power :: e -> p e c
+
+fromExpression :: (Polynomial p e c, Fractional c) => Expression -> Maybe (p e c)
+fromExpression = undefined
+
+toExpression :: (Polynomial p e c, Real c) => p e c -> Text -> Expression
+toExpression p s = getSum $ foldTerms convert p
+  where
+    convert e c
+      | d == 1 = Sum xpower
+      | otherwise = Sum $ (fromInteger n / fromInteger d) * xpower
+      where
+        xpower = Symbol s ** Number (fromIntegral e)
+        r = toRational c
+        n = fromIntegral $ numerator r
+        d = fromIntegral $ denominator r
 
 -- | Polynomial division.  It returns the quotient polynomial and the remainder polynomial.
 --
@@ -119,3 +146,8 @@ extendedEuclidean u v = descend u v 1 0 0 1
         (q, r) = divide a b
         r1 = a1 - q * b1
         r2 = a2 - q * b2
+
+integrate :: (Polynomial p e c, Num (p e c), Fractional c) => p e c -> p e c
+integrate p = getSum $ foldTerms integrateTerm p
+  where
+    integrateTerm e c = Sum $ scale (c / (fromIntegral e + 1)) $ power $ e + 1
