@@ -27,6 +27,7 @@ library
   exposed-modules:
       Symtegration
       Symtegration.Polynomial
+      Symtegration.Polynomial.Indexed
       Symtegration.Symbolic
       Symtegration.Symbolic.Haskell
       Symtegration.Symbolic.Simplify.RecursiveHeuristic
@@ -67,6 +68,8 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Symtegration.FiniteDouble
+      Symtegration.Polynomial.Indexed.Arbitrary
+      Symtegration.Polynomial.IndexedSpec
       Symtegration.Symbolic.Arbitrary
       Symtegration.Symbolic.HaskellSpec
       Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec

@@ -14,7 +14,7 @@ import Test.QuickCheck
 import TextShow (showt)
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "toHaskellText" $ do
     prop "converts for number" $
       \n -> toHaskellText (Number n) `shouldBe` showt n

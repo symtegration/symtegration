@@ -19,7 +19,7 @@ evaluate' :: Expression -> Map Text Double -> Maybe Double
 evaluate' = evaluate
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "Expression from" $ modifyMaxSuccess (`div` 10) $ do
     describe "IsString" $ do
       prop "fromString" $

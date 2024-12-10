@@ -14,7 +14,7 @@ import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 spec :: Spec
-spec = modifyMaxSuccess (* 100) $ do
+spec = modifyMaxSuccess (* 100) $ parallel $ do
   describe "simplify" $ do
     prop "maintains semantics" $
       \(Complete e m) ->
