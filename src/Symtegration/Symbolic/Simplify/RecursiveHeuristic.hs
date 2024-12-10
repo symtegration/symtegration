@@ -23,7 +23,7 @@ import Symtegration.Symbolic
 -- "x ** 2"
 simplify :: Expression -> Expression
 simplify (UnaryApply func x)
-  | Negate <- func, UnaryApply Negate x'' <- x' = x''
+  | Negate <- func, Negate' x'' <- x' = x''
   | Negate <- func, Number n <- x', n < 0 = Number (-n)
   | otherwise = UnaryApply func x'
   where
@@ -40,7 +40,7 @@ simplify (BinaryApply func x y)
   | Subtract <- func, Number m <- x', Number n <- y' = Number (m - n)
   | Subtract <- func, Number 0 <- y' = x'
   | Subtract <- func, x' == y' = Number 0
-  | Divide <- func, Number 0 <- y' = BinaryApply Divide x' y'
+  | Divide <- func, Number 0 <- y' = x' :/: y'
   | Divide <- func, Number 1 <- y' = x'
   | Divide <- func,
     Number m <- x',
@@ -48,7 +48,7 @@ simplify (BinaryApply func x y)
       let d = gcd m n
           x'' = Number $ m `div` d
           y'' = Number $ n `div` d
-       in if n == d then x'' else BinaryApply Divide x'' y''
+       in if n == d then x'' else x'' :/: y''
   | Divide <- func, x' == y' = Number 1
   | otherwise = BinaryApply func x' y'
   where

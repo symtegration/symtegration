@@ -1,4 +1,5 @@
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE PatternSynonyms #-}
 
 -- |
 -- Module: Symtegration.Symbolic
@@ -15,8 +16,35 @@ module Symtegration.Symbolic
     getBinaryFunction,
     evaluate,
 
-    -- * Pattern synonyms.
-    (:+:),
+    -- * Pattern synonyms
+
+    -- ** Unary functions
+    pattern Negate',
+    pattern Abs',
+    pattern Signum',
+    pattern Exp',
+    pattern Log',
+    pattern Sqrt',
+    pattern Sin',
+    pattern Cos',
+    pattern Tan',
+    pattern Asin',
+    pattern Acos',
+    pattern Atan',
+    pattern Sinh',
+    pattern Cosh',
+    pattern Tanh',
+    pattern Asinh',
+    pattern Acosh',
+    pattern Atanh',
+
+    -- ** Binary functions
+    pattern (:+:),
+    pattern (:*:),
+    pattern (:-:),
+    pattern (:/:),
+    pattern (:**:),
+    pattern LogBase',
   )
 where
 
@@ -27,7 +55,7 @@ import Data.String (IsString, fromString)
 import Data.Text
 import GHC.Generics (Generic)
 import TextShow (TextShow)
-import TextShow.Generic (FromGeneric(..))
+import TextShow.Generic (FromGeneric (..))
 
 -- | Symbolic representation of a mathematical expression.
 --
@@ -47,7 +75,7 @@ data Expression
   | -- | Represents the application of a binary function.
     BinaryApply BinaryFunction Expression Expression
   deriving (Eq, Ord, Show, Read, Generic)
-  deriving TextShow via FromGeneric Expression
+  deriving (TextShow) via FromGeneric Expression
 
 -- | Symbolic representation for unary functions.
 data UnaryFunction
@@ -88,7 +116,27 @@ data UnaryFunction
   | -- | 'atanh'
     Atanh
   deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic)
-  deriving TextShow via FromGeneric UnaryFunction
+  deriving (TextShow) via FromGeneric UnaryFunction
+
+pattern Negate', Abs', Signum', Exp', Log', Sqrt', Sin', Cos', Tan', Asin', Acos', Atan', Sinh', Cosh', Tanh', Asinh', Acosh', Atanh' :: Expression -> Expression
+pattern Negate' x = UnaryApply Negate x
+pattern Abs' x = UnaryApply Abs x
+pattern Signum' x = UnaryApply Signum x
+pattern Exp' x = UnaryApply Exp x
+pattern Log' x = UnaryApply Log x
+pattern Sqrt' x = UnaryApply Sqrt x
+pattern Sin' x = UnaryApply Sin x
+pattern Cos' x = UnaryApply Cos x
+pattern Tan' x = UnaryApply Tan x
+pattern Asin' x = UnaryApply Asin x
+pattern Acos' x = UnaryApply Acos x
+pattern Atan' x = UnaryApply Atan x
+pattern Sinh' x = UnaryApply Sinh x
+pattern Cosh' x = UnaryApply Cosh x
+pattern Tanh' x = UnaryApply Tanh x
+pattern Asinh' x = UnaryApply Asinh x
+pattern Acosh' x = UnaryApply Acosh x
+pattern Atanh' x = UnaryApply Atanh x
 
 -- | Symbolic representation for binary functions.
 data BinaryFunction
@@ -105,9 +153,15 @@ data BinaryFunction
   | -- | 'logBase'
     LogBase
   deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic)
-  deriving TextShow via FromGeneric BinaryFunction
+  deriving (TextShow) via FromGeneric BinaryFunction
 
-pattern (:+:) = BinaryApply Add
+pattern (:+:), (:*:), (:-:), (:/:), (:**:), LogBase' :: Expression -> Expression -> Expression
+pattern x :+: y = BinaryApply Add x y
+pattern x :*: y = BinaryApply Multiply x y
+pattern x :-: y = BinaryApply Subtract x y
+pattern x :/: y = BinaryApply Divide x y
+pattern x :**: y = BinaryApply Power x y
+pattern LogBase' x y = BinaryApply LogBase x y
 
 instance IsString Expression where
   fromString = Symbol . fromString
