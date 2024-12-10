@@ -59,6 +59,11 @@ class (Integral e, Num c) => Polynomial p e c where
   -- | Fold the terms, i.e., the powers and coefficients, using the given monoid.
   -- Only terms with non-zero coefficients will be folded.
   -- Folding is ordered from higher to lower terms.
+  --
+  -- For example with \(3x^5 - 2x + 7\),
+  --
+  -- >>> foldTerms (\e c -> show (e, c)) (3 * power 5 - 2 * power 1 + 7 :: IndexedPolynomial)
+  -- "(5,3 % 1)(1,(-2) % 1)(0,7 % 1)"
   foldTerms :: (Monoid m) => (e -> c -> m) -> p e c -> m
 
   -- | Multiplies a polynomial by a scalar.
