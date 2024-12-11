@@ -51,6 +51,8 @@ tests:
     - hspec >= 2.11 && < 2.12
     - quickcheck-instances >= 0.3 && < 0.4
     - QuickCheck >= 2.14 && < 2.15
+    build-tool-depends:
+    - hspec-discover >= 2.11 && < 2.12
 
     when:
       condition: false
