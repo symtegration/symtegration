@@ -8,6 +8,18 @@
 -- Other modules are used for finer control over what happens,
 -- or for supporting the work that yet other modules do.
 --
+-- For example, with \(\int (4x^3 + 1) \, dx = x^4 + x\):
+--
+-- >>> import Symtegration
+-- >>> toHaskellText <$> integrate "x" (4 * "x" ** 3 + 1)
+-- Just "(x ** 4) + x"
+--
+-- For another example, with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):
+--
+-- >>> import Symtegration
+-- >>> toHaskellText <$> integrate "z" ("x" * "z" + "y")
+-- Just "((x / 2) * (z ** 2)) + (y * z)"
+--
 -- For symbolic differentiation, use [automatic differentiation](https://hackage.haskell.org/package/ad).
 -- For example,
 --
@@ -29,8 +41,6 @@ module Symtegration
     toHaskellText,
 
     -- * Simplification
-
-    --
 
     -- | When using only this module, explicitly simplifying mathematical expressions
     -- should usually not be necessary, since the exported functions automatically
