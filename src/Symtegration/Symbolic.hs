@@ -58,7 +58,16 @@ import GHC.Generics (Generic)
 import TextShow (TextShow)
 import TextShow.Generic (FromGeneric (..))
 
+-- $setup
+-- >>> import Symtegration
+
 -- | Symbolic representation of a mathematical expression.
+-- It is an instance of the 'Num', 'Fractional', and 'Floating' type classes,
+-- so normal Haskell expressions can be used, although the expressions
+-- are limited to using the functions defined by these type classses.
+-- The type is also an instance of the 'IsString' type class,
+-- so symbols can be expressed as Haskell string with the @OverloadedStrings@ extension.
+-- The structure of these values is intended to be visible.
 --
 -- >>> 2 :: Expression
 -- Number 2
@@ -66,6 +75,11 @@ import TextShow.Generic (FromGeneric (..))
 -- Symbol "x"
 -- >>> 2 + sin "x" :: Expression
 -- BinaryApply Add (Number 2) (UnaryApply Sin (Symbol "x"))
+--
+-- A somewhat more concise representation can be obtained using 'Symtegration.toHaskellText':
+--
+-- >>> toHaskellText $ 2 * "y" + sin "x"
+-- "(2 * y) + (sin x)"
 data Expression
   = -- | Represents a concrete number.
     Number Integer

@@ -4,13 +4,39 @@ This is a Haskell library intended to support symbolic integration of mathematic
 
 It offers the following:
 
-*   TODO: Symbolic integration of mathematical expressions.
+*   Symbolic integration of mathematical expressions.
+
+    *   Currently, only simple integration of polynomials is supported.
 
 *   Symbolic representation of mathematical expressions.
 
 *   Utility functions to make it easier to read the mathematical expressions.
     For example, deriving equivalent Haskell code for a mathematical expression,
     and rudimentary support to simplify the symbolic representation.
+
+## Integration
+
+Mathematical expressions with either numeric coefficients or symbolic coefficients
+can be integrated.  For example:
+
+```haskell
+>>> import Symtegration
+>>> toHaskellText <$> integrate "x" (4 * "x" ** 3 + 1)
+Just "(x ** 4) + x"
+>>> toHaskellText <$> integrate "z" ("x" * "z" + "y")
+Just "((x / 2) * (z ** 2)) + (y * z)"
+```
+
+Concrete numbers can also be computed from these integrals.  For example:
+
+```haskell
+>>> import Symtegration
+>>> import Data.Map qualified as Map
+>>> let assignments = Map.singleton "x" (3 / 7 :: Rational)
+>>> let (Just p) = integrate "x" (4 * "x" ** 3 + 1)
+>>> fractionalEvaluate p assignments
+Just (1110 % 2401)
+```
 
 ## Differentiation
 

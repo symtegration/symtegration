@@ -4,8 +4,12 @@
 -- Maintainer: dev@chungyc.org
 --
 -- Symtegration is a library for symbolic integration of mathematical expressions.
+-- For normal use, this is the only module which needs to be loaded.
+-- Other modules are used for finer control over what happens,
+-- or for supporting the work that yet other modules do.
 --
--- For symbolic differentiation, use automatic differentiation.
+-- For symbolic differentiation, use [automatic differentiation](https://hackage.haskell.org/package/ad).
+-- For example,
 --
 -- >>> import Numeric.AD
 -- >>> diff (\x -> x + 1) ("x" :: Expression)
