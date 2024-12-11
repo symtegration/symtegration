@@ -2,8 +2,10 @@ name: Documentation
 
 on:
   push:
-    branch:
+    branches:
       - 'main'
+    paths:
+      - '**.hs'
 
 jobs:
   haddock:

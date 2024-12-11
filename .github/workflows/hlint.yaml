@@ -1,7 +1,7 @@
 name: HLint
 on:
   push:
-    branch:
+    branches:
       - 'main'
 
   pull_request:
