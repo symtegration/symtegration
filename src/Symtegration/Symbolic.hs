@@ -315,7 +315,14 @@ evaluate (BinaryApply fun expr1 expr2) m = f <$> v1 <*> v2
 --
 -- >>> evaluate p $ Map.singleton "x" (2 / 7 :: Double)
 -- Just 2.3026441978353196
-fractionalEvaluate :: (Eq a, Fractional a) => Expression -> Map Text a -> Maybe a
+fractionalEvaluate ::
+  (Eq a, Fractional a) =>
+  -- | Mathematical expression to evaluate.
+  Expression ->
+  -- | Map of symbols to concrete values.
+  Map Text a ->
+  -- | Evaluation result.
+  Maybe a
 fractionalEvaluate (Number n) _ = Just $ fromInteger n
 fractionalEvaluate (Symbol x) m = Map.lookup x m
 fractionalEvaluate (Negate' x) m = negate <$> fractionalEvaluate x m

@@ -25,11 +25,20 @@ module Symtegration
     -- * Integration
     integrate,
 
-    -- * Simplification
-    simplify,
-
     -- * Conversion
     toHaskellText,
+
+    -- * Simplification
+
+    --
+
+    -- | When using only this module, explicitly simplifying mathematical expressions
+    -- should usually not be necessary, since the exported functions automatically
+    -- simplify results as appropriate.  One may want to explicitly simplify
+    -- mathematical expressions when used with other packages, however,
+    -- such as when using [Numeric.AD](https://hackage.haskell.org/package/ad)
+    -- for differentiation.
+    simplify,
   )
 where
 
@@ -40,7 +49,7 @@ import Symtegration.Symbolic.Haskell (toHaskellText)
 import Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify)
 
 -- |
--- Return the indefinite integral of a mathematical expression given
+-- Returns the indefinite integral of a mathematical expression given
 -- its symbolic representation.  It will return 'Nothing' if it is
 -- unable to derive an integral.  The indefinite integral will be
 -- simplified to a certain extent.
@@ -56,5 +65,11 @@ import Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify)
 --
 -- >>> toHaskellText <$> integrate "z" ("x" * "z" + "y")
 -- Just "((x / 2) * (z ** 2)) + (y * z)"
-integrate :: Text -> Expression -> Maybe Expression
+integrate ::
+  -- | The symbol representing the variable being integrated over.
+  Text ->
+  -- | The mathematical expression being integrated.
+  Expression ->
+  -- | The indefinite integral, if derived.
+  Maybe Expression
 integrate var expr = simplify <$> Integration.integrate var expr
