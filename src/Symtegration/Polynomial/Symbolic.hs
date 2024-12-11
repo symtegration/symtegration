@@ -84,5 +84,5 @@ toRationalCoefficient c
     n = fromInteger $ numerator r
     d = fromInteger $ denominator r
 
-toAbstractCoefficient :: Expression -> Expression
-toAbstractCoefficient = id
+toSymbolicCoefficient :: Expression -> Expression
+toSymbolicCoefficient = id
