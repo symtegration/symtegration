@@ -1,13 +1,27 @@
 module Symtegration.Polynomial.Symbolic where
 
+import Data.Maybe (fromMaybe)
 import Data.Monoid (Sum (..))
 import Data.Ratio (denominator, numerator)
 import Data.Text (Text)
 import Symtegration.Polynomial
 import Symtegration.Symbolic
 
+-- $setup
+-- >>> import Symtegration
+-- >>> import Symtegration.Polynomial
+-- >>> import Symtegration.Polynomial.Indexed
+
+-- |
+-- >>> fromExpression (forVariable "x") (("x" + 4) ** 3) :: Maybe IndexedPolynomial
+-- Just x^3 + 12x^2 + 48x + 64
+--
+-- >>> let expr = ("a" + "b") * "x" + "c" :: Expression
+-- >>> let (Just p) = fromExpression (withSymbolicCoefficients (forVariable "x")) expr :: Maybe IndexedSymbolicPolynomial
+-- >>> toHaskellText $ simplify $ coefficient p 1
+-- "a + b"
 fromExpression ::
-  (Polynomial p e c, Num (p e c), Integral e, Fractional c) =>
+  (Polynomial p e c, Num (p e c), Fractional c) =>
   (Text -> Maybe (p e c), Expression -> Maybe c) ->
   Expression ->
   Maybe (p e c)
@@ -28,19 +42,45 @@ fromExpression (_, eval) e
   | Just e' <- eval e = Just $ scale e' 1
   | otherwise = Nothing
 
-forVariable :: (Polynomial p e c) => Text -> Text -> Maybe (p e c)
-forVariable x s
-  | x == s = Just $ power 1
-  | otherwise = Nothing
+forVariable ::
+  (Polynomial p e c, Num (p e c), Fractional c) =>
+  Text ->
+  (Text -> Maybe (p e c), Expression -> Maybe c)
+forVariable v = (fromSymbol, toCoefficient)
+  where
+    fromSymbol s
+      | v == s = Just $ power 1
+      | otherwise = Nothing
 
-withSymbolicCoefficientsForVariable ::
-  (Polynomial p e Expression) =>
-  Text ->
-  Text ->
-  Maybe (p e Expression)
-withSymbolicCoefficientsForVariable x s
-  | x == s = Just $ power 1
-  | otherwise = Just $ scale (Symbol s) $ power 0
+    toCoefficient (Symbol _) = Nothing
+    toCoefficient (Number n) = Just $ fromInteger n
+    toCoefficient (Negate' x) = negate <$> toCoefficient x
+    toCoefficient (Abs' x) = abs <$> toCoefficient x
+    toCoefficient (Signum' x) = signum <$> toCoefficient x
+    toCoefficient (x :+: y) = (+) <$> toCoefficient x <*> toCoefficient y
+    toCoefficient (x :*: y) = (*) <$> toCoefficient x <*> toCoefficient y
+    toCoefficient (x :-: y) = (-) <$> toCoefficient x <*> toCoefficient y
+    toCoefficient (x :/: y) = (/) <$> toCoefficient x <*> toCoefficient y
+    toCoefficient (x :**: (Number n)) = (^^ n) <$> toCoefficient x
+    toCoefficient _ = Nothing
+
+withSymbolicCoefficients ::
+  (Polynomial p e Expression, Num (p e Expression), Integral e) =>
+  (Text -> Maybe (p e Expression), Expression -> Maybe Expression) ->
+  (Text -> Maybe (p e Expression), Expression -> Maybe Expression)
+withSymbolicCoefficients (fromSymbol, _) = (fromSymbol', toCoefficient)
+  where
+    fromSymbol' s = Just $ fromMaybe (scale (Symbol s) 1) (fromSymbol s)
+
+    toCoefficient e@(Symbol s)
+      | Nothing <- fromSymbol s = Just e
+      | otherwise = Nothing
+    toCoefficient e@(Number _) = Just e
+    toCoefficient (UnaryApply func x) = UnaryApply func <$> toCoefficient x
+    toCoefficient (BinaryApply func x y) = BinaryApply func <$> x' <*> y'
+      where
+        x' = toCoefficient x
+        y' = toCoefficient y
 
 toExpression :: (Polynomial p e c) => Text -> (c -> Expression) -> p e c -> Expression
 toExpression x cf p = getSum $ foldTerms convert p
