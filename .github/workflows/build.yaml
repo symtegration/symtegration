@@ -23,7 +23,7 @@ jobs:
 
         ghc:
           - "9.6.6"
-          - "9.8.4"
+          - "9.10.1"
 
     name: cabal / ${{ matrix.os }} / ghc ${{ matrix.ghc }}
     runs-on: ${{ matrix.os }}
