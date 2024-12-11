@@ -42,7 +42,7 @@ jobs:
           echo "docs=$(stack path --local-doc-root --no-haddock-deps)/symtegration-$(stack query locals symtegration version)" >> $GITHUB_OUTPUT
 
       - name: Upload
-        uses: actions/upload-pages-artifact@v356afc609e74202658d3ffba0e8f6dda462b719fa #v3.0.1
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa #v3.0.1
         with:
           path: ${{ steps.build.outputs.docs }}
 
