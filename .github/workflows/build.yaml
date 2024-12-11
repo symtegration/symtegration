@@ -1,0 +1,78 @@
+name: Build
+permissions: read-all
+
+on:
+  push:
+    branch:
+      - main
+
+  pull_request:
+    paths:
+      - 'stack.yaml'
+      - 'package.yaml'
+      - 'symtegration.cabal'
+      - '**.hs'
+
+jobs:
+  cabal:
+    # We will test only lower and upper bounds.
+    strategy:
+      matrix:
+        os:
+          - "ubuntu-latest"
+
+        ghc:
+          - "9.6.6"
+
+    name: cabal / ${{ matrix.os }} / ghc ${{ matrix.ghc }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Cache dependencies
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: ~/.cabal
+          key: cabal-${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('symtegration.cabal') }}
+          restore-keys: cabal-${{ runner.os }}-${{ matrix.ghc }}
+
+      - name: Setup Haskell
+        uses: haskell-actions/setup@dd344bc1cec854a369df8814ce17ef337d6e6170 # v2.7.6
+        with:
+          ghc-version: ${{ matrix.ghc }}
+
+      - name: Build
+        run: |
+          cabal configure --disable-optimization --enable-tests
+          cabal build
+
+      - name: Test
+        run: cabal test
+
+  stack:
+    name: stack
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Cache dependencies
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: ~/.stack
+          key: stack-${{ hashFiles('stack.yaml', 'package.yaml') }}
+          restore-keys: stack
+
+      - name: Setup Haskell
+        uses: haskell-actions/setup@dd344bc1cec854a369df8814ce17ef337d6e6170 # v2.7.6
+        with:
+          enable-stack: true
+
+      - name: Build
+        run: stack build --test --no-run-tests
+
+      - name: Test
+        run: stack build --test
