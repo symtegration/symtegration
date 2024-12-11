@@ -11,6 +11,7 @@ on:
       - 'stack.yaml'
       - 'package.yaml'
       - 'symtegration.cabal'
+      - '.github/workflows/**'
       - '**.hs'
 
 jobs:
@@ -22,7 +23,7 @@ jobs:
           - "ubuntu-latest"
 
         ghc:
-          - "9.6.6"
+          - "9.4.8"
           - "9.10.1"
 
     name: cabal / ${{ matrix.os }} / ghc ${{ matrix.ghc }}
