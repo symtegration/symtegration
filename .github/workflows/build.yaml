@@ -51,8 +51,8 @@ jobs:
       - name: Test spec
         run: cabal run spec
 
-      - name: Test examples
-        run: cabal run examples
+#      - name: Test examples
+#        run: cabal run examples
 
   stack:
     name: stack

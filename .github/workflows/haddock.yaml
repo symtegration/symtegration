@@ -38,8 +38,8 @@ jobs:
       - name: Build
         id: build
         run: |
-          stack haddock
-          echo "docs=$(stack path --local-doc-root --no-haddock-deps)/symtegration-$(stack query locals symtegration version)" >> $GITHUB_OUTPUT
+          stack haddock --no-haddock-deps
+          echo "docs=$(stack path --local-doc-root --no-haddock-deps)" >> $GITHUB_OUTPUT
 
       - name: Upload
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa #v3.0.1
