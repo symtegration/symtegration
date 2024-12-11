@@ -5,9 +5,11 @@ module Symtegration.SymbolicSpec (spec) where
 
 import Data.Map (Map)
 import Data.Map qualified as Map
+import Data.Maybe (isJust)
 import Data.Ratio (denominator, numerator)
 import Data.String (fromString)
 import Data.Text (Text)
+import Symtegration.FiniteDouble
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Arbitrary
 import Test.Hspec
@@ -135,6 +137,19 @@ spec = parallel $ do
 
     prop "nothing" $
       \(Complete e m) -> not (Map.null m) ==> evaluate' e Map.empty `shouldBe` Nothing
+
+  describe "Expression fractionally evaluates as" $ do
+    prop "number" $ \n m ->
+      fractionalEvaluate (Number n) m `shouldBe` Just (fromInteger n :: Rational)
+
+    prop "symbol" $ \s x m ->
+      fractionalEvaluate (Symbol s) (Map.insert s x m) `shouldBe` Just (x :: Rational)
+
+    prop "similar to evaluate" $ \(Complete e m) ->
+      let v = fractionalEvaluate e (Map.map toRational m)
+          v' = evaluate e (Map.map FiniteDouble m)
+       in isJust v && maybe False isFinite v' ==>
+            Near . FiniteDouble . fromRational <$> v `shouldBe` Near <$> v'
 
   describe "unary functions are correctly mapped for" $ do
     mapM_

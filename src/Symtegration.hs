@@ -16,6 +16,7 @@ module Symtegration
   ( -- * Symbolic representation
     Expression,
     evaluate,
+    fractionalEvaluate,
 
     -- * Simplification
     simplify,
@@ -25,6 +26,6 @@ module Symtegration
   )
 where
 
-import Symtegration.Symbolic (Expression, evaluate)
+import Symtegration.Symbolic (Expression, evaluate, fractionalEvaluate)
 import Symtegration.Symbolic.Haskell (toHaskellText)
 import Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify)
