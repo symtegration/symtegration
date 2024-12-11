@@ -4,7 +4,7 @@ permissions: read-all
 on:
   push:
     branch:
-      - main
+      - 'main'
 
   pull_request:
     paths:

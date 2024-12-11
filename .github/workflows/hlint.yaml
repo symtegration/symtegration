@@ -1,5 +1,14 @@
 name: HLint
-on: [push, pull_request]
+on:
+  push:
+    branch:
+      - 'main'
+
+  pull_request:
+    paths:
+      - '**.hs'
+      - '.hlint.yaml'
+      - '.github/workflows/hlint.yaml'
 
 jobs:
   hlint:
