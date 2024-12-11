@@ -49,7 +49,10 @@ jobs:
           cabal build
 
       - name: Test
-        run: cabal test
+        run: cabal run spec
+
+      - name: Test examples
+        run: cabal run examples
 
   stack:
     name: stack
