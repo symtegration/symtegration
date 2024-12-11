@@ -84,6 +84,8 @@ test-suite spec
   default-extensions:
       OverloadedStrings
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
+  build-tool-depends:
+      hspec-discover:hspec-discover ==2.11.*
   build-depends:
       QuickCheck ==2.14.*
     , base ==4.18.*
