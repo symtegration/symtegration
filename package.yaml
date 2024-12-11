@@ -30,7 +30,7 @@ ghc-options:
 
 dependencies:
 - base >= 4.18 && < 4.21
-- containers >= 0.6 && < 0.7
+- containers >= 0.6 && < 0.8
 - text >= 2.0 && < 2.2
 - text-show >= 3.10 && < 3.11
 
@@ -47,7 +47,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - symtegration
-    - containers >= 0.6 && < 0.7
+    - containers >= 0.6 && < 0.8
     - hspec >= 2.11 && < 2.12
     - quickcheck-instances >= 0.3 && < 0.4
     - QuickCheck >= 2.14 && < 2.15
@@ -68,5 +68,5 @@ tests:
     dependencies:
     - symtegration
     - ad >= 4.5 && < 4.6
-    - containers >= 0.6 && < 0.7
+    - containers >= 0.6 && < 0.8
     - doctest-parallel >= 0.3 && < 0.4
