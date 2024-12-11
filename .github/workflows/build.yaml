@@ -45,14 +45,11 @@ jobs:
 
       - name: Build
         run: |
-          cabal configure --disable-optimization --enable-tests
+          cabal configure --disable-optimization --enable-tests --write-ghc-environment-files=always
           cabal build
 
-      - name: Test spec
-        run: cabal run spec
-
-#      - name: Test examples
-#        run: cabal run examples
+      - name: Test
+        run: cabal test
 
   stack:
     name: stack
