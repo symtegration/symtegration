@@ -40,12 +40,7 @@ fromExpression t (Negate' x) = negate <$> fromExpression t x
 fromExpression t (x :+: y) = (+) <$> fromExpression t x <*> fromExpression t y
 fromExpression t (x :*: y) = (*) <$> fromExpression t x <*> fromExpression t y
 fromExpression t (x :-: y) = (-) <$> fromExpression t x <*> fromExpression t y
-fromExpression t (x :**: (Number n))
-  | (z : _) <- drop n' $ iterate (\v -> (*) <$> v <*> x') (Just 1) = z
-  | otherwise = Nothing
-  where
-    x' = fromExpression t x
-    n' = fromInteger n
+fromExpression t (x :**: (Number n)) = (`exponentiate` n) <$> fromExpression t x
 fromExpression _ (_ :**: _) = Nothing
 fromExpression _ (Number n :/: Number m) = Just $ scale r 1
   where
@@ -53,6 +48,11 @@ fromExpression _ (Number n :/: Number m) = Just $ scale r 1
 fromExpression (_, eval) e
   | Just e' <- eval e = Just $ scale e' 1
   | otherwise = Nothing
+
+exponentiate :: (Num a, Integral b) => a -> b -> a
+exponentiate _ 0 = 1
+exponentiate x n | even n = exponentiate (x*x) (n `div` 2)
+                 | otherwise = x * exponentiate (x*x) (n `div` 2)
 
 forVariable :: (Polynomial p e c) => Text -> Text -> Maybe (p e c)
 forVariable x s
