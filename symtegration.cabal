@@ -26,6 +26,8 @@ source-repository head
 library
   exposed-modules:
       Symtegration
+      Symtegration.Integration
+      Symtegration.Integration.Polynomial
       Symtegration.Polynomial
       Symtegration.Polynomial.Indexed
       Symtegration.Polynomial.Symbolic

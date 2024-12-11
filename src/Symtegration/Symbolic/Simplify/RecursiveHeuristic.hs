@@ -50,6 +50,7 @@ simplify (BinaryApply func x y)
           y'' = Number $ n `div` d
        in if n == d then x'' else x'' :/: y''
   | Divide <- func, x' == y' = Number 1
+  | Power <- func, y' == Number 1 = x'
   | otherwise = BinaryApply func x' y'
   where
     x' = simplify x
