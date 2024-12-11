@@ -44,7 +44,7 @@ library
   build-depends:
       base >=4.18 && <4.21
     , containers ==0.6.*
-    , text ==2.0.*
+    , text >=2.0 && <2.2
     , text-show ==3.10.*
   default-language: GHC2021
 
@@ -62,7 +62,7 @@ test-suite examples
     , containers ==0.6.*
     , doctest-parallel ==0.3.*
     , symtegration
-    , text ==2.0.*
+    , text >=2.0 && <2.2
     , text-show ==3.10.*
   default-language: GHC2021
 
@@ -93,6 +93,6 @@ test-suite spec
     , hspec ==2.11.*
     , quickcheck-instances ==0.3.*
     , symtegration
-    , text ==2.0.*
+    , text >=2.0 && <2.2
     , text-show ==3.10.*
   default-language: GHC2021
