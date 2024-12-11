@@ -1,6 +1,8 @@
 -- |
 -- Module: Symtegration.Polynomial.Indexed
 -- Description: A polynomial representation mapping the power of each term to its coefficient.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.Indexed (IndexedPolynomial, IndexedSymbolicPolynomial) where
 

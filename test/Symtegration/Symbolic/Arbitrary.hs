@@ -2,6 +2,8 @@
 
 -- |
 -- Description: QuickCheck Arbitrary instances for generating Symtegration.Symbolic values.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Symbolic.Arbitrary
   ( Simple (..),

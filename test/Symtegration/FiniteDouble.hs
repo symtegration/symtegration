@@ -1,5 +1,7 @@
 -- |
 -- Description: A variant of 'Double' without infinities or multiple zeroes.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
 -- 'FiniteDouble' is a variant of 'Double' which avoids sensitivities

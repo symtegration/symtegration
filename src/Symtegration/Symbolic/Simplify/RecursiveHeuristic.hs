@@ -1,6 +1,8 @@
 -- |
 -- Module: Symtegration.Symbolic.Simplify.RecursiveHeuristic
 -- Description: Simplification of mathematical expressions with recursive heuristics.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
 -- Supports simplification of the symbolic representation of a mathematical expression

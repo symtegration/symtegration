@@ -4,6 +4,8 @@
 -- |
 -- Module: Symtegration.Symbolic
 -- Description: Library for symbolically representing mathematical expressions.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Symbolic
   ( -- * Representation

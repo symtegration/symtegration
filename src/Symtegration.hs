@@ -1,6 +1,8 @@
 -- |
 -- Module: Symtegration
 -- Description: Library for symbolic integration of mathematical expressions.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
 -- Symtegration is a library for symbolic integration of mathematical expressions.

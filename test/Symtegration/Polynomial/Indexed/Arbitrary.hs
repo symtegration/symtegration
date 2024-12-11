@@ -1,5 +1,10 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
+-- |
+-- Description: Generate arbitrary instances of 'IndexedPolynomial'.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
+-- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.Indexed.Arbitrary where
 
 import Symtegration.Polynomial

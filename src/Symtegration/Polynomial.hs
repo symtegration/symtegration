@@ -1,6 +1,8 @@
 -- |
 -- Module: Symtegration.Polynomial
 -- Description: Polynomials for Symtegration.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
 -- This modules defines a type class that concrete types representing polynomials

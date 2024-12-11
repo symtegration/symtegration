@@ -1,6 +1,8 @@
 -- |
 -- Module: Symtegration.Symbolic.Haskell
 -- Description: Converts a symbolic representation of a mathematical expression into equivalent Haskell code.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
 -- Support for converting symbolic representations of mathematical expressions
