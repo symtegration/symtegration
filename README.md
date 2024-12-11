@@ -83,3 +83,11 @@ Number 1
 ```
 
 [automatic differentiation]: https://hackage.haskell.org/package/ad
+
+## Code of conduct
+
+Be nice; see [`CODE_OF_CONDUCT.md`](docs/CODE_OF_CONDUCT.md) for details.
+
+## License
+
+Apache 2.0; see [`LICENSE`](LICENSE) for details.
