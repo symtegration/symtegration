@@ -48,8 +48,11 @@ jobs:
           cabal configure --disable-optimization --enable-tests
           cabal build
 
-      - name: Test
-        run: cabal test
+      - name: Test spec
+        run: cabal run spec
+
+      - name: Test examples
+        run: cabal run examples
 
   stack:
     name: stack
