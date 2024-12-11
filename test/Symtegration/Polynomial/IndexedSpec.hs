@@ -3,7 +3,7 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.IndexedSpec (spec) where
 
-import Data.List (dropWhileEnd, foldl')
+import Data.List (dropWhileEnd)
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Indexed.Arbitrary ()
@@ -32,7 +32,7 @@ spec = parallel $ describe "IndexedPolynomial" $ do
 
   prop "from series of powers" $ \cs ->
     let cs' = dropWhileEnd (== 0) cs
-        p = foldl' accumulate 0 (zip [0 ..] cs') :: IndexedPolynomial
+        p = foldl accumulate 0 (zip [0 ..] cs') :: IndexedPolynomial
         accumulate p' (e, c) = p' + scale c (power e)
      in not (null cs') ==> getCoefficients p `shouldBe` cs'
 
