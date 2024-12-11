@@ -280,7 +280,28 @@ evaluate (BinaryApply fun expr1 expr2) m = f <$> v1 <*> v2
     v1 = evaluate expr1 m
     v2 = evaluate expr2 m
 
-fractionalEvaluate :: (Fractional a) => Expression -> Map Text a -> Maybe a
+-- |
+-- Evaluates a mathematical expression with only operations available to 'Fractional' values.
+-- In particular, this allows exact evaluations with 'Rational' values.
+-- 'Nothing' will be returned if a function not supported by all 'Fractional' values
+-- is used by the mathematical expression.
+--
+-- As an exception, the '(**)' operator is allowed with constant integer exponents,
+-- even though '(**)' is not a function applicable to all 'Fractional' types.
+--
+-- For example,
+--
+-- >>> import Data.Map qualified as Map
+-- >>> let p = 1 / (3 * "x"**5 - 2 * "x" + 1) :: Expression
+-- >>> fractionalEvaluate p $ Map.singleton "x" (2 / 7 :: Rational)
+-- Just (16807 % 7299)
+--
+-- Compare against 'evaluate', which cannot even use 'Rational' computations
+-- because 'Rational' is not an instance of the 'Floating' type class:
+--
+-- >>> evaluate p $ Map.singleton "x" (2 / 7 :: Double)
+-- Just 2.3026441978353196
+fractionalEvaluate :: (Eq a, Fractional a) => Expression -> Map Text a -> Maybe a
 fractionalEvaluate (Number n) _ = Just $ fromInteger n
 fractionalEvaluate (Symbol x) m = Map.lookup x m
 fractionalEvaluate (Negate' x) m = negate <$> fractionalEvaluate x m
@@ -289,8 +310,11 @@ fractionalEvaluate (Signum' x) m = signum <$> fractionalEvaluate x m
 fractionalEvaluate (x :+: y) m = (+) <$> fractionalEvaluate x m <*> fractionalEvaluate y m
 fractionalEvaluate (x :-: y) m = (-) <$> fractionalEvaluate x m <*> fractionalEvaluate y m
 fractionalEvaluate (x :*: y) m = (*) <$> fractionalEvaluate x m <*> fractionalEvaluate y m
-fractionalEvaluate (x :/: y) m = (/) <$> fractionalEvaluate x m <*> fractionalEvaluate y m
-fractionalEvaluate (x :**: (Number n)) m
-  | n >= 0 = (^ n) <$> fractionalEvaluate x m
-  | otherwise = Nothing
+fractionalEvaluate (x :/: y) m
+  | Just 0 <- y' = Nothing
+  | otherwise = (/) <$> x' <*> y'
+  where
+    x' = fractionalEvaluate x m
+    y' = fractionalEvaluate y m
+fractionalEvaluate (x :**: (Number n)) m = (^^ n) <$> fractionalEvaluate x m
 fractionalEvaluate _ _ = Nothing
