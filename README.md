@@ -86,8 +86,18 @@ Number 1
 
 ## Code of conduct
 
-Be nice; see [`CODE_OF_CONDUCT.md`](docs/CODE_OF_CONDUCT.md) for details.
+Be nice; see [`CODE_OF_CONDUCT.md`] for details.
+
+[`CODE_OF_CONDUCT.md`]: docs/CODE_OF_CONDUCT.md
+
+## Security policy
+
+See [`SECURITY.md`] for details.
+
+[`SECURITY.md`]: docs/SECURITY.md
 
 ## License
 
-Apache 2.0; see [`LICENSE`](LICENSE) for details.
+Apache 2.0; see [`LICENSE`] for details.
+
+[`LICENSE`]: LICENSE
