@@ -38,6 +38,7 @@ jobs:
         with:
           path: ~/.cabal
           key: cabal-${{ matrix.os }}-${{ matrix.ghc }}-${{ hashFiles('symtegration.cabal') }}
+          restore-keys: cabal-${{ matrix.os }}-${{ matrix.ghc }}-
 
       - name: Setup Haskell
         uses: haskell-actions/setup@dd344bc1cec854a369df8814ce17ef337d6e6170 # v2.7.6
@@ -68,6 +69,7 @@ jobs:
         with:
           path: ~/.stack
           key: stack-${{ hashFiles('stack.yaml', 'package.yaml') }}
+          restore-keys: stack-
 
       - name: Setup Haskell
         uses: haskell-actions/setup@dd344bc1cec854a369df8814ce17ef337d6e6170 # v2.7.6
