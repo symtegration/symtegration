@@ -4,7 +4,7 @@ module Symtegration.Polynomial.Indexed.Arbitrary where
 
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Indexed
-import Test.QuickCheck (Arbitrary(..), arbitrarySizedNatural)
+import Test.QuickCheck (Arbitrary (..), arbitrarySizedNatural)
 
 instance Arbitrary IndexedPolynomial where
   arbitrary = scale <$> arbitrary <*> (power <$> arbitrarySizedNatural)

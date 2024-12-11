@@ -56,24 +56,24 @@ spec = parallel $ do
 
       prop "operators with numbers" $
         \op m n ->
-          (op /= LogBase)
-            ==> toHaskellText (BinaryApply op (Number m) (Number n))
-            `shouldBe` showt m <> " " <> getBinaryFunctionText op <> " " <> showt n
+          (op /= LogBase) ==>
+            toHaskellText (BinaryApply op (Number m) (Number n))
+              `shouldBe` showt m <> " " <> getBinaryFunctionText op <> " " <> showt n
 
       prop "operators with symbols" $
         \op s r ->
-          (op /= LogBase)
-            ==> toHaskellText (BinaryApply op (Symbol $ fromString s) (Symbol $ fromString r))
-            `shouldBe` fromString s <> " " <> getBinaryFunctionText op <> " " <> fromString r
+          (op /= LogBase) ==>
+            toHaskellText (BinaryApply op (Symbol $ fromString s) (Symbol $ fromString r))
+              `shouldBe` fromString s <> " " <> getBinaryFunctionText op <> " " <> fromString r
 
       prop "operators with compound arguments" $
         \op (Compound e1) (Compound e2) ->
-          (op /= LogBase)
-            ==> let text1 = toHaskellText e1
-                    text2 = toHaskellText e2
-                    optext = getBinaryFunctionText op
-                 in toHaskellText (BinaryApply op e1 e2)
-                      `shouldBe` "(" <> text1 <> ") " <> optext <> " (" <> text2 <> ")"
+          (op /= LogBase) ==>
+            let text1 = toHaskellText e1
+                text2 = toHaskellText e2
+                optext = getBinaryFunctionText op
+             in toHaskellText (BinaryApply op e1 e2)
+                  `shouldBe` "(" <> text1 <> ") " <> optext <> " (" <> text2 <> ")"
 
   -- The UnaryFunction constructors have the same spelling as their corresponding function name.
   describe "correct unary function text" $ do
