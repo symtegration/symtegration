@@ -1,3 +1,9 @@
+-- |
+-- Module: Symtegration.Polynomial.Symbolic
+-- Description: Conversion between data structures storing general mathematical expressions and those specialized for storing polynomials.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
+-- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.Symbolic where
 
 import Data.Maybe (fromMaybe)
@@ -12,14 +18,29 @@ import Symtegration.Symbolic
 -- >>> import Symtegration.Polynomial
 -- >>> import Symtegration.Polynomial.Indexed
 
--- |
+-- | Converts an 'Expression' into a 'Polynomial'.
+-- 'Nothing' will be returned if the conversion is not possible.
+--
+-- Specify the symbol representing the variable for the polynomial with 'forVariable'.
+-- For example,
+--
 -- >>> fromExpression (forVariable "x") (("x" + 4) ** 3) :: Maybe IndexedPolynomial
 -- Just x^3 + 12x^2 + 48x + 64
+--
+-- By default, symbols other than the variable for the polynomial are not allowed.
+-- To use symbols representing constants, use 'withSymbolicCoefficients' as well.
+-- Note that the polynomial type the expression is being converted into
+-- must be able to handle symbolic mathematical expressions for the coefficients.
+-- For example,
 --
 -- >>> let expr = ("a" + "b") * "x" + "c" :: Expression
 -- >>> let (Just p) = fromExpression (withSymbolicCoefficients (forVariable "x")) expr :: Maybe IndexedSymbolicPolynomial
 -- >>> toHaskell $ simplify $ coefficient p 1
 -- "a + b"
+--
+-- The expressions which can be converted must only use 'negate', '(+)', '(*)', '(-)',
+-- '(/)' with only numbers, coefficients which do not contain the variable,
+-- '(**)' with a non-negative integral exponent, and expressions formed thereof.
 fromExpression ::
   (Polynomial p e c, Num (p e c), Fractional c) =>
   (Text -> Maybe (p e c), Expression -> Maybe c) ->
@@ -42,6 +63,7 @@ fromExpression (_, eval) e
   | Just e' <- eval e = Just $ scale e' 1
   | otherwise = Nothing
 
+-- | Specifies the symbol representing the variable for 'fromExpression'.
 forVariable ::
   (Polynomial p e c, Num (p e c), Fractional c) =>
   Text ->
@@ -64,6 +86,8 @@ forVariable v = (fromSymbol, toCoefficient)
     toCoefficient (x :**: (Number n)) = (^^ n) <$> toCoefficient x
     toCoefficient _ = Nothing
 
+-- | Specifies that non-variable symbols are allowed for 'fromExpression'.
+-- The coefficients will be represented by 'Expression' values.
 withSymbolicCoefficients ::
   (Polynomial p e Expression, Num (p e Expression), Integral e) =>
   (Text -> Maybe (p e Expression), Expression -> Maybe Expression) ->
@@ -82,13 +106,31 @@ withSymbolicCoefficients (fromSymbol, _) = (fromSymbol', toCoefficient)
         x' = toCoefficient x
         y' = toCoefficient y
 
+-- | Converts a 'Polynomial' into an 'Expression'.
+-- The symbol which will represent the variable is the first argument.
+--
+-- How the coefficients are converted must also be specified.
+-- To evaluate the coefficients to an exact rational number,
+-- use 'toRationalCoefficient'.  For example,
+--
+-- >>> let (Just p) = fromExpression (forVariable "x") (3 * "x"**4 + 1) :: Maybe IndexedPolynomial
+-- >>> toHaskellText $ simplify $ toExpression "x" toRationalCoefficient p
+-- "(3 * (x ** 4)) + 1"
+--
+-- To evaluate the coefficients symbolically, use 'toSymbolicCoefficient'.
+--
+-- >>> let (Just p) = fromExpression (withSymbolicCoefficients (forVariable "x")) (("a"+"b") * "x"**4 + 1) :: Maybe IndexedSymbolicPolynomial
+-- >>> toHaskellText $ simplify $ toExpression "x" toSymbolicCoefficient p
+-- "((a + b) * (x ** 4)) + 1"
 toExpression :: (Polynomial p e c) => Text -> (c -> Expression) -> p e c -> Expression
 toExpression x cf p = getSum $ foldTerms convert p
   where
+    convert 0 c = Sum $ cf c
     convert e c = Sum $ cf c * xp
       where
         xp = Symbol x ** Number (fromIntegral e)
 
+-- | Specifies that coefficients are numbers for 'toExpression'.
 toRationalCoefficient :: (Real c) => c -> Expression
 toRationalCoefficient c
   | d == 1 = Number n
@@ -98,5 +140,6 @@ toRationalCoefficient c
     n = fromInteger $ numerator r
     d = fromInteger $ denominator r
 
+-- | Specifies that coefficients are symbolic for 'toExpression'.
 toSymbolicCoefficient :: Expression -> Expression
 toSymbolicCoefficient = id

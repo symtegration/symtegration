@@ -1,3 +1,9 @@
+-- |
+-- Module: Symtegration.Integration
+-- Description: Symbolically integrates mathematical expressions.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
+-- Maintainer: dev@chungyc.org
 module Symtegration.Integration (integrate) where
 
 import Data.Foldable (asum)
@@ -12,7 +18,7 @@ import Symtegration.Symbolic.Simplify.RecursiveHeuristic
 -- |
 -- Return the indefinite integral of a mathematical expression given
 -- its symbolic representation.  It will return 'Nothing' if it is
--- unable to derive an integral.
+-- unable to derive an integral.  This will not apply any simplification.
 integrate :: Text -> Expression -> Maybe Expression
 integrate var expr =
   asum $

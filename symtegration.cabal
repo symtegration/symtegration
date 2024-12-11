@@ -14,6 +14,9 @@ homepage:       https://github.com/chungyc/symtegration#readme
 bug-reports:    https://github.com/chungyc/symtegration/issues
 author:         Yoo Chung
 maintainer:     dev@chungyc.org
+copyright:      Copyright 2024 Yoo Chung
+license:        Apache-2.0
+license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
