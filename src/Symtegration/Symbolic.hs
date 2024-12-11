@@ -15,6 +15,7 @@ module Symtegration.Symbolic
     getUnaryFunction,
     getBinaryFunction,
     evaluate,
+    fractionalEvaluate,
 
     -- * Pattern synonyms
 
@@ -278,3 +279,18 @@ evaluate (BinaryApply fun expr1 expr2) m = f <$> v1 <*> v2
     f = getBinaryFunction fun
     v1 = evaluate expr1 m
     v2 = evaluate expr2 m
+
+fractionalEvaluate :: (Fractional a) => Expression -> Map Text a -> Maybe a
+fractionalEvaluate (Number n) _ = Just $ fromInteger n
+fractionalEvaluate (Symbol x) m = Map.lookup x m
+fractionalEvaluate (Negate' x) m = negate <$> fractionalEvaluate x m
+fractionalEvaluate (Abs' x) m = abs <$> fractionalEvaluate x m
+fractionalEvaluate (Signum' x) m = signum <$> fractionalEvaluate x m
+fractionalEvaluate (x :+: y) m = (+) <$> fractionalEvaluate x m <*> fractionalEvaluate y m
+fractionalEvaluate (x :-: y) m = (-) <$> fractionalEvaluate x m <*> fractionalEvaluate y m
+fractionalEvaluate (x :*: y) m = (*) <$> fractionalEvaluate x m <*> fractionalEvaluate y m
+fractionalEvaluate (x :/: y) m = (/) <$> fractionalEvaluate x m <*> fractionalEvaluate y m
+fractionalEvaluate (x :**: (Number n)) m
+  | n >= 0 = (^ n) <$> fractionalEvaluate x m
+  | otherwise = Nothing
+fractionalEvaluate _ _ = Nothing
