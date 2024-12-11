@@ -26,7 +26,6 @@ jobs:
         with:
           path: ~/.stack
           key: haddock-${{ hashFiles('stack.yaml', 'package.yaml') }}
-          restore-keys: haddock
 
       - name: Setup Haskell
         uses: haskell-actions/setup@dd344bc1cec854a369df8814ce17ef337d6e6170 # v2.7.6
