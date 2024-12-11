@@ -6,29 +6,6 @@ import Data.Text (Text)
 import Symtegration.Polynomial
 import Symtegration.Symbolic
 
-fromExpressionOld ::
-  (Polynomial p e c, Num (p e c), Integral e, Fractional c) =>
-  (Text -> Maybe (p e c)) ->
-  Expression ->
-  Maybe (p e c)
-fromExpressionOld _ (Number n) = Just $ fromInteger n
-fromExpressionOld _ ((Number n) :/: (Number m)) = Just $ scale (n' / m') 1
-  where
-    n' = fromInteger n
-    m' = fromInteger m
-fromExpressionOld symbolize (Symbol x) = symbolize x
-fromExpressionOld s (Negate' x) = negate <$> fromExpressionOld s x
-fromExpressionOld s (x :+: y) = (+) <$> fromExpressionOld s x <*> fromExpressionOld s y
-fromExpressionOld s (x :-: y) = (-) <$> fromExpressionOld s x <*> fromExpressionOld s y
-fromExpressionOld s (x :*: y) = (*) <$> fromExpressionOld s x <*> fromExpressionOld s y
-fromExpressionOld s (x :**: (Number n))
-  | (z : _) <- drop n' $ iterate (\v -> (*) <$> v <*> x') (Just 1) = z
-  | otherwise = Nothing
-  where
-    x' = fromExpressionOld s x
-    n' = fromInteger n
-fromExpressionOld _ _ = Nothing
-
 fromExpression ::
   (Polynomial p e c, Num (p e c), Integral e, Fractional c) =>
   (Text -> Maybe (p e c), Expression -> Maybe c) ->
@@ -51,8 +28,9 @@ fromExpression (_, eval) e
 
 exponentiate :: (Num a, Integral b) => a -> b -> a
 exponentiate _ 0 = 1
-exponentiate x n | even n = exponentiate (x*x) (n `div` 2)
-                 | otherwise = x * exponentiate (x*x) (n `div` 2)
+exponentiate x n
+  | even n = exponentiate (x * x) (n `div` 2)
+  | otherwise = x * exponentiate (x * x) (n `div` 2)
 
 forVariable :: (Polynomial p e c) => Text -> Text -> Maybe (p e c)
 forVariable x s
