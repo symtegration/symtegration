@@ -19,6 +19,8 @@ module Symtegration.Symbolic
 
     -- * Pattern synonyms
 
+    -- | Pattern synonyms are defined to make it more convenient to pattern match on 'Expression'.
+
     -- ** Unary functions
     pattern Negate',
     pattern Abs',
@@ -79,7 +81,7 @@ import TextShow.Generic (FromGeneric (..))
 -- A somewhat more concise representation can be obtained using 'Symtegration.toHaskellText':
 --
 -- >>> toHaskellText $ 2 * "y" + sin "x"
--- "(2 * y) + (sin x)"
+-- "2 * y + (sin x)"
 data Expression
   = -- | Represents a concrete number.
     Number Integer

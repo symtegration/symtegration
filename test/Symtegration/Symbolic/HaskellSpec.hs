@@ -77,6 +77,11 @@ spec = parallel $ do
             par s = "(" <> s <> ")"
             t = toHaskellText $ e1 :+: e2
          in t `shouldBe` case (e1, e2) of
+              (_ :*: _, _ :*: _) -> text1 <> " + " <> text2
+              (_ :*: _, _ :+: _) -> text1 <> " + " <> text2
+              (_ :*: _, _) -> text1 <> " + " <> par text2
+              (_ :+: _, _ :*: _) -> text1 <> " + " <> text2
+              (_, _ :*: _) -> par text1 <> " + " <> text2
               (_ :+: _, _ :+: _) -> text1 <> " + " <> text2
               (_ :+: _, _) -> text1 <> " + " <> par text2
               (_, _ :+: _) -> par text1 <> " + " <> text2

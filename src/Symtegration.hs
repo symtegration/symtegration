@@ -18,7 +18,7 @@
 --
 -- >>> import Symtegration
 -- >>> toHaskellText <$> integrate "z" ("x" * "z" + "y")
--- Just "((x / 2) * (z ** 2)) + (y * z)"
+-- Just "(x / 2) * (z ** 2) + y * z"
 --
 -- For symbolic differentiation, use [automatic differentiation](https://hackage.haskell.org/package/ad).
 -- For example,
@@ -74,7 +74,7 @@ import Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify)
 -- are symbolic, as with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):
 --
 -- >>> toHaskellText <$> integrate "z" ("x" * "z" + "y")
--- Just "((x / 2) * (z ** 2)) + (y * z)"
+-- Just "(x / 2) * (z ** 2) + y * z"
 integrate ::
   -- | The symbol representing the variable being integrated over.
   Text ->

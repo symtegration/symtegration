@@ -41,6 +41,11 @@ toHaskellText (UnaryApply fun x) = funcText <> " " <> asArg x
 toHaskellText (LogBase' x y) = funcText <> " " <> asArg x <> " " <> asArg y
   where
     funcText = getBinaryFunctionText LogBase
+toHaskellText (x@(_ :*: _) :+: y@(_ :*: _)) = toHaskellText x <> " + " <> toHaskellText y
+toHaskellText (x@(_ :*: _) :+: y@(_ :+: _)) = toHaskellText x <> " + " <> toHaskellText y
+toHaskellText (x@(_ :*: _) :+: y) = toHaskellText x <> " + " <> asArg y
+toHaskellText (x@(_ :+: _) :+: y@(_ :*: _)) = toHaskellText x <> " + " <> toHaskellText y
+toHaskellText (x :+: y@(_ :*: _)) = asArg x <> " + " <> toHaskellText y
 toHaskellText (x@(_ :+: _) :+: y@(_ :+: _)) = toHaskellText x <> " + " <> toHaskellText y
 toHaskellText (x@(_ :+: _) :+: y) = toHaskellText x <> " + " <> asArg y
 toHaskellText (x :+: y@(_ :+: _)) = asArg x <> " + " <> toHaskellText y
