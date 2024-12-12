@@ -191,6 +191,10 @@ spec = parallel $ do
           [(BinaryFunction, Double -> Double -> Double)]
       )
 
+  describe "show" $ do
+    prop "has inverse with read" $ \e ->
+      read (show e) `shouldBe` (e :: Expression)
+
 -- | Wrapper type over 'Double' so that the same return values are compared as equal.
 -- In other words, a NaN compared to a NaN will be considered equal.
 -- Used for confirming that 'evaluate' returns the expected results,
