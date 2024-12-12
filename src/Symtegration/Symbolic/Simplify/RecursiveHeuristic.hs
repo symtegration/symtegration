@@ -35,6 +35,10 @@ unary (Negate' (Negate' x)) = x
 unary e@(Negate' (Number n))
   | n < 0 = Number (-n)
   | otherwise = e
+unary (Exp' 0) = 1
+unary (Exp' (Log' x)) = x
+unary (Log' (Exp' x)) = x
+unary (Log' 1) = 0
 unary e = e
 
 -- | Simplify expression with binary function.
@@ -54,6 +58,15 @@ binary (0 :*: _) = Number 0
 binary (_ :*: 0) = Number 0
 binary (1 :*: x) = x
 binary (x :*: 1) = x
+binary e@((x :**: y) :*: (x' :**: y'))
+  | x == x' = x :**: simplify (y :+: y')
+  | otherwise = e
+binary e@((x :**: y) :*: x')
+  | x == x' = x :**: simplify (y :+: 1)
+  | otherwise = e
+binary e@(x :*: (x' :**: y'))
+  | x == x' = x :**: simplify (1 :+: y')
+  | otherwise = e
 binary (Number m :-: Number n) = Number $ m - n
 binary (x :-: 0) = x
 binary e@(x :-: y)
@@ -68,6 +81,15 @@ binary (Number m :/: Number n)
     d = gcd m n
     m' = Number $ m `div` d
     n' = Number $ n `div` d
+binary e@(1 :/: (x :**: Number n))
+  | n < 0 = x :**: Number (-n)
+  | otherwise = e
+binary e@((x :**: y) :/: (x' :**: y'))
+  | x == x' = x :**: simplify (y :-: y')
+  | otherwise = e
+binary e@((x :**: y) :/: x')
+  | x == x' = x :**: simplify (y :-: 1)
+  | otherwise = e
 binary e@(x :/: y)
   | x == y = 1
   | otherwise = e
