@@ -268,13 +268,13 @@ getBinaryFunction LogBase = logBase
 -- | Substitute the symbols with the corresponding expressions they are mapped to.
 -- The symbols will be replaced as is; there is no special treatment if the
 -- expression they are replaced by also contains the same symbol.
-substitute :: Expression -> Map Text Expression -> Expression
+substitute :: Expression -> (Text -> Maybe Expression) -> Expression
 substitute e@(Number _) _ = e
-substitute e@(Symbol s) m
-  | (Just x) <- Map.lookup s m = x
+substitute e@(Symbol s) f
+  | (Just x) <- f s = x
   | otherwise = e
-substitute (UnaryApply func x) m = UnaryApply func (substitute x m)
-substitute (BinaryApply func x y) m = BinaryApply func (substitute x m) (substitute y m)
+substitute (UnaryApply func x) f = UnaryApply func (substitute x f)
+substitute (BinaryApply func x y) f = BinaryApply func (substitute x f) (substitute y f)
 
 -- | Calculates the value for a mathematical expression for a given assignment of values to symbols.
 --

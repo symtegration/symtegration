@@ -14,8 +14,10 @@ module Symtegration.Symbolic.Arbitrary
     arbitraryUnaryFunction,
     arbitraryBinaryFunction,
     arbitrarySymbolText,
-    shrinkSymbolMap,
     shrinkSymbolText,
+    arbitrarySymbolMap,
+    shrinkSymbolMap,
+    assign,
   )
 where
 
@@ -154,3 +156,10 @@ shrinkSymbolText :: Text -> [Text]
 shrinkSymbolText s =
   -- Exclude empty text and s itself.
   drop 1 $ reverse $ drop 1 $ Text.tails s
+
+-- | For creating a function which assigns symbols to values
+-- based on the given map, which are easier to generate with
+-- specific properties and easier to show than a function itself.
+-- Shorthand for writing @assign m@ instead of @flip Map.lookup m@.
+assign :: Map Text a -> Text -> Maybe a
+assign = flip Map.lookup
