@@ -7,22 +7,27 @@ module Symtegration.Symbolic.Arbitrary
   ( Simple (..),
     Compound (..),
     Complete (..),
+    SymbolMap (..),
+    SymbolText (..),
     arbitraryNumber,
     arbitrarySymbol,
     arbitraryUnaryFunction,
     arbitraryBinaryFunction,
+    arbitrarySymbolText,
+    shrinkSymbolMap,
+    shrinkSymbolText,
   )
 where
 
 import Data.Map (Map)
 import Data.Map qualified as Map
+import Data.Set (Set)
 import Data.Set qualified as S
 import Data.String (fromString)
 import Data.Text (Text)
 import Data.Text qualified as Text
 import Symtegration.Symbolic
 import Test.QuickCheck
-import Test.QuickCheck.Instances.Text ()
 
 instance Arbitrary Expression where
   arbitrary = sized $ \n -> case n of
@@ -36,9 +41,7 @@ instance Arbitrary Expression where
         ]
 
   shrink (Number n) = Number <$> shrink n
-  shrink (Symbol s) =
-    -- Exclude empty text and s itself.
-    [Symbol x | x <- drop 1 $ reverse $ drop 1 $ Text.tails s]
+  shrink (Symbol s) = Symbol <$> shrinkSymbolText s
   shrink (UnaryApply func x) = x : (UnaryApply func <$> shrink x)
   shrink (BinaryApply func x y) =
     x : y : [BinaryApply func x' y' | (x', y') <- shrink (x, y)]
@@ -69,22 +72,42 @@ instance Arbitrary Compound where
       isCompound _ = True
 
 -- | Generates arbitrary expressions with a complete assignment of numbers to symbols.
+-- The assignment of symbols to values will only contain symbols appearing in the expression.
 data Complete = Complete Expression (Map Text Double) deriving (Eq, Show)
 
 instance Arbitrary Complete where
   arbitrary = do
     expr <- arbitrary
     vals <- infiniteList
-    let symbols = gather expr
+    let symbols = gatherSymbols expr
     let assignment = Map.fromList $ zip (S.toList symbols) vals
     return $ Complete expr assignment
-    where
-      gather (Number _) = S.empty
-      gather (Symbol s) = S.singleton s
-      gather (UnaryApply _ x) = gather x
-      gather (BinaryApply _ x y) = S.union (gather x) (gather y)
 
-  shrink (Complete e m) = [Complete e' m | e' <- shrink e]
+  shrink (Complete e m) = [Complete e' (restrict m e') | e' <- shrink e]
+    where
+      -- Keep symbol assignments still relevant to a shrinked expression.
+      restrict xs x = Map.restrictKeys xs $ gatherSymbols x
+
+-- | Gather the symbols appearing in an expression.
+gatherSymbols :: Expression -> Set Text
+gatherSymbols (Number _) = S.empty
+gatherSymbols (Symbol s) = S.singleton s
+gatherSymbols (UnaryApply _ x) = gatherSymbols x
+gatherSymbols (BinaryApply _ x y) = S.union (gatherSymbols x) (gatherSymbols y)
+
+-- | Generates a random assignment from symbols to values.
+newtype SymbolMap a = SymbolMap (Map Text a) deriving (Eq, Show)
+
+instance (Arbitrary a) => Arbitrary (SymbolMap a) where
+  arbitrary = SymbolMap <$> arbitrarySymbolMap
+  shrink (SymbolMap m) = SymbolMap <$> shrinkSymbolMap m
+
+-- | Generates random readable symbol.
+newtype SymbolText = SymbolText Text deriving (Eq, Show)
+
+instance Arbitrary SymbolText where
+  arbitrary = SymbolText <$> arbitrarySymbolText
+  shrink (SymbolText s) = SymbolText <$> shrinkSymbolText s
 
 -- | Generate a random number.
 arbitraryNumber :: Gen Expression
@@ -92,7 +115,7 @@ arbitraryNumber = Number <$> arbitrary
 
 -- | Generate a random symbol with only letters.
 arbitrarySymbol :: Gen Expression
-arbitrarySymbol = Symbol . fromString <$> listOf1 (choose ('a', 'z'))
+arbitrarySymbol = Symbol <$> arbitrarySymbolText
 
 -- | Generate a random expression with an unary function application.
 arbitraryUnaryFunction :: Gen Expression
@@ -101,3 +124,33 @@ arbitraryUnaryFunction = UnaryApply <$> arbitrary <*> arbitrary
 -- | Generate a random expression with a binary function application.
 arbitraryBinaryFunction :: Gen Expression
 arbitraryBinaryFunction = BinaryApply <$> arbitrary <*> arbitrary <*> arbitrary
+
+-- | Generate a random map from readable symbols to values.
+arbitrarySymbolMap :: (Arbitrary a) => Gen (Map Text a)
+arbitrarySymbolMap = Map.fromList <$> listOf assocs
+  where
+    assocs = do
+      s <- arbitrarySymbolText
+      x <- arbitrary
+      return (s, x)
+
+-- | Shrinks a map from readable symbols to values.
+shrinkSymbolMap :: (Arbitrary a) => Map Text a -> [Map Text a]
+shrinkSymbolMap = shrinkMapBy Map.fromList Map.toList (shrinkList shrinkAssoc)
+  where
+    shrinkAssoc (s, x) = do
+      s' <- shrinkSymbolText s
+      x' <- shrink x
+      return (s', x')
+
+-- | Generate random text that is appropriate as a readable symbol.
+-- They will be short, since what exactly are in the symbols is usually not important.
+-- Does not generate the special symbol "pi".
+arbitrarySymbolText :: Gen Text
+arbitrarySymbolText = resize 3 $ fromString <$> listOf1 (choose ('a', 'z')) `suchThat` (/= "pi")
+
+-- | Shrinks readable symbols.
+shrinkSymbolText :: Text -> [Text]
+shrinkSymbolText s =
+  -- Exclude empty text and s itself.
+  drop 1 $ reverse $ drop 1 $ Text.tails s

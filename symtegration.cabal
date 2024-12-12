@@ -91,7 +91,6 @@ test-suite spec
     , base >=4.16 && <4.21
     , containers >=0.6 && <0.8
     , hspec ==2.11.*
-    , quickcheck-instances ==0.3.*
     , symtegration
     , text >=2.0 && <2.2
     , text-show ==3.10.*
