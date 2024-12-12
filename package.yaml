@@ -7,16 +7,13 @@ copyright:           Copyright 2024 Yoo Chung
 license:             Apache-2.0
 
 extra-source-files:
+- LICENSE
 - README.md
-- docs/CHANGELOG.md
+- docs/**
 
-# Metadata used when publishing your package
 synopsis:            Library for symbolic integration of mathematical expressions.
-category:            Mathematics
+category:            Mathematics, Symbolic Computation
 
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
 description: |
   Symtegration is a library providing symbolic integration of mathematical expressions.
   See the [README](https://github.com/chungyc/symtegration#readme) on GitHub.
