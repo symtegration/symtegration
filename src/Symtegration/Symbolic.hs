@@ -91,7 +91,14 @@ data Expression
     UnaryApply UnaryFunction Expression
   | -- | Represents the application of a binary function.
     BinaryApply BinaryFunction Expression Expression
-  deriving (Eq, Ord, Show, Read, Generic)
+  deriving
+    ( -- | Structural equality, not semantic equality.
+      -- E.g., @"a" - "a" /= 0@.
+      Eq,
+      Show,
+      Read,
+      Generic
+    )
   deriving (TextShow) via FromGeneric Expression
 
 -- | Symbolic representation for unary functions.
@@ -132,7 +139,7 @@ data UnaryFunction
     Acosh
   | -- | 'atanh'
     Atanh
-  deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic)
+  deriving (Eq, Enum, Bounded, Show, Read, Generic)
   deriving (TextShow) via FromGeneric UnaryFunction
 
 pattern Negate', Abs', Signum', Exp', Log', Sqrt', Sin', Cos', Tan', Asin', Acos', Atan', Sinh', Cosh', Tanh', Asinh', Acosh', Atanh' :: Expression -> Expression
@@ -169,7 +176,7 @@ data BinaryFunction
     Power
   | -- | 'logBase'
     LogBase
-  deriving (Eq, Ord, Enum, Bounded, Show, Read, Generic)
+  deriving (Eq, Enum, Bounded, Show, Read, Generic)
   deriving (TextShow) via FromGeneric BinaryFunction
 
 pattern (:+:), (:*:), (:-:), (:/:), (:**:), LogBase' :: Expression -> Expression -> Expression
