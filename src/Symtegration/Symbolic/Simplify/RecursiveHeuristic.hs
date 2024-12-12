@@ -22,37 +22,55 @@ import Symtegration.Symbolic
 -- >>> toHaskellText $ simplify $ "x" ** (3 - 1) * 1 + 0 * sin "x"
 -- "x ** 2"
 simplify :: Expression -> Expression
-simplify (UnaryApply func x)
-  | Negate <- func, Negate' x'' <- x' = x''
-  | Negate <- func, Number n <- x', n < 0 = Number (-n)
-  | otherwise = UnaryApply func x'
-  where
-    x' = simplify x
-simplify (BinaryApply func x y)
-  | Add <- func, Number m <- x', Number n <- y' = Number (m + n)
-  | Add <- func, Number 0 <- x' = y'
-  | Add <- func, Number 0 <- y' = x'
-  | Multiply <- func, Number m <- x', Number n <- y' = Number (m * n)
-  | Multiply <- func, Number 0 <- x' = Number 0
-  | Multiply <- func, Number 0 <- y' = Number 0
-  | Multiply <- func, Number 1 <- x' = y'
-  | Multiply <- func, Number 1 <- y' = x'
-  | Subtract <- func, Number m <- x', Number n <- y' = Number (m - n)
-  | Subtract <- func, Number 0 <- y' = x'
-  | Subtract <- func, x' == y' = Number 0
-  | Divide <- func, Number 0 <- y' = x' :/: y'
-  | Divide <- func, Number 1 <- y' = x'
-  | Divide <- func,
-    Number m <- x',
-    Number n <- y' =
-      let d = gcd m n
-          x'' = Number $ m `div` d
-          y'' = Number $ n `div` d
-       in if n == d then x'' else x'' :/: y''
-  | Divide <- func, x' == y' = Number 1
-  | Power <- func, y' == Number 1 = x'
-  | otherwise = BinaryApply func x' y'
-  where
-    x' = simplify x
-    y' = simplify y
+simplify (UnaryApply func x) =
+  unary $ UnaryApply func $ simplify x
+simplify (BinaryApply func x y) =
+  binary $ BinaryApply func (simplify x) (simplify y)
 simplify e = e
+
+-- | Simplify expression with unary function.
+-- The argument to the function should already be simplified.
+unary :: Expression -> Expression
+unary (Negate' (Negate' x)) = x
+unary e@(Negate' (Number n))
+  | n < 0 = Number (-n)
+  | otherwise = e
+unary e = e
+
+-- | Simplify expression with binary function.
+-- The arguments to the function should already be simplified.
+binary :: Expression -> Expression
+binary (Number m :+: Number n) = Number $ m + n
+binary (0 :+: x) = x
+binary (x :+: 0) = x
+binary e@((Negate' x) :+: y)
+  | x == y = 0
+  | otherwise = e
+binary e@(x :+: (Negate' y))
+  | x == y = 0
+  | otherwise = e
+binary (Number m :*: Number n) = Number $ m * n
+binary (0 :*: _) = Number 0
+binary (_ :*: 0) = Number 0
+binary (1 :*: x) = x
+binary (x :*: 1) = x
+binary (Number m :-: Number n) = Number $ m - n
+binary (x :-: 0) = x
+binary e@(x :-: y)
+  | x == y = 0
+  | otherwise = e
+binary e@(_ :/: 0) = e
+binary (x :/: 1) = x
+binary (Number m :/: Number n)
+  | n == d = m'
+  | otherwise = m' :/: n'
+  where
+    d = gcd m n
+    m' = Number $ m `div` d
+    n' = Number $ n `div` d
+binary e@(x :/: y)
+  | x == y = 1
+  | otherwise = e
+binary (_ :**: 0) = 1
+binary (x :**: 1) = x
+binary e = e
