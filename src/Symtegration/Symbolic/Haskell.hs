@@ -61,8 +61,9 @@ toHaskellText (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
 -- In other words, show numbers and symbols as is, while surrounding everything
 -- else in parentheses.
 asArg :: Expression -> Text
-asArg x@(Number n) | n >= 0 = toHaskellText x
-                   | otherwise = "(" <> toHaskellText x <> ")"
+asArg x@(Number n)
+  | n >= 0 = toHaskellText x
+  | otherwise = "(" <> toHaskellText x <> ")"
 asArg x@(Symbol _) = toHaskellText x
 asArg x = "(" <> toHaskellText x <> ")"
 
