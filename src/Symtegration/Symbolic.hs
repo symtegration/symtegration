@@ -11,11 +11,14 @@ module Symtegration.Symbolic
     UnaryFunction (..),
     BinaryFunction (..),
 
+    -- * Manipulation
+    substitute,
+
     -- * Computation
-    getUnaryFunction,
-    getBinaryFunction,
     evaluate,
     fractionalEvaluate,
+    getUnaryFunction,
+    getBinaryFunction,
 
     -- * Pattern synonyms
 
@@ -261,6 +264,17 @@ getBinaryFunction Subtract = (-)
 getBinaryFunction Divide = (/)
 getBinaryFunction Power = (**)
 getBinaryFunction LogBase = logBase
+
+-- | Substitute the symbols with the corresponding expressions they are mapped to.
+-- The symbols will be replaced as is; there is no special treatment if the
+-- expression they are replaced by also contains the same symbol.
+substitute :: Expression -> Map Text Expression -> Expression
+substitute e@(Number _) _ = e
+substitute e@(Symbol s) m
+  | (Just x) <- Map.lookup s m = x
+  | otherwise = e
+substitute (UnaryApply func x) m = UnaryApply func (substitute x m)
+substitute (BinaryApply func x y) m = BinaryApply func (substitute x m) (substitute y m)
 
 -- | Calculates the value for a mathematical expression for a given assignment of values to symbols.
 --

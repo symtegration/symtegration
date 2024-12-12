@@ -116,6 +116,25 @@ spec = parallel $ do
       prop "atanh" $ \(Simple x) ->
         atanh x `shouldBe` UnaryApply Atanh x
 
+  describe "substitute" $ do
+    prop "for number" $ \n (SymbolMap m) ->
+      substitute (Number n) m `shouldBe` Number n
+
+    prop "for unmapped symbol" $ \(SymbolText s) (SymbolMap m) ->
+      Map.notMember s m ==>
+        substitute (Symbol s) m `shouldBe` Symbol s
+
+    prop "for mapped symbol" $ \(SymbolText s) e (SymbolMap m) ->
+      let m' = Map.insert s e m
+       in substitute (Symbol s) m' `shouldBe` e
+
+    prop "for unary function" $ \func e (SymbolMap m) ->
+      substitute (UnaryApply func e) m `shouldBe` UnaryApply func (substitute e m)
+
+    prop "for binary function" $ \func x y (SymbolMap m) ->
+      substitute (BinaryApply func x y) m
+        `shouldBe` BinaryApply func (substitute x m) (substitute y m)
+
   describe "Expression exactly evaluates as" $ do
     prop "number" $ \n (SymbolMap m) ->
       evaluate' (Number n) m `shouldBe` Just (fromInteger n)
