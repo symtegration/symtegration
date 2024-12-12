@@ -148,7 +148,7 @@ spec = parallel $ do
     prop "similar to evaluate" $ \(Complete e m) ->
       let v = fractionalEvaluate e (Map.map toRational m)
           v' = evaluate e (Map.map FiniteDouble m)
-       in isJust v && maybe False isFinite v' ==>
+       in maybe False isFinite v' && isJust v ==>
             Near . FiniteDouble . fromRational <$> v `shouldBe` Near <$> v'
 
   describe "unary functions are correctly mapped for" $ do
