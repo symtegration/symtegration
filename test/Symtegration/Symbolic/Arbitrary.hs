@@ -19,6 +19,7 @@ import Data.Map qualified as Map
 import Data.Set qualified as S
 import Data.String (fromString)
 import Data.Text (Text)
+import Data.Text qualified as Text
 import Symtegration.Symbolic
 import Test.QuickCheck
 import Test.QuickCheck.Instances.Text ()
@@ -34,7 +35,13 @@ instance Arbitrary Expression where
           (8, resize (n `div` 2) arbitraryBinaryFunction)
         ]
 
-  shrink = genericShrink
+  shrink (Number n) = Number <$> shrink n
+  shrink (Symbol s) =
+    -- Exclude empty text and s itself.
+    [Symbol x | x <- drop 1 $ reverse $ drop 1 $ Text.tails s]
+  shrink (UnaryApply func x) = x : (UnaryApply func <$> shrink x)
+  shrink (BinaryApply func x y) =
+    x : y : [BinaryApply func x' y' | (x', y') <- shrink (x, y)]
 
 instance Arbitrary UnaryFunction where
   arbitrary = chooseEnum (minBound, maxBound)
@@ -77,7 +84,7 @@ instance Arbitrary Complete where
       gather (UnaryApply _ x) = gather x
       gather (BinaryApply _ x y) = S.union (gather x) (gather y)
 
-  shrink (Complete e m) = [Complete e' m | e' <- genericShrink e]
+  shrink (Complete e m) = [Complete e' m | e' <- shrink e]
 
 -- | Generate a random number.
 arbitraryNumber :: Gen Expression

@@ -38,9 +38,16 @@ toHaskellText (Symbol t) = t
 toHaskellText (UnaryApply fun x) = funcText <> " " <> asArg x
   where
     funcText = getUnaryFunctionText fun
-toHaskellText (BinaryApply LogBase x y) = funcText <> " " <> asArg x <> " " <> asArg y
+toHaskellText (LogBase' x y) = funcText <> " " <> asArg x <> " " <> asArg y
   where
     funcText = getBinaryFunctionText LogBase
+toHaskellText (x@(_ :+: _) :+: y@(_ :+: _)) = toHaskellText x <> " + " <> toHaskellText y
+toHaskellText (x@(_ :+: _) :+: y) = toHaskellText x <> " + " <> asArg y
+toHaskellText (x :+: y@(_ :+: _)) = asArg x <> " + " <> toHaskellText y
+toHaskellText (x@(_ :*: _) :*: y@(_ :*: _)) = toHaskellText x <> " * " <> toHaskellText y
+toHaskellText (x@(_ :*: _) :*: y) = toHaskellText x <> " * " <> asArg y
+toHaskellText (x :*: y@(_ :*: _)) = asArg x <> " * " <> toHaskellText y
+toHaskellText (x@(_ :+: _) :-: y) = toHaskellText x <> " - " <> asArg y
 toHaskellText (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
   where
     opText = getBinaryFunctionText op
@@ -49,7 +56,8 @@ toHaskellText (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
 -- In other words, show numbers and symbols as is, while surrounding everything
 -- else in parentheses.
 asArg :: Expression -> Text
-asArg x@(Number _) = toHaskellText x
+asArg x@(Number n) | n >= 0 = toHaskellText x
+                   | otherwise = "(" <> toHaskellText x <> ")"
 asArg x@(Symbol _) = toHaskellText x
 asArg x = "(" <> toHaskellText x <> ")"
 

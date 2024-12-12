@@ -23,8 +23,8 @@ spec = parallel $ do
       \(PrintableString s) -> toHaskellText (Symbol $ fromString s) `shouldBe` fromString s
 
     describe "converts for unary function" $ do
-      prop "with number" $
-        \func n ->
+      prop "with non-negative number" $
+        \func (NonNegative n) ->
           toHaskellText (UnaryApply func $ Number n)
             `shouldBe` getUnaryFunctionText func <> " " <> showt n
 
@@ -39,8 +39,8 @@ spec = parallel $ do
             `shouldBe` getUnaryFunctionText func <> " (" <> toHaskellText e <> ")"
 
     describe "converts for binary function" $ do
-      prop "logBase with numbers" $
-        \m n ->
+      prop "logBase with non-negative numbers" $
+        \(NonNegative m) (NonNegative n) ->
           toHaskellText (BinaryApply LogBase (Number m) (Number n))
             `shouldBe` "logBase " <> showt m <> " " <> showt n
 
@@ -54,8 +54,8 @@ spec = parallel $ do
           toHaskellText (BinaryApply LogBase e1 e2)
             `shouldBe` "logBase (" <> toHaskellText e1 <> ") (" <> toHaskellText e2 <> ")"
 
-      prop "operators with numbers" $
-        \op m n ->
+      prop "operators with non-negative numbers" $
+        \op (NonNegative m) (NonNegative n) ->
           (op /= LogBase) ==>
             toHaskellText (BinaryApply op (Number m) (Number n))
               `shouldBe` showt m <> " " <> getBinaryFunctionText op <> " " <> showt n
@@ -66,14 +66,24 @@ spec = parallel $ do
             toHaskellText (BinaryApply op (Symbol $ fromString s) (Symbol $ fromString r))
               `shouldBe` fromString s <> " " <> getBinaryFunctionText op <> " " <> fromString r
 
-      prop "operators with compound arguments" $
-        \op (Compound e1) (Compound e2) ->
-          (op /= LogBase) ==>
-            let text1 = toHaskellText e1
-                text2 = toHaskellText e2
-                optext = getBinaryFunctionText op
-             in toHaskellText (BinaryApply op e1 e2)
-                  `shouldBe` "(" <> text1 <> ") " <> optext <> " (" <> text2 <> ")"
+      modifyMaxSuccess (* 10) $
+        prop "operators with compound arguments" $
+          \op (Compound e1) (Compound e2) ->
+            op /= LogBase ==>
+              let text1 = toHaskellText e1
+                  text2 = toHaskellText e2
+                  optext = getBinaryFunctionText op
+                  t = toHaskellText (BinaryApply op e1 e2)
+                  par s = "(" <> s <> ")"
+               in t `shouldBe` case (op, e1, e2) of
+                    (Add, _ :+: _, _ :+: _) -> text1 <> " + " <> text2
+                    (Add, _ :+: _, _) -> text1 <> " + " <> par text2
+                    (Add, _, _ :+: _) -> par text1 <> " + " <> text2
+                    (Multiply, _ :*: _, _ :*: _) -> text1 <> " * " <> text2
+                    (Multiply, _ :*: _, _) -> text1 <> " * " <> par text2
+                    (Multiply, _, _ :*: _) -> par text1 <> " * " <> text2
+                    (Subtract, _ :+: _, _) -> text1 <> " - " <> par text2
+                    _ -> par text1 <> " " <> optext <> " " <> par text2
 
   -- The UnaryFunction constructors have the same spelling as their corresponding function name.
   describe "correct unary function text" $ do
