@@ -13,7 +13,7 @@ import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 spec :: Spec
-spec = parallel $ modifyMaxSuccess (*10) $ do
+spec = parallel $ modifyMaxSuccess (* 10) $ do
   prop "consistent with derivative of integral" $ \(Trig e) x ->
     antiderivativeProperty integrate (Map.singleton var x) e x
 

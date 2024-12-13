@@ -75,6 +75,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Symtegration.FiniteDouble
+      Symtegration.Integration.PolynomialSpec
       Symtegration.Integration.Properties
       Symtegration.Integration.TrigonometricSpec
       Symtegration.IntegrationSpec

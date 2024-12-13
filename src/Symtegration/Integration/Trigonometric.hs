@@ -33,7 +33,7 @@ integrate v (Acos' x@(Symbol s))
   | s == v = Just $ (x :*: Acos' x) :-: Sqrt' (1 :-: (x :**: 2))
   | otherwise = Nothing
 integrate v (Atan' x@(Symbol s))
-  | s == v = Just $ (x :*: Atan' x) :-: (Log' ((x :**: 2) :+:1) :/: 2)
+  | s == v = Just $ (x :*: Atan' x) :-: (Log' ((x :**: 2) :+: 1) :/: 2)
   | otherwise = Nothing
 integrate v (Sinh' x@(Symbol s))
   | s == v = Just $ Cosh' x
