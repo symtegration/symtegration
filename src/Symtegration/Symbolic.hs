@@ -17,6 +17,7 @@ module Symtegration.Symbolic
     -- * Computation
     evaluate,
     fractionalEvaluate,
+    toFunction,
     getUnaryFunction,
     getBinaryFunction,
 
@@ -368,3 +369,48 @@ fractionalEvaluate (x :/: y) m
     y' = fractionalEvaluate y m
 fractionalEvaluate (x :**: (Number n)) m = (^^ n) <$> fractionalEvaluate x m
 fractionalEvaluate _ _ = Nothing
+
+-- | Returns a function based on a given expression.  This requires
+-- a specification of how a symbol maps the argument to a value
+-- to be used in it place.
+--
+-- For example, the symbol "x" could use the argument as is as its value.
+-- I.e., "x" can be mapped to a function which maps the argument to itself.
+--
+-- >>> let f = toFunction ("x" ** 2 + 1) (\case "x" -> id) :: Double -> Double
+-- >>> f 3  -- 3 ** 2 + 1
+-- 10.0
+-- >>> f 10  -- 10 ** 2 + 1
+-- 101.0
+--
+-- For another example, "x" could map the first element from a tuple argument,
+-- and "y" could map the second element from the tuple argument.  I.e.,
+-- for a tuple argument to the function, the first element will be used as "x"
+-- and the second element will be used as "y".
+--
+-- >>> let m = \case "x" -> (\(x,_) -> x); "y" -> (\(_,y) -> y)
+-- >>> let g = toFunction ("x" + 2 * "y") m :: (Double, Double) -> Double
+-- >>> g (3,4)  -- 3 + 2 * 4
+-- 11.0
+-- >>> g (7,1)  -- 7 + 2 * 1
+-- 9.0
+toFunction ::
+  (Floating b) =>
+  -- | The expression to be converted into a function.
+  Expression ->
+  -- | Maps how the argument to the function should be mapped to a value for a symbol.
+  -- E.g., "x" could map the first element in a tuple as the value to use in its place.
+  (Text -> (a -> b)) ->
+  -- | The function generated from the expression.
+  (a -> b)
+toFunction (Number n) _ = const $ fromInteger n
+toFunction (Symbol s) m = m s
+toFunction (UnaryApply func x) m = f . g
+  where
+    f = getUnaryFunction func
+    g = toFunction x m
+toFunction (BinaryApply func x y) m = \v -> f (g v) (h v)
+  where
+    f = getBinaryFunction func
+    g = toFunction x m
+    h = toFunction y m
