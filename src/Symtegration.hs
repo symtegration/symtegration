@@ -31,11 +31,14 @@
 module Symtegration
   ( -- * Symbolic representation
     Expression,
-    evaluate,
-    fractionalEvaluate,
 
     -- * Integration
     integrate,
+
+    -- * Computation
+    evaluate,
+    fractionalEvaluate,
+    toFunction,
 
     -- * Conversion
     toHaskellText,
@@ -54,7 +57,7 @@ where
 
 import Data.Text (Text)
 import Symtegration.Integration qualified as Integration
-import Symtegration.Symbolic (Expression, evaluate, fractionalEvaluate)
+import Symtegration.Symbolic (Expression, evaluate, fractionalEvaluate, toFunction)
 import Symtegration.Symbolic.Haskell (toHaskellText)
 import Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify)
 
