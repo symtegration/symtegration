@@ -21,9 +21,9 @@ can be integrated.  For example:
 
 ```haskell
 >>> import Symtegration
->>> toHaskellText <$> integrate "x" (4 * "x" ** 3 + 1)
+>>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
 Just "(x ** 4) + x"
->>> toHaskellText <$> integrate "z" ("x" * "z" + "y")
+>>> toHaskell <$> integrate "z" ("x" * "z" + "y")
 Just "((x / 2) * (z ** 2)) + (y * z)"
 ```
 
@@ -55,7 +55,7 @@ and compute approximate or exact values from these integrals.
 ```haskell
 >>> :set -XLambdaCase
 >>> :load Symtegration
->>> toHaskellText <$> integrate "x" ("a" * "x" ** 4 + "x" + "b")
+>>> toHaskell <$> integrate "x" ("a" * "x" ** 4 + "x" + "b")
 Just "(a / 5) * (x ** 5) + (1 / 2) * (x ** 2) + b * x"
 >>>
 >>> let (Just p) = integrate "x" ("x" ** 2)
@@ -80,7 +80,7 @@ For example,
 >>> import Numeric.AD
 >>> diff (\x -> x + 1) ("x" :: Expression)
 Number 1
->>> toHaskellText $ simplify $ diff (\x -> x ** 3 + 1) ("x" :: Expression)
+>>> toHaskell $ simplify $ diff (\x -> x ** 3 + 1) ("x" :: Expression)
 "3 * (x ** 2)"
 ```
 

@@ -6,7 +6,7 @@
 -- Support for converting symbolic representations of mathematical expressions
 -- into equivalent Haskell code.
 module Symtegration.Symbolic.Haskell
-  ( toHaskellText,
+  ( toHaskell,
 
     -- * Support functions
     getUnaryFunctionText,
@@ -23,37 +23,37 @@ import TextShow (showt)
 
 -- | Converts an 'Expression' into an equivalent Haskell expression.
 --
--- >>> toHaskellText $ BinaryApply Add (Number 1) (Number 3)
+-- >>> toHaskell $ BinaryApply Add (Number 1) (Number 3)
 -- "1 + 3"
--- >>> toHaskellText $ 1 + 3
+-- >>> toHaskell $ 1 + 3
 -- "1 + 3"
 --
 -- Symbols are included without quotation.
 --
--- >>> toHaskellText $ ("x" + "y") * 4
+-- >>> toHaskell $ ("x" + "y") * 4
 -- "(x + y) * 4"
-toHaskellText :: Expression -> Text
-toHaskellText (Number n) = showt n
-toHaskellText (Symbol t) = t
-toHaskellText (UnaryApply fun x) = funcText <> " " <> asArg x
+toHaskell :: Expression -> Text
+toHaskell (Number n) = showt n
+toHaskell (Symbol t) = t
+toHaskell (UnaryApply fun x) = funcText <> " " <> asArg x
   where
     funcText = getUnaryFunctionText fun
-toHaskellText (LogBase' x y) = funcText <> " " <> asArg x <> " " <> asArg y
+toHaskell (LogBase' x y) = funcText <> " " <> asArg x <> " " <> asArg y
   where
     funcText = getBinaryFunctionText LogBase
-toHaskellText (x@(_ :*: _) :+: y@(_ :*: _)) = toHaskellText x <> " + " <> toHaskellText y
-toHaskellText (x@(_ :*: _) :+: y@(_ :+: _)) = toHaskellText x <> " + " <> toHaskellText y
-toHaskellText (x@(_ :*: _) :+: y) = toHaskellText x <> " + " <> asArg y
-toHaskellText (x@(_ :+: _) :+: y@(_ :*: _)) = toHaskellText x <> " + " <> toHaskellText y
-toHaskellText (x :+: y@(_ :*: _)) = asArg x <> " + " <> toHaskellText y
-toHaskellText (x@(_ :+: _) :+: y@(_ :+: _)) = toHaskellText x <> " + " <> toHaskellText y
-toHaskellText (x@(_ :+: _) :+: y) = toHaskellText x <> " + " <> asArg y
-toHaskellText (x :+: y@(_ :+: _)) = asArg x <> " + " <> toHaskellText y
-toHaskellText (x@(_ :*: _) :*: y@(_ :*: _)) = toHaskellText x <> " * " <> toHaskellText y
-toHaskellText (x@(_ :*: _) :*: y) = toHaskellText x <> " * " <> asArg y
-toHaskellText (x :*: y@(_ :*: _)) = asArg x <> " * " <> toHaskellText y
-toHaskellText (x@(_ :+: _) :-: y) = toHaskellText x <> " - " <> asArg y
-toHaskellText (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
+toHaskell (x@(_ :*: _) :+: y@(_ :*: _)) = toHaskell x <> " + " <> toHaskell y
+toHaskell (x@(_ :*: _) :+: y@(_ :+: _)) = toHaskell x <> " + " <> toHaskell y
+toHaskell (x@(_ :*: _) :+: y) = toHaskell x <> " + " <> asArg y
+toHaskell (x@(_ :+: _) :+: y@(_ :*: _)) = toHaskell x <> " + " <> toHaskell y
+toHaskell (x :+: y@(_ :*: _)) = asArg x <> " + " <> toHaskell y
+toHaskell (x@(_ :+: _) :+: y@(_ :+: _)) = toHaskell x <> " + " <> toHaskell y
+toHaskell (x@(_ :+: _) :+: y) = toHaskell x <> " + " <> asArg y
+toHaskell (x :+: y@(_ :+: _)) = asArg x <> " + " <> toHaskell y
+toHaskell (x@(_ :*: _) :*: y@(_ :*: _)) = toHaskell x <> " * " <> toHaskell y
+toHaskell (x@(_ :*: _) :*: y) = toHaskell x <> " * " <> asArg y
+toHaskell (x :*: y@(_ :*: _)) = asArg x <> " * " <> toHaskell y
+toHaskell (x@(_ :+: _) :-: y) = toHaskell x <> " - " <> asArg y
+toHaskell (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
   where
     opText = getBinaryFunctionText op
 
@@ -62,10 +62,10 @@ toHaskellText (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
 -- else in parentheses.
 asArg :: Expression -> Text
 asArg x@(Number n)
-  | n >= 0 = toHaskellText x
-  | otherwise = "(" <> toHaskellText x <> ")"
-asArg x@(Symbol _) = toHaskellText x
-asArg x = "(" <> toHaskellText x <> ")"
+  | n >= 0 = toHaskell x
+  | otherwise = "(" <> toHaskell x <> ")"
+asArg x@(Symbol _) = toHaskell x
+asArg x = "(" <> toHaskell x <> ")"
 
 -- | Returns the corresponding Haskell function name.
 getUnaryFunctionText :: UnaryFunction -> Text

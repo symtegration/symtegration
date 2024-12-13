@@ -81,9 +81,9 @@ import TextShow.Generic (FromGeneric (..))
 -- >>> 2 + sin "x" :: Expression
 -- BinaryApply Add (Number 2) (UnaryApply Sin (Symbol "x"))
 --
--- A somewhat more concise representation can be obtained using 'Symtegration.toHaskellText':
+-- A somewhat more concise representation can be obtained using 'Symtegration.toHaskell':
 --
--- >>> toHaskellText $ 2 * "y" + sin "x"
+-- >>> toHaskell $ 2 * "y" + sin "x"
 -- "2 * y + (sin x)"
 data Expression
   = -- | Represents a concrete number.
@@ -269,7 +269,7 @@ getBinaryFunction LogBase = logBase
 -- The symbols will be replaced as is; there is no special treatment if the
 -- expression they are replaced by also contains the same symbol.
 --
--- >>> toHaskellText $ substitute ("x" + "y") (\case "x" -> Just ("a" * "b"); "y" -> Just 4)
+-- >>> toHaskell $ substitute ("x" + "y") (\case "x" -> Just ("a" * "b"); "y" -> Just 4)
 -- "a * b + 4"
 substitute ::
   -- | Expression to apply substitution.

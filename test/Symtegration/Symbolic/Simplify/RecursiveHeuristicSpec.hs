@@ -19,7 +19,7 @@ spec = modifyMaxSuccess (* 100) $ parallel $ do
       let e' = simplify e
           v = evaluate e (assign m)
           v' = evaluate e' (assign m)
-       in counterexample ("e = " <> show (toHaskellText e)) $
-            counterexample ("simplify e = " <> show (toHaskellText e')) $
+       in counterexample ("e = " <> show (toHaskell e)) $
+            counterexample ("simplify e = " <> show (toHaskell e')) $
               maybe False isFinite v ==>
                 fmap Near v' `shouldBe` fmap Near v

@@ -18,7 +18,7 @@ import Symtegration.Symbolic
 --
 -- >>> let expr = ("a" + "b") * "x" + "c" :: Expression
 -- >>> let (Just p) = fromExpression (withSymbolicCoefficients (forVariable "x")) expr :: Maybe IndexedSymbolicPolynomial
--- >>> toHaskellText $ simplify $ coefficient p 1
+-- >>> toHaskell $ simplify $ coefficient p 1
 -- "a + b"
 fromExpression ::
   (Polynomial p e c, Num (p e c), Fractional c) =>

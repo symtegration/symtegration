@@ -17,9 +17,9 @@ import Symtegration.Symbolic
 --
 -- This implementation recursively applies simple heuristics to each sub-term.
 --
--- >>> toHaskellText $ simplify $ 1 + 5
+-- >>> toHaskell $ simplify $ 1 + 5
 -- "6"
--- >>> toHaskellText $ simplify $ "x" ** (3 - 1) * 1 + 0 * sin "x"
+-- >>> toHaskell $ simplify $ "x" ** (3 - 1) * 1 + 0 * sin "x"
 -- "x ** 2"
 simplify :: Expression -> Expression
 simplify (UnaryApply func x) =

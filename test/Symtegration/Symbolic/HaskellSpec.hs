@@ -15,67 +15,67 @@ import TextShow (showt)
 
 spec :: Spec
 spec = parallel $ do
-  describe "toHaskellText" $ do
+  describe "toHaskell" $ do
     prop "converts for number" $ \n ->
-      toHaskellText (Number n) `shouldBe` showt n
+      toHaskell (Number n) `shouldBe` showt n
 
     prop "converts for symbol" $ \(PrintableString s) ->
-      toHaskellText (Symbol $ fromString s) `shouldBe` fromString s
+      toHaskell (Symbol $ fromString s) `shouldBe` fromString s
 
     describe "converts for unary function" $ do
       prop "with non-negative number" $ \func (NonNegative n) ->
-        toHaskellText (UnaryApply func $ Number n)
+        toHaskell (UnaryApply func $ Number n)
           `shouldBe` getUnaryFunctionText func <> " " <> showt n
 
       prop "with negative number" $ \func (Negative n) ->
-        toHaskellText (UnaryApply func $ Number n)
+        toHaskell (UnaryApply func $ Number n)
           `shouldBe` getUnaryFunctionText func <> " (" <> showt n <> ")"
 
       prop "with symbol" $ \func s ->
-        toHaskellText (UnaryApply func $ Symbol $ fromString s)
+        toHaskell (UnaryApply func $ Symbol $ fromString s)
           `shouldBe` getUnaryFunctionText func <> " " <> fromString s
 
       prop "with compound argument" $ \func (Compound e) ->
-        toHaskellText (UnaryApply func e)
-          `shouldBe` getUnaryFunctionText func <> " (" <> toHaskellText e <> ")"
+        toHaskell (UnaryApply func e)
+          `shouldBe` getUnaryFunctionText func <> " (" <> toHaskell e <> ")"
 
     describe "converts for binary function" $ do
       prop "logBase with non-negative numbers" $ \(NonNegative m) (NonNegative n) ->
-        toHaskellText (BinaryApply LogBase (Number m) (Number n))
+        toHaskell (BinaryApply LogBase (Number m) (Number n))
           `shouldBe` "logBase " <> showt m <> " " <> showt n
 
       prop "logBase with negative numbers" $ \(Negative m) (Negative n) ->
-        toHaskellText (BinaryApply LogBase (Number m) (Number n))
+        toHaskell (BinaryApply LogBase (Number m) (Number n))
           `shouldBe` "logBase (" <> showt m <> ") (" <> showt n <> ")"
 
       prop "logBase with symbols" $ \s r ->
-        toHaskellText (BinaryApply LogBase (Symbol $ fromString s) (Symbol $ fromString r))
+        toHaskell (BinaryApply LogBase (Symbol $ fromString s) (Symbol $ fromString r))
           `shouldBe` "logBase " <> fromString s <> " " <> fromString r
 
       prop "logBase with compound arguments" $ \(Compound e1) (Compound e2) ->
-        toHaskellText (BinaryApply LogBase e1 e2)
-          `shouldBe` "logBase (" <> toHaskellText e1 <> ") (" <> toHaskellText e2 <> ")"
+        toHaskell (BinaryApply LogBase e1 e2)
+          `shouldBe` "logBase (" <> toHaskell e1 <> ") (" <> toHaskell e2 <> ")"
 
       prop "operators with non-negative numbers" $ \op (NonNegative m) (NonNegative n) ->
         op /= LogBase ==>
-          toHaskellText (BinaryApply op (Number m) (Number n))
+          toHaskell (BinaryApply op (Number m) (Number n))
             `shouldBe` showt m <> " " <> getBinaryFunctionText op <> " " <> showt n
 
       prop "operators with negative numbers" $ \op (Negative m) (Negative n) ->
         op /= LogBase ==>
-          toHaskellText (BinaryApply op (Number m) (Number n))
+          toHaskell (BinaryApply op (Number m) (Number n))
             `shouldBe` "(" <> showt m <> ") " <> getBinaryFunctionText op <> " (" <> showt n <> ")"
 
       prop "operators with symbols" $ \op s r ->
         op /= LogBase ==>
-          toHaskellText (BinaryApply op (Symbol $ fromString s) (Symbol $ fromString r))
+          toHaskell (BinaryApply op (Symbol $ fromString s) (Symbol $ fromString r))
             `shouldBe` fromString s <> " " <> getBinaryFunctionText op <> " " <> fromString r
 
       prop "addition with compound arguments" $ \(Compound e1) (Compound e2) ->
-        let text1 = toHaskellText e1
-            text2 = toHaskellText e2
+        let text1 = toHaskell e1
+            text2 = toHaskell e2
             par s = "(" <> s <> ")"
-            t = toHaskellText $ e1 :+: e2
+            t = toHaskell $ e1 :+: e2
          in t `shouldBe` case (e1, e2) of
               (_ :*: _, _ :*: _) -> text1 <> " + " <> text2
               (_ :*: _, _ :+: _) -> text1 <> " + " <> text2
@@ -88,10 +88,10 @@ spec = parallel $ do
               _ -> par text1 <> " + " <> par text2
 
       prop "multiplication with compound arguments" $ \(Compound e1) (Compound e2) ->
-        let text1 = toHaskellText e1
-            text2 = toHaskellText e2
+        let text1 = toHaskell e1
+            text2 = toHaskell e2
             par s = "(" <> s <> ")"
-            t = toHaskellText $ e1 :*: e2
+            t = toHaskell $ e1 :*: e2
          in t `shouldBe` case (e1, e2) of
               (_ :*: _, _ :*: _) -> text1 <> " * " <> text2
               (_ :*: _, _) -> text1 <> " * " <> par text2
@@ -99,21 +99,21 @@ spec = parallel $ do
               _ -> par text1 <> " * " <> par text2
 
       prop "subtraction with compound arguments" $ \(Compound e1) (Compound e2) ->
-        let text1 = toHaskellText e1
-            text2 = toHaskellText e2
+        let text1 = toHaskell e1
+            text2 = toHaskell e2
             par s = "(" <> s <> ")"
-            t = toHaskellText $ e1 :-: e2
+            t = toHaskell $ e1 :-: e2
          in t `shouldBe` case (e1, e2) of
               (_ :+: _, _) -> text1 <> " - " <> par text2
               _ -> par text1 <> " - " <> par text2
 
       prop "operators with compound arguments" $ \(Compound e1) (Compound e2) ->
         forAll (elements [Divide, Power]) $ \op ->
-          let text1 = toHaskellText e1
-              text2 = toHaskellText e2
+          let text1 = toHaskell e1
+              text2 = toHaskell e2
               optext = getBinaryFunctionText op
               par s = "(" <> s <> ")"
-              t = toHaskellText (BinaryApply op e1 e2)
+              t = toHaskell (BinaryApply op e1 e2)
            in t `shouldBe` par text1 <> " " <> optext <> " " <> par text2
 
   -- The UnaryFunction constructors have the same spelling as their corresponding function name.

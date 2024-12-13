@@ -11,13 +11,13 @@
 -- For example, with \(\int (4x^3 + 1) \, dx = x^4 + x\):
 --
 -- >>> import Symtegration
--- >>> toHaskellText <$> integrate "x" (4 * "x" ** 3 + 1)
+-- >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
 -- Just "(x ** 4) + x"
 --
 -- For another example, with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):
 --
 -- >>> import Symtegration
--- >>> toHaskellText <$> integrate "z" ("x" * "z" + "y")
+-- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
 -- Just "(x / 2) * (z ** 2) + y * z"
 --
 -- For symbolic differentiation, use [automatic differentiation](https://hackage.haskell.org/package/ad).
@@ -26,7 +26,7 @@
 -- >>> import Numeric.AD
 -- >>> diff (\x -> x + 1) ("x" :: Expression)
 -- Number 1
--- >>> toHaskellText $ simplify $ diff (\x -> x ** 3 + 1) ("x" :: Expression)
+-- >>> toHaskell $ simplify $ diff (\x -> x ** 3 + 1) ("x" :: Expression)
 -- "3 * (x ** 2)"
 module Symtegration
   ( -- * Symbolic representation
@@ -41,7 +41,7 @@ module Symtegration
     toFunction,
 
     -- * Conversion
-    toHaskellText,
+    toHaskell,
     toLaTeX,
 
     -- * Simplification
@@ -59,7 +59,7 @@ where
 import Data.Text (Text)
 import Symtegration.Integration qualified as Integration
 import Symtegration.Symbolic (Expression, evaluate, fractionalEvaluate, toFunction)
-import Symtegration.Symbolic.Haskell (toHaskellText)
+import Symtegration.Symbolic.Haskell (toHaskell)
 import Symtegration.Symbolic.LaTeX (toLaTeX)
 import Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify)
 
@@ -72,13 +72,13 @@ import Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify)
 -- For example, with \(\int (4x^3 + 1) \, dx = x^4 + x\)
 -- where all the coefficients are numbers:
 --
--- >>> toHaskellText <$> integrate "x" (4 * "x" ** 3 + 1)
+-- >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
 -- Just "(x ** 4) + x"
 --
 -- It can also return indefinite integrals when the coefficients
 -- are symbolic, as with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):
 --
--- >>> toHaskellText <$> integrate "z" ("x" * "z" + "y")
+-- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
 -- Just "(x / 2) * (z ** 2) + y * z"
 integrate ::
   -- | The symbol representing the variable being integrated over.
