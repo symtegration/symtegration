@@ -162,8 +162,8 @@ spec = parallel $ do
       fractionalEvaluate (Symbol s) (const $ Just x) `shouldBe` Just (x :: Rational)
 
     prop "similar to evaluate" $ \(Complete e m) ->
-      let v = fractionalEvaluate e (\x -> toRational <$> assign m x)
-          v' = evaluate e (\x -> FiniteDouble <$> assign m x)
+      let v = fractionalEvaluate e (fmap toRational . assign m)
+          v' = evaluate e (fmap FiniteDouble . assign m)
        in maybe False isFinite v' && isJust v ==>
             Near . FiniteDouble . fromRational <$> v `shouldBe` Near <$> v'
 
