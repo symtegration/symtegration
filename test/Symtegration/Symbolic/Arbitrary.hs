@@ -28,8 +28,8 @@ import Data.Set qualified as S
 import Data.String (fromString)
 import Data.Text (Text)
 import Data.Text qualified as Text
-import Symtegration.Symbolic
 import Symtegration.FiniteDouble
+import Symtegration.Symbolic
 import Test.QuickCheck
 
 instance Arbitrary Expression where
