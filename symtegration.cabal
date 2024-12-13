@@ -33,6 +33,7 @@ library
       Symtegration.Polynomial.Symbolic
       Symtegration.Symbolic
       Symtegration.Symbolic.Haskell
+      Symtegration.Symbolic.LaTeX
       Symtegration.Symbolic.Simplify.RecursiveHeuristic
   other-modules:
       Paths_symtegration
@@ -77,6 +78,7 @@ test-suite spec
       Symtegration.PolynomialSpec
       Symtegration.Symbolic.Arbitrary
       Symtegration.Symbolic.HaskellSpec
+      Symtegration.Symbolic.LaTeXSpec
       Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec
       Symtegration.SymbolicSpec
       Paths_symtegration

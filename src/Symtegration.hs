@@ -42,6 +42,7 @@ module Symtegration
 
     -- * Conversion
     toHaskellText,
+    toLaTeX,
 
     -- * Simplification
 
@@ -59,6 +60,7 @@ import Data.Text (Text)
 import Symtegration.Integration qualified as Integration
 import Symtegration.Symbolic (Expression, evaluate, fractionalEvaluate, toFunction)
 import Symtegration.Symbolic.Haskell (toHaskellText)
+import Symtegration.Symbolic.LaTeX (toLaTeX)
 import Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify)
 
 -- |
