@@ -23,7 +23,7 @@ jobs:
           - "ubuntu-latest"
 
         ghc:
-          - "9.2.8"
+          - "9.6.6"
           - "9.10.1"
 
     name: cabal / ${{ matrix.os }} / ghc ${{ matrix.ghc }}
