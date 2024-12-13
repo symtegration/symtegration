@@ -45,7 +45,7 @@ library
       OverloadedStrings
   ghc-options: -Wall -Werror
   build-depends:
-      base >=4.16 && <4.21
+      base >=4.18 && <4.21
     , containers >=0.6 && <0.8
     , text >=2.0 && <2.2
     , text-show ==3.10.*
@@ -62,7 +62,7 @@ test-suite examples
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       ad ==4.5.*
-    , base >=4.16 && <4.21
+    , base >=4.18 && <4.21
     , containers >=0.6 && <0.8
     , doctest-parallel ==0.3.*
     , symtegration
@@ -75,6 +75,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Symtegration.FiniteDouble
+      Symtegration.Integration.Properties
       Symtegration.IntegrationSpec
       Symtegration.Polynomial.Indexed.Arbitrary
       Symtegration.Polynomial.IndexedSpec
@@ -97,7 +98,7 @@ test-suite spec
   build-depends:
       QuickCheck ==2.14.*
     , ad ==4.5.*
-    , base >=4.16 && <4.21
+    , base >=4.18 && <4.21
     , containers >=0.6 && <0.8
     , hspec ==2.11.*
     , symtegration
