@@ -17,8 +17,8 @@ spec = modifyMaxSuccess (* 100) $ parallel $ do
   describe "simplify" $ do
     prop "maintains semantics" $ \(Complete e m) ->
       let e' = simplify e
-          v = evaluate e (fmap FiniteDouble . assign m)
-          v' = evaluate e' (fmap FiniteDouble . assign m)
+          v = evaluate e (assign m)
+          v' = evaluate e' (assign m)
        in counterexample ("e = " <> show (toHaskellText e)) $
             counterexample ("simplify e = " <> show (toHaskellText e')) $
               maybe False isFinite v ==>

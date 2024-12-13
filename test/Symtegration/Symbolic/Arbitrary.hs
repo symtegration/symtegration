@@ -29,6 +29,7 @@ import Data.String (fromString)
 import Data.Text (Text)
 import Data.Text qualified as Text
 import Symtegration.Symbolic
+import Symtegration.FiniteDouble
 import Test.QuickCheck
 
 instance Arbitrary Expression where
@@ -76,7 +77,7 @@ instance Arbitrary Compound where
 -- | Generates arbitrary expressions with a complete assignment of numbers to symbols.
 -- The assignment of symbols to values will only contain symbols appearing in the expression.
 -- Use the 'assign' function to turn the map into a function.
-data Complete = Complete Expression (Map Text Double) deriving (Eq, Show)
+data Complete = Complete Expression (Map Text FiniteDouble) deriving (Eq, Show)
 
 instance Arbitrary Complete where
   arbitrary = do

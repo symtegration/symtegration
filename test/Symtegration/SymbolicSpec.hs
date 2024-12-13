@@ -16,8 +16,8 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
--- | Same as 'evaluate', except specialized to 'Double'.
-evaluate' :: Expression -> (Text -> Maybe Double) -> Maybe Double
+-- | Same as 'evaluate', except specialized to 'FiniteDouble'.
+evaluate' :: Expression -> (Text -> Maybe FiniteDouble) -> Maybe FiniteDouble
 evaluate' = evaluate
 
 spec :: Spec
@@ -163,14 +163,14 @@ spec = parallel $ do
 
     prop "similar to evaluate" $ \(Complete e m) ->
       let v = fractionalEvaluate e (fmap toRational . assign m)
-          v' = evaluate e (fmap FiniteDouble . assign m)
+          v' = evaluate e (assign m)
        in maybe False isFinite v' && isJust v ==>
             Near . FiniteDouble . fromRational <$> v `shouldBe` Near <$> v'
 
   describe "unary functions are correctly mapped for" $ do
     mapM_
-      ( \(func, f) -> prop (show func) $
-          \x -> Exact (getUnaryFunction func x) `shouldBe` Exact (f x)
+      ( \(func, f) -> prop (show func) $ \x ->
+          Exact (getUnaryFunction func x) `shouldBe` Exact (f x)
       )
       ( [ (Negate, negate),
           (Abs, abs),
@@ -191,7 +191,7 @@ spec = parallel $ do
           (Acosh, acosh),
           (Atanh, atanh)
         ] ::
-          [(UnaryFunction, Double -> Double)]
+          [(UnaryFunction, FiniteDouble -> FiniteDouble)]
       )
 
   describe "binary functions are correctly mapped for" $ do
@@ -206,20 +206,9 @@ spec = parallel $ do
           (Power, (**)),
           (LogBase, logBase)
         ] ::
-          [(BinaryFunction, Double -> Double -> Double)]
+          [(BinaryFunction, FiniteDouble -> FiniteDouble -> FiniteDouble)]
       )
 
   describe "show" $ do
     prop "has inverse with read" $ \e ->
       read (show e) `shouldBe` (e :: Expression)
-
--- | Wrapper type over 'Double' so that the same return values are compared as equal.
--- In other words, a NaN compared to a NaN will be considered equal.
--- Used for confirming that 'evaluate' returns the expected results,
--- including when it returns NaN.
-newtype Exact = Exact Double deriving (Show)
-
-instance Eq Exact where
-  (Exact x) == (Exact y)
-    | isNaN x && isNaN y = True
-    | otherwise = x == y

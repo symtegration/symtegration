@@ -25,7 +25,9 @@
 --     @d / (0 - (cosh (exp ((logBase f c) / 0))))@
 --
 -- *   @tanh (s ** (f / (0 * k)))@ and @tanh (s ** (f / 0))@
-module Symtegration.FiniteDouble (FiniteDouble (..), isFinite, Near (..)) where
+module Symtegration.FiniteDouble (FiniteDouble (..), isFinite, Exact (..), Near (..)) where
+
+import Test.QuickCheck
 
 -- | A variant of 'Double' which only allows finite
 newtype FiniteDouble = FiniteDouble Double
@@ -70,6 +72,30 @@ instance Floating FiniteDouble where
   acosh = unaryOp acosh
   atanh = unaryOp atanh
 
+instance Real FiniteDouble where
+  toRational (FiniteDouble x) = toRational x
+
+instance RealFrac FiniteDouble where
+  properFraction (FiniteDouble x) = (n, FiniteDouble f)
+    where
+      (n, f) = properFraction x
+
+instance RealFloat FiniteDouble where
+  floatRadix (FiniteDouble x) = floatRadix x
+  floatDigits (FiniteDouble x) = floatDigits x
+  floatRange (FiniteDouble x) = floatRange x
+  decodeFloat (FiniteDouble x) = decodeFloat x
+  encodeFloat x y = FiniteDouble $ encodeFloat x y
+  isNaN (FiniteDouble x) = isNaN x || isInfinite x
+  isInfinite _ = False
+  isDenormalized (FiniteDouble x) = isDenormalized x
+  isNegativeZero (FiniteDouble x) = isNegativeZero x
+  isIEEE (FiniteDouble x) = isIEEE x
+
+instance Arbitrary FiniteDouble where
+  arbitrary = FiniteDouble <$> arbitrary
+  shrink (FiniteDouble x) = FiniteDouble <$> shrink x
+
 -- | Returns whether a number is finite and not a NaN.
 isFinite :: FiniteDouble -> Bool
 isFinite (FiniteDouble x)
@@ -94,6 +120,16 @@ unaryOp op (FiniteDouble x)
   where
     v = op x
     nan = 0 / 0
+
+-- | Wrapper type over 'FiniteDouble' so that the same return values are compared as equal.
+-- In other words, a NaN compared to a NaN will be considered equal.
+-- Used for comparing that two implementations apply the exact same operations.
+newtype Exact = Exact FiniteDouble deriving (Show)
+
+instance Eq Exact where
+  (Exact x) == (Exact y)
+    | isNaN x && isNaN y = True
+    | otherwise = x == y
 
 -- | Wrapper type for comparing whether 'FiniteDouble' values are close enough.
 -- Intended for testing whether two supposedly equivalent functions return
