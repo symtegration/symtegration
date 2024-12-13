@@ -28,6 +28,7 @@ library
       Symtegration
       Symtegration.Integration
       Symtegration.Integration.Polynomial
+      Symtegration.Integration.Trigonometric
       Symtegration.Polynomial
       Symtegration.Polynomial.Indexed
       Symtegration.Polynomial.Symbolic
