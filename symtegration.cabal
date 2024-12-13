@@ -40,6 +40,7 @@ library
   hs-source-dirs:
       src
   default-extensions:
+      LambdaCase
       OverloadedStrings
   ghc-options: -Wall -Werror
   build-depends:
@@ -55,6 +56,7 @@ test-suite examples
   other-modules:
       Paths_symtegration
   default-extensions:
+      LambdaCase
       OverloadedStrings
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
@@ -72,6 +74,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       Symtegration.FiniteDouble
+      Symtegration.IntegrationSpec
       Symtegration.Polynomial.Indexed.Arbitrary
       Symtegration.Polynomial.IndexedSpec
       Symtegration.Polynomial.SymbolicSpec
@@ -85,12 +88,14 @@ test-suite spec
   hs-source-dirs:
       test
   default-extensions:
+      LambdaCase
       OverloadedStrings
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-tool-depends:
       hspec-discover:hspec-discover ==2.11.*
   build-depends:
       QuickCheck ==2.14.*
+    , ad ==4.5.*
     , base >=4.16 && <4.21
     , containers >=0.6 && <0.8
     , hspec ==2.11.*
