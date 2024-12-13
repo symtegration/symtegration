@@ -4,8 +4,6 @@
 -- Maintainer: dev@chungyc.org
 --
 -- Supports basic integration of trigonometric functions.
--- Trigonometric functions on just the variable and
--- those multiplied by a constant can be integrated.
 -- This does not support the integration of anything else,
 -- even if it is trivial like integrating a constant.
 module Symtegration.Integration.Trigonometric (integrate) where
