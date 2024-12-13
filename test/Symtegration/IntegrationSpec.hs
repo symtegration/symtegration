@@ -19,6 +19,8 @@ spec :: Spec
 spec = parallel $ do
   -- Each integration algorithm should have their own tests,
   -- where they focus the input expressions which are generated.
+  -- These tests are for checking whether they could have problems
+  -- with expressions they do not focus on.
   modifyMaxSuccess (* 10) $ context "for any expression" $ do
     describe "integral consistent with derivative" $ do
       prop "for polynomial integration" $

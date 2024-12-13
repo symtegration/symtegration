@@ -3,6 +3,7 @@ module Symtegration.Integration (integrate) where
 import Data.Foldable (asum)
 import Data.Text (Text)
 import Symtegration.Integration.Polynomial qualified as Polynomial
+import Symtegration.Integration.Trigonometric qualified as Trigonometric
 import Symtegration.Symbolic
 
 -- |
@@ -13,5 +14,6 @@ integrate :: Text -> Expression -> Maybe Expression
 integrate var expr =
   asum
     [ Polynomial.rationalIntegrate var expr,
-      Polynomial.symbolicIntegrate var expr
+      Polynomial.symbolicIntegrate var expr,
+      Trigonometric.integrate var expr
     ]
