@@ -54,8 +54,6 @@ module Symtegration.Symbolic
   )
 where
 
-import Data.Map (Map)
-import Data.Map qualified as Map
 import Data.Ratio
 import Data.String (IsString, fromString)
 import Data.Text
@@ -64,6 +62,7 @@ import TextShow (TextShow)
 import TextShow.Generic (FromGeneric (..))
 
 -- $setup
+-- >>> :set -XLambdaCase
 -- >>> import Symtegration
 
 -- | Symbolic representation of a mathematical expression.
@@ -268,7 +267,16 @@ getBinaryFunction LogBase = logBase
 -- | Substitute the symbols with the corresponding expressions they are mapped to.
 -- The symbols will be replaced as is; there is no special treatment if the
 -- expression they are replaced by also contains the same symbol.
-substitute :: Expression -> (Text -> Maybe Expression) -> Expression
+--
+-- >>> toHaskellText $ substitute ("x" + "y") (\case "x" -> Just ("a" * "b"); "y" -> Just 4)
+-- "a * b + 4"
+substitute ::
+  -- | Expression to apply substitution.
+  Expression ->
+  -- | Maps symbols to expressions they are to be substituted with.
+  (Text -> Maybe Expression) ->
+  -- | Expression with substitution applied.
+  Expression
 substitute e@(Number _) _ = e
 substitute e@(Symbol s) f
   | (Just x) <- f s = x
@@ -281,32 +289,32 @@ substitute (BinaryApply func x y) f = BinaryApply func (substitute x f) (substit
 -- For example, when \(x=5\), then \(2x+1=11\).
 --
 -- >>> import Data.Map qualified as Map
--- >>> evaluate (2 * "x" + 1) (Map.singleton "x" 5)
+-- >>> evaluate (2 * "x" + 1) (\case "x" -> Just 5)
 -- Just 11.0
 --
 -- All symbols except for @"pi"@ in a mathematical expression must be assigned a value.
 -- Otherwise, a value cannot be computed.
 --
--- >>> evaluate (2 * "x" + 1) Map.empty
+-- >>> evaluate (2 * "x" + 1) (const Nothing)
 -- Nothing
 --
 -- The symbol @"pi"@ is always used to represent \(\pi\),
 -- and any assignment to @"pi"@ will be ignored.
 -- For example, the following is \(\pi - \pi\), not \(100 - \pi\).
 --
--- >>> evaluate ("pi" - pi) (Map.singleton "pi" 100)
+-- >>> evaluate ("pi" - pi) (\case "x" -> Just 100)
 -- Just 0.0
 evaluate ::
   (Floating a) =>
   -- | Mathematical expression to evaluate.
   Expression ->
-  -- | Map of symbols to concrete values.
-  Map Text a ->
+  -- | Maps symbols to concrete values.
+  (Text -> Maybe a) ->
   -- | Evaluation result.
   Maybe a
 evaluate (Number n) _ = Just $ fromInteger n
 evaluate (Symbol "pi") _ = Just pi
-evaluate (Symbol x) m = Map.lookup x m
+evaluate (Symbol x) m = m x
 evaluate (UnaryApply fun expr) m = fmap f v
   where
     f = getUnaryFunction fun
@@ -328,26 +336,25 @@ evaluate (BinaryApply fun expr1 expr2) m = f <$> v1 <*> v2
 --
 -- For example,
 --
--- >>> import Data.Map qualified as Map
 -- >>> let p = 1 / (3 * "x"**5 - 2 * "x" + 1) :: Expression
--- >>> fractionalEvaluate p $ Map.singleton "x" (2 / 7 :: Rational)
+-- >>> fractionalEvaluate p (\case "x" -> Just (2 / 7 :: Rational))
 -- Just (16807 % 7299)
 --
 -- Compare against 'evaluate', which cannot even use 'Rational' computations
 -- because 'Rational' is not an instance of the 'Floating' type class:
 --
--- >>> evaluate p $ Map.singleton "x" (2 / 7 :: Double)
+-- >>> evaluate p (\case "x" -> Just (2 / 7 :: Double))
 -- Just 2.3026441978353196
 fractionalEvaluate ::
   (Eq a, Fractional a) =>
   -- | Mathematical expression to evaluate.
   Expression ->
-  -- | Map of symbols to concrete values.
-  Map Text a ->
+  -- | Maps symbols to concrete values.
+  (Text -> Maybe a) ->
   -- | Evaluation result.
   Maybe a
 fractionalEvaluate (Number n) _ = Just $ fromInteger n
-fractionalEvaluate (Symbol x) m = Map.lookup x m
+fractionalEvaluate (Symbol x) m = m x
 fractionalEvaluate (Negate' x) m = negate <$> fractionalEvaluate x m
 fractionalEvaluate (Abs' x) m = abs <$> fractionalEvaluate x m
 fractionalEvaluate (Signum' x) m = signum <$> fractionalEvaluate x m

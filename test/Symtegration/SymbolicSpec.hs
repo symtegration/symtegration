@@ -3,7 +3,6 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.SymbolicSpec (spec) where
 
-import Data.Map (Map)
 import Data.Map qualified as Map
 import Data.Maybe (isJust)
 import Data.Ratio (denominator, numerator)
@@ -18,7 +17,7 @@ import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 -- | Same as 'evaluate', except specialized to 'Double'.
-evaluate' :: Expression -> Map Text Double -> Maybe Double
+evaluate' :: Expression -> (Text -> Maybe Double) -> Maybe Double
 evaluate' = evaluate
 
 spec :: Spec
@@ -120,9 +119,8 @@ spec = parallel $ do
     prop "for number" $ \n (SymbolMap m) ->
       substitute (Number n) (assign m) `shouldBe` Number n
 
-    prop "for unmapped symbol" $ \(SymbolText s) (SymbolMap m) ->
-      Map.notMember s m ==>
-        substitute (Symbol s) (assign m) `shouldBe` Symbol s
+    prop "for unmapped symbol" $ \(SymbolText s) ->
+      substitute (Symbol s) (const Nothing) `shouldBe` Symbol s
 
     prop "for mapped symbol" $ \(SymbolText s) e (SymbolMap m) ->
       let m' = Map.insert s e m
@@ -138,34 +136,34 @@ spec = parallel $ do
 
   describe "Expression exactly evaluates as" $ do
     prop "number" $ \n (SymbolMap m) ->
-      evaluate' (Number n) m `shouldBe` Just (fromInteger n)
+      evaluate' (Number n) (assign m) `shouldBe` Just (fromInteger n)
 
-    prop "symbol" $ \(SymbolText s) x (SymbolMap m) ->
-      evaluate' (Symbol s) (Map.insert s x m) `shouldBe` Just x
+    prop "symbol" $ \(SymbolText s) x ->
+      evaluate' (Symbol s) (\s' -> if s' == s then Just x else Nothing) `shouldBe` Just x
 
     prop "unary function" $ \(Complete e m) func ->
-      fmap Exact (evaluate' (UnaryApply func e) m)
-        `shouldBe` fmap (Exact . getUnaryFunction func) (evaluate' e m)
+      fmap Exact (evaluate' (UnaryApply func e) (assign m))
+        `shouldBe` fmap (Exact . getUnaryFunction func) (evaluate' e (assign m))
 
     prop "binary function" $ \(Complete e1 m1) (Complete e2 m2) func ->
       let m = Map.union m1 m2
           f = getBinaryFunction func
-       in fmap Exact (evaluate' (BinaryApply func e1 e2) m)
-            `shouldBe` fmap Exact (f <$> evaluate' e1 m <*> evaluate' e2 m)
+       in fmap Exact (evaluate' (BinaryApply func e1 e2) (assign m))
+            `shouldBe` fmap Exact (f <$> evaluate' e1 (assign m) <*> evaluate' e2 (assign m))
 
     prop "nothing" $ \(Complete e m) ->
-      not (Map.null m) ==> evaluate' e Map.empty `shouldBe` Nothing
+      not (Map.null m) ==> evaluate' e (const Nothing) `shouldBe` Nothing
 
   describe "Expression fractionally evaluates as" $ do
-    prop "number" $ \n (SymbolMap m) ->
-      fractionalEvaluate (Number n) m `shouldBe` Just (fromInteger n :: Rational)
+    prop "number" $ \n ->
+      fractionalEvaluate (Number n) (const Nothing) `shouldBe` Just (fromInteger n :: Rational)
 
-    prop "symbol" $ \(SymbolText s) x (SymbolMap m) ->
-      fractionalEvaluate (Symbol s) (Map.insert s x m) `shouldBe` Just (x :: Rational)
+    prop "symbol" $ \(SymbolText s) x ->
+      fractionalEvaluate (Symbol s) (const $ Just x) `shouldBe` Just (x :: Rational)
 
     prop "similar to evaluate" $ \(Complete e m) ->
-      let v = fractionalEvaluate e (Map.map toRational m)
-          v' = evaluate e (Map.map FiniteDouble m)
+      let v = fractionalEvaluate e (\x -> toRational <$> assign m x)
+          v' = evaluate e (\x -> FiniteDouble <$> assign m x)
        in maybe False isFinite v' && isJust v ==>
             Near . FiniteDouble . fromRational <$> v `shouldBe` Near <$> v'
 

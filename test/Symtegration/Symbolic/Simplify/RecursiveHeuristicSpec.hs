@@ -3,7 +3,6 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec (spec) where
 
-import Data.Map qualified as Map
 import Symtegration.FiniteDouble
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Arbitrary
@@ -19,8 +18,8 @@ spec = modifyMaxSuccess (* 100) $ parallel $ do
     prop "maintains semantics" $
       \(Complete e m) ->
         let e' = simplify e
-            v = evaluate e (Map.map FiniteDouble m)
-            v' = evaluate e' (Map.map FiniteDouble m)
+            v = evaluate e (\s -> FiniteDouble <$> assign m s)
+            v' = evaluate e' (\s -> FiniteDouble <$> assign m s)
          in counterexample ("e = " <> show (toHaskellText e)) $
               counterexample ("simplify e = " <> show (toHaskellText e')) $
                 maybe False isFinite v ==>
