@@ -372,7 +372,7 @@ fractionalEvaluate _ _ = Nothing
 
 -- | Returns a function based on a given expression.  This requires
 -- a specification of how a symbol maps the argument to a value
--- to be used in it place.
+-- to be used in its place.
 --
 -- For example, the symbol "x" could use the argument as is as its value.
 -- I.e., "x" can be mapped to a function which maps the argument to itself.
