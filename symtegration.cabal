@@ -76,6 +76,7 @@ test-suite spec
   other-modules:
       Symtegration.FiniteDouble
       Symtegration.Integration.Properties
+      Symtegration.Integration.TrigonometricSpec
       Symtegration.IntegrationSpec
       Symtegration.Polynomial.Indexed.Arbitrary
       Symtegration.Polynomial.IndexedSpec
