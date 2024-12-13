@@ -288,7 +288,6 @@ substitute (BinaryApply func x y) f = BinaryApply func (substitute x f) (substit
 --
 -- For example, when \(x=5\), then \(2x+1=11\).
 --
--- >>> import Data.Map qualified as Map
 -- >>> evaluate (2 * "x" + 1) (\case "x" -> Just 5)
 -- Just 11.0
 --

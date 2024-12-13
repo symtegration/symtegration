@@ -75,6 +75,7 @@ instance Arbitrary Compound where
 
 -- | Generates arbitrary expressions with a complete assignment of numbers to symbols.
 -- The assignment of symbols to values will only contain symbols appearing in the expression.
+-- Use the 'assign' function to turn the map into a function.
 data Complete = Complete Expression (Map Text Double) deriving (Eq, Show)
 
 instance Arbitrary Complete where
@@ -98,6 +99,7 @@ gatherSymbols (UnaryApply _ x) = gatherSymbols x
 gatherSymbols (BinaryApply _ x y) = S.union (gatherSymbols x) (gatherSymbols y)
 
 -- | Generates a random assignment from symbols to values.
+-- Use the 'assign' function to turn it into a function.
 newtype SymbolMap a = SymbolMap (Map Text a) deriving (Eq, Show)
 
 instance (Arbitrary a) => Arbitrary (SymbolMap a) where
