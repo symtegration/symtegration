@@ -15,12 +15,11 @@ import Test.QuickCheck
 spec :: Spec
 spec = modifyMaxSuccess (* 100) $ parallel $ do
   describe "simplify" $ do
-    prop "maintains semantics" $
-      \(Complete e m) ->
-        let e' = simplify e
-            v = evaluate e (fmap FiniteDouble . assign m)
-            v' = evaluate e' (fmap FiniteDouble . assign m)
-         in counterexample ("e = " <> show (toHaskellText e)) $
-              counterexample ("simplify e = " <> show (toHaskellText e')) $
-                maybe False isFinite v ==>
-                  fmap Near v' `shouldBe` fmap Near v
+    prop "maintains semantics" $ \(Complete e m) ->
+      let e' = simplify e
+          v = evaluate e (fmap FiniteDouble . assign m)
+          v' = evaluate e' (fmap FiniteDouble . assign m)
+       in counterexample ("e = " <> show (toHaskellText e)) $
+            counterexample ("simplify e = " <> show (toHaskellText e')) $
+              maybe False isFinite v ==>
+                fmap Near v' `shouldBe` fmap Near v
