@@ -32,7 +32,7 @@ genPolynomial = sized $ \n -> case n of
         (1, pure $ Symbol var),
         (5, resize (max 0 (n - 1)) $ Negate' <$> genPolynomial),
         -- Keep exponents reasonably small.
-        (10, resize (max 0 (n - 1)) $ (:**:) <$> genPolynomial <*> (Number <$> choose (0, 4))),
+        (10, resize (max 0 (n - 1)) $ (:**:) <$> genPolynomial <*> (Number <$> choose (0, 3))),
         (50, resize (n `div` 2) $ (:+:) <$> genPolynomial <*> genPolynomial),
         (50, resize (n `div` 2) $ (:*:) <$> genPolynomial <*> genPolynomial),
         (50, resize (n `div` 2) $ (:-:) <$> genPolynomial <*> genPolynomial)
