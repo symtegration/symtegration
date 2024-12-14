@@ -3,7 +3,7 @@
 ##########################
 
 # Specify additional command line arguments
-- arguments: [-XGHC2021, -XOverloadedStrings]
+- arguments: [-XGHC2021, -XOverloadedStrings, -XLambdaCase]
 
 # Warn on use of partial functions
 - group: {name: partial, enabled: true}
