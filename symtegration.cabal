@@ -43,6 +43,7 @@ library
       Symtegration.Symbolic
       Symtegration.Symbolic.Haskell
       Symtegration.Symbolic.LaTeX
+      Symtegration.Symbolic.Simplify.AlgebraicRingOrder
       Symtegration.Symbolic.Simplify.RecursiveHeuristic
   other-modules:
       Paths_symtegration
