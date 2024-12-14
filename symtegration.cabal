@@ -78,6 +78,7 @@ test-suite spec
       Symtegration.FiniteDouble
       Symtegration.Integration.PolynomialSpec
       Symtegration.Integration.Properties
+      Symtegration.Integration.TermSpec
       Symtegration.Integration.TrigonometricSpec
       Symtegration.IntegrationSpec
       Symtegration.Polynomial.Indexed.Arbitrary

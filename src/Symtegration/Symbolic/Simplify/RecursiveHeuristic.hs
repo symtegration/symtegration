@@ -69,6 +69,7 @@ binary e@(x :*: (x' :**: y'))
   | otherwise = e
 binary (Number m :-: Number n) = Number $ m - n
 binary (x :-: 0) = x
+binary (x :-: (Negate' y)) = binary (x :+: y)
 binary e@(x :-: y)
   | x == y = 0
   | otherwise = e

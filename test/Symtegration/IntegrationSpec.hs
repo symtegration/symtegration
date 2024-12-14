@@ -6,6 +6,7 @@ module Symtegration.IntegrationSpec (spec) where
 import Data.Map qualified as Map
 import Data.Text (Text)
 import Symtegration.FiniteDouble
+import Symtegration.Integration
 import Symtegration.Integration.Polynomial qualified as Polynomial
 import Symtegration.Integration.Properties qualified as Properties
 import Symtegration.Integration.Trigonometric qualified as Trigonometric
@@ -28,6 +29,9 @@ spec = parallel $ do
 
       prop "for trigonometric integration" $
         antiderivativeProperty Trigonometric.integrate
+
+      prop "for general integration" $
+        antiderivativeProperty integrate
 
 antiderivativeProperty ::
   (Text -> Expression -> Maybe Expression) ->

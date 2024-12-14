@@ -14,15 +14,14 @@ import Symtegration.Symbolic
 integrate :: Text -> Expression -> Maybe Expression
 integrate _ (Number _) = Nothing
 integrate _ (Symbol _) = Nothing
-integrate v (Negate' x) = UnaryApply Negate <$> integrate v x
 integrate v (Sin' x@(Symbol s))
-  | s == v = Just $ Cos' x
+  | s == v = Just $ Negate' $ Cos' x
   | otherwise = Nothing
 integrate v (Cos' x@(Symbol s))
-  | s == v = Just $ Negate' $ Sin' x
+  | s == v = Just $ Sin' x
   | otherwise = Nothing
 integrate v (Tan' x@(Symbol s))
-  | s == v = Just $ Negate' $ Log' (Cos' x)
+  | s == v = Just $ Negate' $ Log' $ Abs' $ Cos' x
   | otherwise = Nothing
 integrate v (Asin' x@(Symbol s))
   | s == v = Just $ (x :*: Asin' x) :+: Sqrt' (1 :-: (x :**: 2))
