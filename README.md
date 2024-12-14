@@ -24,7 +24,7 @@ can be integrated.  For example:
 >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
 Just "(x ** 4) + x"
 >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
-Just "((x / 2) * (z ** 2)) + (y * z)"
+Just "(x / 2) * (z ** 2) + y * z"
 ```
 
 Concrete numbers can also be computed from these integrals.  For example:
@@ -52,7 +52,6 @@ You can then proceed to symbolically integrate mathematical expressions
 and compute approximate or exact values from these integrals.
 
 ```haskell
->>> :set -XLambdaCase
 >>> :load Symtegration
 >>> toHaskell <$> integrate "x" ("a" * "x" ** 4 + "x" + "b")
 Just "(a / 5) * (x ** 5) + (1 / 2) * (x ** 2) + b * x"
