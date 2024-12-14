@@ -30,7 +30,6 @@ Just "((x / 2) * (z ** 2)) + (y * z)"
 Concrete numbers can also be computed from these integrals.  For example:
 
 ```haskell
->>> :set -XLambdaCase
 >>> import Symtegration
 >>> let (Just p) = integrate "x" (4 * "x" ** 3 + 1)
 >>> fractionalEvaluate p (\case "x" -> Just (3 / 7 :: Rational))

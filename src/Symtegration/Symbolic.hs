@@ -63,7 +63,6 @@ import TextShow (TextShow)
 import TextShow.Generic (FromGeneric (..))
 
 -- $setup
--- >>> :set -XLambdaCase
 -- >>> import Symtegration
 
 -- | Symbolic representation of a mathematical expression.

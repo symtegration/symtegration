@@ -11,9 +11,13 @@ import Symtegration.Symbolic
 -- its symbolic representation.  It will return 'Nothing' if it is
 -- unable to derive an integral.
 integrate :: Text -> Expression -> Maybe Expression
-integrate var expr =
-  asum
-    [ Polynomial.rationalIntegrate var expr,
-      Polynomial.symbolicIntegrate var expr,
-      Trigonometric.integrate var expr
-    ]
+integrate var expr = asum [f var expr | f <- directIntegrations]
+
+-- | List of direct integration functions.
+-- These integrate expressions directly without using other integration functions.
+directIntegrations :: [Text -> Expression -> Maybe Expression]
+directIntegrations =
+  [ Polynomial.rationalIntegrate,
+    Polynomial.symbolicIntegrate,
+    Trigonometric.integrate
+  ]
