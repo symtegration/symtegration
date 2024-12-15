@@ -7,6 +7,7 @@ import Symtegration.Integration.Powers qualified as Powers
 import Symtegration.Integration.Term qualified as Term
 import Symtegration.Integration.Trigonometric qualified as Trigonometric
 import Symtegration.Symbolic
+import Symtegration.Symbolic.Simplify.RecursiveHeuristic
 
 -- |
 -- Return the indefinite integral of a mathematical expression given
@@ -24,6 +25,6 @@ directIntegrations :: [Text -> Expression -> Maybe Expression]
 directIntegrations =
   [ Polynomial.rationalIntegrate,
     Polynomial.symbolicIntegrate,
-    Powers.integrate,
+    \v -> Powers.integrate v . simplify,
     Trigonometric.integrate
   ]

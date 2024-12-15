@@ -2,7 +2,7 @@
 -- Module: Symtegration.Integration.Powers
 -- Description: Integration of arbitrary powers of a variable.
 -- Maintainer: dev@chungyc.org
-module Symtegration.Integration.Powers where
+module Symtegration.Integration.Powers (integrate) where
 
 import Data.Text (Text)
 import Symtegration.Symbolic
