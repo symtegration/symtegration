@@ -11,7 +11,10 @@ import Symtegration.Symbolic
 -- In other words, expressions of the form \(x^c\),
 -- where \(c\) is a constant.
 integrate :: Text -> Expression -> Maybe Expression
-integrate v (x :**: (Negate' (Number n))) = integrate v $ x :**: Number (-n)
+integrate v (x :**: (Negate' (Number n :/: Number m))) =
+  integrate v $ x :**: (Number (-n) :/: Number m)
+integrate v (x :**: (Negate' (Number n))) =
+  integrate v $ x :**: Number (-n)
 integrate v (x@(Symbol s) :**: Number n)
   | s == v, -1 <- n = Just $ Log' x
   | s == v = Just $ (x :**: Number (n + 1)) :/: Number (n + 1)
