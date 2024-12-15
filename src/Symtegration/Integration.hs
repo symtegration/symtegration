@@ -3,6 +3,7 @@ module Symtegration.Integration (integrate) where
 import Data.Foldable (asum)
 import Data.Text (Text)
 import Symtegration.Integration.Polynomial qualified as Polynomial
+import Symtegration.Integration.Powers qualified as Powers
 import Symtegration.Integration.Term qualified as Term
 import Symtegration.Integration.Trigonometric qualified as Trigonometric
 import Symtegration.Symbolic
@@ -23,5 +24,6 @@ directIntegrations :: [Text -> Expression -> Maybe Expression]
 directIntegrations =
   [ Polynomial.rationalIntegrate,
     Polynomial.symbolicIntegrate,
+    Powers.integrate,
     Trigonometric.integrate
   ]

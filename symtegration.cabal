@@ -28,6 +28,7 @@ library
       Symtegration
       Symtegration.Integration
       Symtegration.Integration.Polynomial
+      Symtegration.Integration.Powers
       Symtegration.Integration.Term
       Symtegration.Integration.Trigonometric
       Symtegration.Polynomial
@@ -77,6 +78,7 @@ test-suite spec
   other-modules:
       Symtegration.FiniteDouble
       Symtegration.Integration.PolynomialSpec
+      Symtegration.Integration.PowersSpec
       Symtegration.Integration.Properties
       Symtegration.Integration.TermSpec
       Symtegration.Integration.TrigonometricSpec
