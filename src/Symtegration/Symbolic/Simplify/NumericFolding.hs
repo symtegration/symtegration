@@ -10,7 +10,7 @@
 -- finite inputs should result in the equivalent finite input.
 -- The changes will also be exact, and no numeric constant will be replaced
 -- by an approximate floating-point number.
-module Symtegration.Symbolic.Simplify.NumericFolding where
+module Symtegration.Symbolic.Simplify.NumericFolding (simplify) where
 
 import Symtegration.Symbolic
 
@@ -26,6 +26,10 @@ import Symtegration.Symbolic
 -- "2"
 -- >>> toHaskell $ simplify $ 7 ** (1/3)
 -- "7 ** (1 / 3)"
+-- >>> toHaskell $ simplify $ 5 * 10 * "x"
+-- "50 * x"
+--
+-- It will replace subtraction by addition and square roots by powers of \(\frac{1}{2}\).
 simplify :: Expression -> Expression
 simplify e@(Number _) = e
 simplify e@(Symbol _) = e
@@ -93,6 +97,9 @@ binary e@((Number n :/: Number m) :**: (Number k :/: Number l))
 binary (LogBase' b x) = simplify $ Log' x :/: Log' b
 binary e = e
 
+-- | Simplify integer ratios.  Basically turns them into integers if possible,
+-- and if not, reduce the fractions so that the denominator and numerator
+-- do not have a common factor.
 reduceRatio :: Integer -> Integer -> Expression
 reduceRatio n 0 = Number n :/: Number 0
 reduceRatio n 1 = Number n
@@ -102,12 +109,14 @@ reduceRatio n m
   where
     d = gcd n m
 
+-- | Compute the integer root to the given power.
+-- I.e., find \(m\) such that \(m^k = n\)
 root ::
-  -- | Number whose root we want.
+  -- | Number \(n\) whose root we want.
   Integer ->
-  -- | The power of the root.
+  -- | The power \(k\) of the root.
   Integer ->
-  -- | The root.
+  -- | The root \(m\).
   Maybe Integer
 root 0 _ = Just 0
 root 1 _ = Just 1
@@ -125,16 +134,25 @@ root n k
         mid = (low + hi) `div` 2
         c = compare (mid ^ k) m
 
+-- | Simplify an exponential of Euler's number.  I.e., simplify \(e^X\).
+-- Only the exponent is given as an argument, while the return value is
+-- the full simplified expression.
 simplifyExp :: Expression -> Expression
 simplifyExp (Number 0) = Number 1
 simplifyExp (Log' x) = x
 simplifyExp e = Exp' e
 
+-- | Simplify a logarithm.  I.e., simplify \(log X\).
+-- Only the parameter \(X\) is given as an argument, while the return value is
+-- the full simplified expression.
 simplifyLog :: Expression -> Expression
 simplifyLog (Number 1) = Number 0
 simplifyLog (Exp' x) = x
 simplifyLog e = Log' e
 
+-- | Simplify a sine.  I.e., simplify \(\sin X\).
+-- Only the parameter \(X\) is given as an argument, while the return value is
+-- the full simplified expression.
 simplifySin :: Expression -> Expression
 simplifySin (Number 0) = 0
 simplifySin (Number _ :*: Pi') = 0
@@ -147,6 +165,9 @@ simplifySin (Pi' :*: x@(Number _ :/: 2)) =
   simplifySin (x :*: Pi')
 simplifySin e = Sin' e
 
+-- | Simplify a cosine.  I.e., simplify \(\cos X\).
+-- Only the parameter \(X\) is given as an argument, while the return value is
+-- the full simplified expression.
 simplifyCos :: Expression -> Expression
 simplifyCos (Number 0) = 1
 simplifyCos (Number n :*: Pi') | even n = 1 | odd n = -1
@@ -156,6 +177,9 @@ simplifyCos ((Number _ :/: 2) :*: Pi') = 0
 simplifyCos (Pi' :*: (Number _ :/: 2)) = 0
 simplifyCos e = Cos' e
 
+-- | Simplify a tangent.  I.e., simplify \(\tan X\).
+-- Only the parameter \(X\) is given as an argument, while the return value is
+-- the full simplified expression.
 simplifyTan :: Expression -> Expression
 simplifyTan (Number 0) = 0
 simplifyTan e = Tan' e
