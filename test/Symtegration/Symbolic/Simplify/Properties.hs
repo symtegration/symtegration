@@ -1,3 +1,8 @@
+-- |
+-- Description: Provides a QuickCheck property checking that simplification does not change an expression's semantics.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
+-- Maintainer: dev@chungyc.org
 module Symtegration.Symbolic.Simplify.Properties (equivalentProperty) where
 
 import Symtegration.FiniteDouble
