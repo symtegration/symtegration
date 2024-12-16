@@ -1,5 +1,7 @@
 -- |
 -- Description: Tests for Symtegration.Symbolic.LaTeX.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Symbolic.LaTeXSpec (spec) where
 

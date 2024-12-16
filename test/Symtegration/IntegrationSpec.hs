@@ -1,5 +1,7 @@
 -- |
 -- Description: General testing of specific integration algorithms with numeric coefficients.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.IntegrationSpec (spec) where
 

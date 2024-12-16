@@ -1,5 +1,7 @@
 -- |
 -- Description: Tests of Symtegration.Integration.Powers
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration.PowersSpec (spec) where
 

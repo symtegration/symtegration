@@ -1,5 +1,7 @@
 -- |
 -- Description: Tests polynomial integration.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration.PolynomialSpec (spec) where
 

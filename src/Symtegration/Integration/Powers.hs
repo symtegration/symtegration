@@ -1,6 +1,8 @@
 -- |
 -- Module: Symtegration.Integration.Powers
 -- Description: Integration of arbitrary powers of a variable.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration.Powers (integrate) where
 

@@ -1,6 +1,8 @@
 -- |
 -- Module: Symtegration.Integration.Term
 -- Description: Integrates individual terms in an expression separately.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration.Term (integrate) where
 
