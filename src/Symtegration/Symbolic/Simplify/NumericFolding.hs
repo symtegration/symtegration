@@ -91,12 +91,12 @@ root n k
 simplifyExp :: Expression -> Expression
 simplifyExp (Number 0) = Number 1
 simplifyExp (Log' x) = x
-simplifyExp e = e
+simplifyExp e = Exp' e
 
 simplifyLog :: Expression -> Expression
 simplifyLog (Number 1) = Number 0
 simplifyLog (Exp' x) = x
-simplifyLog e = e
+simplifyLog e = Log' e
 
 simplifySin :: Expression -> Expression
 simplifySin (Number 0) = 0
@@ -106,4 +106,4 @@ simplifySin ((Number n :/: 2) :*: Pi')
   | even n = 0
   | odd ((n - 1) `div` 2) = 1
   | otherwise = -1
-simplifySin e = e
+simplifySin e = Sin' e
