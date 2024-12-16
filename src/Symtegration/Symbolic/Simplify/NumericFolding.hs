@@ -1,4 +1,4 @@
-module Symtegration.Symbolic.Simplify.NumericFolding where
+module Symtegration.Symbolic.Simplify.NumericFolding (simplify) where
 
 import Symtegration.Symbolic
 
@@ -19,6 +19,7 @@ unary (Log' x) = simplifyLog x
 unary (Sqrt' x) = simplify $ x :**: (Number 1 :/: Number 2)
 unary (Sin' x) = simplifySin x
 unary (Cos' x) = simplifyCos x
+unary (Tan' x) = simplifyTan x
 unary e = e
 
 binary :: Expression -> Expression
@@ -126,3 +127,7 @@ simplifyCos (Pi' :*: Number _) = 0
 simplifyCos ((Number _ :/: 2) :*: Pi') = 0
 simplifyCos (Pi' :*: (Number _ :/: 2)) = 0
 simplifyCos e = Cos' e
+
+simplifyTan :: Expression -> Expression
+simplifyTan (Number 0) = 0
+simplifyTan e = Tan' e
