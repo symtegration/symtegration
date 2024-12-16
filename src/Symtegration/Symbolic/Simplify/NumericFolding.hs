@@ -21,6 +21,7 @@ unary (Sin' x) = simplifySin x
 unary e = e
 
 binary :: Expression -> Expression
+-- Fold addition.
 binary (Number n :+: Number m) = Number (n + m)
 binary ((Number n :/: Number m) :+: Number k) = reduceRatio (n + m * k) m
 binary (Number n :+: (Number m :/: Number k)) = reduceRatio (n * k + m) k
@@ -29,6 +30,7 @@ binary ((x :+: Number n) :+: Number m) = Number (n + m) :+: x
 binary ((Number n :+: x) :+: Number m) = Number (n + m) :+: x
 binary (Number n :+: (x :+: Number m)) = Number (n + m) :+: x
 binary (Number n :+: (Number m :+: x)) = Number (n + m) :+: x
+-- Fold multiplication.
 binary (Number n :*: Number m) = Number (n * m)
 binary (Number n :*: (Number m :/: Number k)) = reduceRatio (n * m) k
 binary ((Number n :/: Number m) :*: Number k) = reduceRatio (n * k) m
@@ -37,10 +39,13 @@ binary ((x :*: Number n) :*: Number m) = Number (n * m) :*: x
 binary ((Number n :*: x) :*: Number m) = Number (n * m) :*: x
 binary (Number n :*: (x :*: Number m)) = Number (n * m) :*: x
 binary (Number n :*: (Number m :*: x)) = Number (n * m) :*: x
+-- Subtractions are turned into addition.
 binary (x :-: y) = simplify $ x :+: Negate' y
+-- Fold division.
 binary (x :/: (y :/: z)) = simplify $ (x :*: z) :/: y
 binary ((x :/: y) :/: z) = simplify $ x :/: (y :*: z)
 binary (Number n :/: Number m) = reduceRatio n m
+-- Fold exponentiation.
 binary e@(Number 0 :**: Number 0) = e
 binary (Number 0 :**: _) = Number 0
 binary (Number 1 :**: _) = Number 1
@@ -54,6 +59,8 @@ binary e@(Number n :**: (Number m :/: Number k))
 binary e@((Number n :/: Number m) :**: (Number k :/: Number l))
   | (Just n', Just m') <- (root n l, root m l) = (Number n' :/: Number m') :**: Number k
   | otherwise = e
+-- Turn LogBase into Log.
+binary (LogBase' b x) = simplify $ Log' x :/: Log' b
 binary e = e
 
 reduceRatio :: Integer -> Integer -> Expression
