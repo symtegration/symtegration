@@ -1,4 +1,4 @@
-module Symtegration.Symbolic.Simplify.NumericMerge where
+module Symtegration.Symbolic.Simplify.NumericFolding where
 
 import Symtegration.Symbolic
 
