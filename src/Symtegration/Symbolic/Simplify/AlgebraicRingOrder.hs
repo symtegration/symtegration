@@ -1,5 +1,6 @@
 module Symtegration.Symbolic.Simplify.AlgebraicRingOrder where
 
+import Data.Text (Text)
 import Symtegration.Symbolic
 
 -- No particular ordering should be expected.
@@ -31,3 +32,15 @@ fromAddList :: [Expression] -> Expression
 fromAddList [] = Number 0
 fromAddList [x] = x
 fromAddList (x : xs) = x :+: fromAddList xs
+
+degree :: Text -> Expression -> Maybe Integer
+degree _ (Number _) = Just 0
+degree v (Symbol s) | v == s = Just 1 | otherwise = Just 0
+degree v (Negate' x) = degree v x
+degree v (x :+: y) = max <$> degree v x <*> degree v y
+degree v (x :-: y) = max <$> degree v x <*> degree v y
+degree v (x :*: y) = (+) <$> degree v x <*> degree v y
+degree v (x :/: y) = (-) <$> degree v x <*> degree v y
+degree v (x :**: (Number n)) = (n *) <$> degree v x
+degree v (x :**: Negate' y) = degree v $ x :**: y
+degree _ _ = Nothing

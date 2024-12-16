@@ -27,6 +27,9 @@ module Symtegration.Symbolic
 
     -- | Pattern synonyms are defined to make it more convenient to pattern match on 'Expression'.
 
+    -- | Constants
+    pattern Pi',
+
     -- ** Unary functions
     pattern Negate',
     pattern Abs',
@@ -104,6 +107,9 @@ data Expression
       Generic
     )
   deriving (TextShow) via FromGeneric Expression
+
+pattern Pi' :: Expression
+pattern Pi' = Symbol "pi"
 
 -- | Symbolic representation for unary functions.
 data UnaryFunction
