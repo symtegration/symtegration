@@ -34,3 +34,8 @@ spec = parallel $ do
         degree a > 0 && degree b > 0 ==>
           let (s, t, g :: IndexedPolynomial) = extendedEuclidean a b
            in s * a + t * b `shouldBe` g
+
+      prop "any sa+tb must be multiple of gcd a b" $ \a b s t ->
+        degree a > 0 && degree b > 0 ==>
+          let (_, _, g :: IndexedPolynomial) = extendedEuclidean a b
+           in snd (divide (s * a + t * b) g) `shouldBe` 0
