@@ -16,7 +16,7 @@ unary (Abs' (Number n)) = Number $ abs n
 unary (Signum' (Number n)) = Number $ signum n
 unary (Exp' x) = simplifyExp x
 unary (Log' x) = simplifyLog x
-unary (Sqrt' x) = simplifySqrt x
+unary (Sqrt' x) = simplify $ x :**: (Number 1 :/: Number 2)
 unary (Sin' x) = simplifySin x
 unary e = e
 
@@ -48,6 +48,12 @@ binary (Number n :**: Number m)
   | m >= 0 = Number (n ^ m)
   | otherwise = Number 1 :/: Number (n ^ m)
 binary ((Number n :/: Number m) :**: Number k) = Number (n ^ k) :/: Number (m ^ k)
+binary e@(Number n :**: (Number m :/: Number k))
+  | (Just l) <- root n k = Number (l ^ m)
+  | otherwise = e
+binary e@((Number n :/: Number m) :**: (Number k :/: Number l))
+  | (Just n', Just m') <- (root n l, root m l) = (Number n' :/: Number m') :**: Number k
+  | otherwise = e
 binary e = e
 
 reduceRatio :: Integer -> Integer -> Expression
@@ -74,8 +80,13 @@ root n k
   | otherwise = Nothing
   where
     search m low hi
-      | low == hi, low ^ k == m = Just low
-      | otherwise = undefined
+      | low >= hi, c /= EQ = Nothing
+      | EQ <- c = Just mid
+      | LT <- c = search m low (mid - 1)
+      | GT <- c = search m (mid + 1) hi
+      where
+        mid = (low + hi) `div` 2
+        c = compare (mid ^ k) m
 
 simplifyExp :: Expression -> Expression
 simplifyExp (Number 0) = Number 1
@@ -87,12 +98,12 @@ simplifyLog (Number 1) = Number 0
 simplifyLog (Exp' x) = x
 simplifyLog e = e
 
-simplifySqrt :: Expression -> Expression
-simplifySqrt (Number 0) = Number 0
-simplifySqrt (x@(Number _) :**: 2) = x
-simplifySqrt e = e
-
 simplifySin :: Expression -> Expression
 simplifySin (Number 0) = 0
-simplifySin Pi' = 1
+simplifySin (Number _ :*: Pi') = 0
+simplifySin (Pi' :*: Number _) = 0
+simplifySin ((Number n :/: 2) :*: Pi')
+  | even n = 0
+  | odd ((n - 1) `div` 2) = 1
+  | otherwise = -1
 simplifySin e = e
