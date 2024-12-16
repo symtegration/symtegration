@@ -1,7 +1,31 @@
-module Symtegration.Symbolic.Simplify.NumericFolding (simplify) where
+-- |
+-- Module: Symtegration.Symbolic.Simplify.NumericFolding
+-- Description: Constant folding of numeric constants.
+-- Copyright: Copyright 2024 Yoo Chung
+-- License: Apache-2.0
+-- Maintainer: dev@chungyc.org
+--
+-- This merges numeric terms as much as it can to simplify expressions.
+-- Simplifications are finitely equivalent; i.e., any calculation with
+-- finite inputs should result in the equivalent finite input.
+-- The changes will also be exact, and no numeric constant will be replaced
+-- by an approximate floating-point number.
+module Symtegration.Symbolic.Simplify.NumericFolding where
 
 import Symtegration.Symbolic
 
+-- $setup
+-- >>> import Symtegration.Symbolic.Haskell
+
+-- | Simplifies computations involving numeric constants.
+-- Basically, it computes as much as it can as long as any change is exact.
+--
+-- >>> toHaskell $ simplify $ 1 + 4
+-- "5"
+-- >>> toHaskell $ simplify $ 8 ** (1/3)
+-- "2"
+-- >>> toHaskell $ simplify $ 7 ** (1/3)
+-- "7 ** (1 / 3)"
 simplify :: Expression -> Expression
 simplify e@(Number _) = e
 simplify e@(Symbol _) = e
@@ -10,6 +34,8 @@ simplify (UnaryApply func x) =
 simplify (BinaryApply func x y) =
   binary $ BinaryApply func (simplify x) (simplify y)
 
+-- | Simplify computations involving numeric constants in unary expressions.
+-- The arguments should already have been simplified.
 unary :: Expression -> Expression
 unary (Negate' (Number n)) = Number (-n)
 unary (Abs' (Number n)) = Number $ abs n
@@ -22,6 +48,8 @@ unary (Cos' x) = simplifyCos x
 unary (Tan' x) = simplifyTan x
 unary e = e
 
+-- | Simplify computations involving numeric constants in binary expressions.
+-- The arguments should already have been simplified.
 binary :: Expression -> Expression
 -- Fold addition.
 binary (Number n :+: Number m) = Number (n + m)
@@ -91,8 +119,8 @@ root n k
     search m low hi
       | low >= hi, c /= EQ = Nothing
       | EQ <- c = Just mid
-      | LT <- c = search m low (mid - 1)
-      | GT <- c = search m (mid + 1) hi
+      | GT <- c = search m low (mid - 1)
+      | LT <- c = search m (mid + 1) hi
       where
         mid = (low + hi) `div` 2
         c = compare (mid ^ k) m
