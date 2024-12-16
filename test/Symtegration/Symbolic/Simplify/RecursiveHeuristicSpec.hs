@@ -5,23 +5,13 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec (spec) where
 
-import Symtegration.FiniteDouble
-import Symtegration.Symbolic
-import Symtegration.Symbolic.Arbitrary
-import Symtegration.Symbolic.Haskell
 import Symtegration.Symbolic.Simplify.RecursiveHeuristic
 import Test.Hspec
 import Test.Hspec.QuickCheck
-import Test.QuickCheck
+import Symtegration.Symbolic.Simplify.Properties
 
 spec :: Spec
-spec = modifyMaxSuccess (* 100) $ parallel $ do
+spec = parallel $ do
   describe "simplify" $ do
-    prop "maintains semantics" $ \(Complete e m) ->
-      let e' = simplify e
-          v = evaluate e (assign m)
-          v' = evaluate e' (assign m)
-       in counterexample ("e = " <> show (toHaskell e)) $
-            counterexample ("simplify e = " <> show (toHaskell e')) $
-              maybe False isFinite v ==>
-                fmap Near v' `shouldBe` fmap Near v
+    modifyMaxSuccess (* 100) $ prop "maintains semantics" $
+      equivalentProperty simplify

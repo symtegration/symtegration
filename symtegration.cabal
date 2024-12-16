@@ -98,6 +98,8 @@ test-suite spec
       Symtegration.Symbolic.Arbitrary
       Symtegration.Symbolic.HaskellSpec
       Symtegration.Symbolic.LaTeXSpec
+      Symtegration.Symbolic.Simplify.NumericFoldingSpec
+      Symtegration.Symbolic.Simplify.Properties
       Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec
       Symtegration.SymbolicSpec
       Paths_symtegration
