@@ -33,6 +33,20 @@ fromAddList [] = Number 0
 fromAddList [x] = x
 fromAddList (x : xs) = x :+: fromAddList xs
 
+compareExpr :: Text -> Expression -> Expression -> Ordering
+compareExpr v x y
+  | (Just LT) <- compareDegree = LT
+  | (Just GT) <- compareDegree = GT
+  | LT <- comparePseudoDegree = LT
+  | GT <- comparePseudoDegree = GT
+  | otherwise = undefined
+  where
+    compareDegree = do
+      xd <- degree v x
+      yd <- degree v y
+      return $ compare xd yd
+    comparePseudoDegree = compare (pseudoDegree v x) (pseudoDegree v y)
+
 degree :: Text -> Expression -> Maybe Integer
 degree _ (Number _) = Just 0
 degree v (Symbol s) | v == s = Just 1 | otherwise = Just 0
@@ -44,3 +58,10 @@ degree v (x :/: y) = (-) <$> degree v x <*> degree v y
 degree v (x :**: (Number n)) = (n *) <$> degree v x
 degree v (x :**: Negate' y) = degree v $ x :**: y
 degree _ _ = Nothing
+
+pseudoDegree :: Text -> Expression -> Integer
+pseudoDegree _ (Number _) = 0
+pseudoDegree v (Symbol s) | v == s = 1 | otherwise = 0
+pseudoDegree v (Negate' x) = pseudoDegree v x
+pseudoDegree v (UnaryApply _ x) = pseudoDegree v x
+pseudoDegree v (BinaryApply _ x y) = pseudoDegree v x + pseudoDegree v y
