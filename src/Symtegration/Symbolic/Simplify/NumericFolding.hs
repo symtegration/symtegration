@@ -18,6 +18,7 @@ unary (Exp' x) = simplifyExp x
 unary (Log' x) = simplifyLog x
 unary (Sqrt' x) = simplify $ x :**: (Number 1 :/: Number 2)
 unary (Sin' x) = simplifySin x
+unary (Cos' x) = simplifyCos x
 unary e = e
 
 binary :: Expression -> Expression
@@ -113,4 +114,15 @@ simplifySin ((Number n :/: 2) :*: Pi')
   | even n = 0
   | odd ((n - 1) `div` 2) = 1
   | otherwise = -1
+simplifySin (Pi' :*: x@(Number _ :/: 2)) =
+  simplifySin (x :*: Pi')
 simplifySin e = Sin' e
+
+simplifyCos :: Expression -> Expression
+simplifyCos (Number 0) = 1
+simplifyCos (Number n :*: Pi') | even n = 1 | odd n = -1
+simplifyCos (Pi' :*: Number _) = 0
+-- Any 2k/2 would have been simplified to k already.
+simplifyCos ((Number _ :/: 2) :*: Pi') = 0
+simplifyCos (Pi' :*: (Number _ :/: 2)) = 0
+simplifyCos e = Cos' e
