@@ -46,7 +46,7 @@ binary (Number 0 :**: _) = Number 0
 binary (Number 1 :**: _) = Number 1
 binary (Number n :**: Number m)
   | m >= 0 = Number (n ^ m)
-  | otherwise = Number 1 :/: Number (n ^ m)
+  | otherwise = Number 1 :/: Number (n ^ (-m))
 binary ((Number n :/: Number m) :**: Number k) = Number (n ^ k) :/: Number (m ^ k)
 binary e@(Number n :**: (Number m :/: Number k))
   | (Just l) <- root n k = Number (l ^ m)
