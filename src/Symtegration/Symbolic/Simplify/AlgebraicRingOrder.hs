@@ -51,7 +51,8 @@ compareExpressions v x y
   | Number n <- x, Number m <- y = compare n m
   | Symbol s <- x, Symbol r <- y = compare s r
   | UnaryApply _ x' <- x, UnaryApply _ y' <- y = compareExpressions v x' y'
-  | BinaryApply _ x' x'' <- x, BinaryApply _ y' y'' <- y =
+  | BinaryApply _ x' x'' <- x,
+    BinaryApply _ y' y'' <- y =
       case compareExpressions v x' y' of
         EQ -> compareExpressions v x'' y''
         c -> c
