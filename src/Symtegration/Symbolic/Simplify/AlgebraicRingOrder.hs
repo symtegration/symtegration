@@ -1,7 +1,14 @@
 module Symtegration.Symbolic.Simplify.AlgebraicRingOrder where
 
+import Data.List (sortBy)
 import Data.Text (Text)
 import Symtegration.Symbolic
+
+order :: Text -> Expression -> Expression
+order v e = fromAddList $ sortBy (compareExpressions v) orderedAddTerms
+  where
+    terms = toAddMultiplyList e
+    orderedAddTerms = map (fromMultiplyList . sortBy (compareExpressions v)) terms
 
 -- No particular ordering should be expected.
 toAddMultiplyList :: Expression -> [[Expression]]
@@ -33,23 +40,29 @@ fromAddList [] = Number 0
 fromAddList [x] = x
 fromAddList (x : xs) = x :+: fromAddList xs
 
-compareExpr :: Text -> Expression -> Expression -> Ordering
-compareExpr _ (Number x) (Number y) = compare x y
-compareExpr v x y
+compareExpressions :: Text -> Expression -> Expression -> Ordering
+compareExpressions v x y
   | (Just LT) <- compareDegree = LT
   | (Just GT) <- compareDegree = GT
   | LT <- comparePseudoDegree = LT
   | GT <- comparePseudoDegree = GT
   | LT <- compareOp = LT
   | GT <- compareOp = GT
-  | otherwise = undefined
+  | Number n <- x, Number m <- y = compare n m
+  | Symbol s <- x, Symbol r <- y = compare s r
+  | UnaryApply _ x' <- x, UnaryApply _ y' <- y = compareExpressions v x' y'
+  | BinaryApply _ x' x'' <- x, BinaryApply _ y' y'' <- y =
+      case compareExpressions v x' y' of
+        EQ -> compareExpressions v x'' y''
+        c -> c
+  | otherwise = EQ
   where
     compareDegree = do
       xd <- degree v x
       yd <- degree v y
       return $ compare xd yd
     comparePseudoDegree = compare (pseudoDegree v x) (pseudoDegree v y)
-    compareOp = compare (order v x) (order v y)
+    compareOp = compare (expressionOrder v x) (expressionOrder v y)
 
 degree :: Text -> Expression -> Maybe Integer
 degree _ (Number _) = Just 0
@@ -70,33 +83,33 @@ pseudoDegree v (Negate' x) = pseudoDegree v x
 pseudoDegree v (UnaryApply _ x) = pseudoDegree v x
 pseudoDegree v (BinaryApply _ x y) = pseudoDegree v x + pseudoDegree v y
 
-order :: Text -> Expression -> Int
-order _ (Number _) = 0
--- constant symbol has order 1
-order _ (UnaryApply Negate _) = 2
-order _ (UnaryApply Signum _) = 3
-order _ (UnaryApply Abs _) = 4
-order _ (BinaryApply Add _ _) = 5
-order _ (BinaryApply Subtract _ _) = 6
-order _ (BinaryApply Multiply _ _) = 7
-order _ (BinaryApply Divide _ _) = 8
-order _ (BinaryApply Power _ _) = 9
-order _ (UnaryApply Sqrt _) = 10
-order _ (UnaryApply Exp _) = 11
-order _ (UnaryApply Log _) = 12
-order _ (BinaryApply LogBase _ _) = 13
-order _ (UnaryApply Sin _) = 14
-order _ (UnaryApply Cos _) = 15
-order _ (UnaryApply Tan _) = 16
-order _ (UnaryApply Asin _) = 17
-order _ (UnaryApply Acos _) = 18
-order _ (UnaryApply Atan _) = 19
-order _ (UnaryApply Sinh _) = 20
-order _ (UnaryApply Cosh _) = 21
-order _ (UnaryApply Tanh _) = 22
-order _ (UnaryApply Asinh _) = 23
-order _ (UnaryApply Acosh _) = 24
-order _ (UnaryApply Atanh _) = 25
-order v (Symbol s)
-  | v == s = 36
-  | otherwise = 2
+expressionOrder :: Text -> Expression -> Int
+expressionOrder _ (Number _) = 0
+-- constant symbol has expressionOrder 1
+expressionOrder _ (UnaryApply Negate _) = 2
+expressionOrder _ (UnaryApply Signum _) = 3
+expressionOrder _ (UnaryApply Abs _) = 4
+expressionOrder _ (BinaryApply Add _ _) = 5
+expressionOrder _ (BinaryApply Subtract _ _) = 6
+expressionOrder _ (BinaryApply Multiply _ _) = 7
+expressionOrder _ (BinaryApply Divide _ _) = 8
+expressionOrder _ (BinaryApply Power _ _) = 9
+expressionOrder _ (UnaryApply Sqrt _) = 10
+expressionOrder _ (UnaryApply Exp _) = 11
+expressionOrder _ (UnaryApply Log _) = 12
+expressionOrder _ (BinaryApply LogBase _ _) = 13
+expressionOrder _ (UnaryApply Sin _) = 14
+expressionOrder _ (UnaryApply Cos _) = 15
+expressionOrder _ (UnaryApply Tan _) = 16
+expressionOrder _ (UnaryApply Asin _) = 17
+expressionOrder _ (UnaryApply Acos _) = 18
+expressionOrder _ (UnaryApply Atan _) = 19
+expressionOrder _ (UnaryApply Sinh _) = 20
+expressionOrder _ (UnaryApply Cosh _) = 21
+expressionOrder _ (UnaryApply Tanh _) = 22
+expressionOrder _ (UnaryApply Asinh _) = 23
+expressionOrder _ (UnaryApply Acosh _) = 24
+expressionOrder _ (UnaryApply Atanh _) = 25
+expressionOrder v (Symbol s)
+  | v == s = 26
+  | otherwise = 1
