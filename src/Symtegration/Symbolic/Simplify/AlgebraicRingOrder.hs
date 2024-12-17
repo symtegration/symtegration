@@ -65,3 +65,34 @@ pseudoDegree v (Symbol s) | v == s = 1 | otherwise = 0
 pseudoDegree v (Negate' x) = pseudoDegree v x
 pseudoDegree v (UnaryApply _ x) = pseudoDegree v x
 pseudoDegree v (BinaryApply _ x y) = pseudoDegree v x + pseudoDegree v y
+
+order :: Text -> Expression -> Int
+order _ (Number _) = 0
+-- constant symbol has order 1
+order _ (UnaryApply Negate _) = 2
+order _ (UnaryApply Signum _) = 3
+order _ (UnaryApply Abs _) = 4
+order _ (BinaryApply Add _ _) = 5
+order _ (BinaryApply Subtract _ _) = 6
+order _ (BinaryApply Multiply _ _) = 7
+order _ (BinaryApply Divide _ _) = 8
+order _ (BinaryApply Power _ _) = 9
+order _ (UnaryApply Sqrt _) = 10
+order _ (UnaryApply Exp _) = 11
+order _ (UnaryApply Log _) = 12
+order _ (BinaryApply LogBase _ _) = 13
+order _ (UnaryApply Sin _) = 14
+order _ (UnaryApply Cos _) = 15
+order _ (UnaryApply Tan _) = 16
+order _ (UnaryApply Asin _) = 17
+order _ (UnaryApply Acos _) = 18
+order _ (UnaryApply Atan _) = 19
+order _ (UnaryApply Sinh _) = 20
+order _ (UnaryApply Cosh _) = 21
+order _ (UnaryApply Tanh _) = 22
+order _ (UnaryApply Asinh _) = 23
+order _ (UnaryApply Acosh _) = 24
+order _ (UnaryApply Atanh _) = 25
+order v (Symbol s)
+  | v == s = 36
+  | otherwise = 2
