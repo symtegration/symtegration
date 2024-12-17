@@ -17,7 +17,8 @@ equivalentProperty simplify (Complete e m) =
   let e' = simplify e
       v = evaluate e (assign m)
       v' = evaluate e' (assign m)
-   in counterexample ("e = " <> show (toHaskell e)) $
-        counterexample ("simplify e = " <> show (toHaskell e')) $
-          maybe False isFinite v ==>
-            fmap Near v' `shouldBe` fmap Near v
+   in within (300 * 1000 * 1000) $
+        counterexample ("e = " <> show (toHaskell e)) $
+          counterexample ("simplify e = " <> show (toHaskell e')) $
+            maybe False isFinite v ==>
+              fmap Near v' `shouldBe` fmap Near v

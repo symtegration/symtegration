@@ -34,11 +34,14 @@ fromAddList [x] = x
 fromAddList (x : xs) = x :+: fromAddList xs
 
 compareExpr :: Text -> Expression -> Expression -> Ordering
+compareExpr _ (Number x) (Number y) = compare x y
 compareExpr v x y
   | (Just LT) <- compareDegree = LT
   | (Just GT) <- compareDegree = GT
   | LT <- comparePseudoDegree = LT
   | GT <- comparePseudoDegree = GT
+  | LT <- compareOp = LT
+  | GT <- compareOp = GT
   | otherwise = undefined
   where
     compareDegree = do
@@ -46,6 +49,7 @@ compareExpr v x y
       yd <- degree v y
       return $ compare xd yd
     comparePseudoDegree = compare (pseudoDegree v x) (pseudoDegree v y)
+    compareOp = compare (order v x) (order v y)
 
 degree :: Text -> Expression -> Maybe Integer
 degree _ (Number _) = Just 0

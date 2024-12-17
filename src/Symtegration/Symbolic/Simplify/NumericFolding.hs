@@ -83,6 +83,7 @@ binary (Number n :/: Number m) = reduceRatio n m
 binary e@(Number 0 :**: Number 0) = e
 binary (Number 0 :**: _) = Number 0
 binary (Number 1 :**: _) = Number 1
+binary (Number _ :**: 0) = Number 1
 binary (Number n :**: Number m)
   | m >= 0 = Number (n ^ m)
   | otherwise = Number 1 :/: Number (n ^ (-m))
@@ -124,6 +125,7 @@ root ::
 root 0 _ = Just 0
 root 1 _ = Just 1
 root n k
+  | k < 0 = Nothing
   | GT <- compare n 0 = search n 1 n
   | LT <- compare n 0, odd k = (* (-1)) <$> search (-n) 1 (-n)
   | otherwise = Nothing
@@ -164,8 +166,10 @@ simplifySin ((Number n :/: 2) :*: Pi')
   | even n = 0
   | odd ((n - 1) `div` 2) = 1
   | otherwise = -1
-simplifySin (Pi' :*: x@(Number _ :/: 2)) =
-  simplifySin (x :*: Pi')
+simplifySin (Pi' :*: (Number n :/: 2))
+  | even n = 0
+  | odd ((n - 1) `div` 2) = 1
+  | otherwise = -1
 simplifySin e = Sin' e
 
 -- | Simplify a cosine.  I.e., simplify \(\cos X\).
@@ -174,7 +178,7 @@ simplifySin e = Sin' e
 simplifyCos :: Expression -> Expression
 simplifyCos (Number 0) = 1
 simplifyCos (Number n :*: Pi') | even n = 1 | odd n = -1
-simplifyCos (Pi' :*: Number _) = 0
+simplifyCos (Pi' :*: Number n) | even n = 1 | odd n = -1
 -- Any 2k/2 would have been simplified to k already.
 simplifyCos ((Number _ :/: 2) :*: Pi') = 0
 simplifyCos (Pi' :*: (Number _ :/: 2)) = 0
