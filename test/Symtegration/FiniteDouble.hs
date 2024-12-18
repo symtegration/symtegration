@@ -145,4 +145,4 @@ instance Eq Near where
     | x == 0 || y == 0 || x == (-0) || y == (-0) = x - y < threshold
     | otherwise = (x - y) / y < threshold
     where
-      threshold = 0.01
+      threshold = 1e-5
