@@ -84,6 +84,7 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Symtegration.ErrorDouble
       Symtegration.FiniteDouble
       Symtegration.Integration.PolynomialSpec
       Symtegration.Integration.PowersSpec

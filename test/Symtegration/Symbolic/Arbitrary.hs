@@ -30,6 +30,7 @@ import Data.Set qualified as S
 import Data.String (fromString)
 import Data.Text (Text)
 import Data.Text qualified as Text
+import Symtegration.ErrorDouble
 import Symtegration.FiniteDouble
 import Symtegration.Symbolic
 import Test.QuickCheck
@@ -87,7 +88,12 @@ instance Arbitrary Complete where
     vals <- infiniteList
     let symbols = gatherSymbols expr
     let assignment = Map.fromList $ zip (S.toList symbols) vals
-    return $ Complete expr assignment
+    let err = relativeError <$> evaluate expr (assign (Map.map includeError assignment))
+    if err < Just 1e-8
+      -- Only use expressions where slight divergences do not result in huge errors.
+      then return $ Complete expr (Map.map FiniteDouble assignment)
+      -- If we do not have such an expression, try again.
+      else arbitrary
 
   shrink (Complete e m) = [Complete e' (restrict m e') | e' <- shrink e]
     where
