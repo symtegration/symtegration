@@ -36,6 +36,7 @@ library
       Symtegration.Integration
       Symtegration.Integration.Polynomial
       Symtegration.Integration.Powers
+      Symtegration.Integration.Substitution
       Symtegration.Integration.Term
       Symtegration.Integration.Trigonometric
       Symtegration.Polynomial
@@ -93,6 +94,7 @@ test-suite spec
       Symtegration.Integration.PolynomialSpec
       Symtegration.Integration.PowersSpec
       Symtegration.Integration.Properties
+      Symtegration.Integration.SubstitutionSpec
       Symtegration.Integration.TermSpec
       Symtegration.Integration.TrigonometricSpec
       Symtegration.IntegrationSpec
