@@ -32,6 +32,7 @@ source-repository head
 library
   exposed-modules:
       Symtegration
+      Symtegration.Differentiation
       Symtegration.Integration
       Symtegration.Integration.Polynomial
       Symtegration.Integration.Powers
@@ -43,9 +44,11 @@ library
       Symtegration.Symbolic
       Symtegration.Symbolic.Haskell
       Symtegration.Symbolic.LaTeX
+      Symtegration.Symbolic.Simplify
       Symtegration.Symbolic.Simplify.AlgebraicRingOrder
       Symtegration.Symbolic.Simplify.NumericFolding
       Symtegration.Symbolic.Simplify.RecursiveHeuristic
+      Symtegration.Symbolic.Simplify.SymbolicFolding
   other-modules:
       Paths_symtegration
   hs-source-dirs:
@@ -55,7 +58,8 @@ library
       OverloadedStrings
   ghc-options: -Wall -Werror
   build-depends:
-      base >=4.18 && <4.21
+      ad ==4.5.*
+    , base >=4.18 && <4.21
     , containers >=0.6 && <0.8
     , text >=2.0 && <2.2
     , text-show ==3.10.*
@@ -103,6 +107,7 @@ test-suite spec
       Symtegration.Symbolic.Simplify.NumericFoldingSpec
       Symtegration.Symbolic.Simplify.Properties
       Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec
+      Symtegration.Symbolic.Simplify.SymbolicFoldingSpec
       Symtegration.SymbolicSpec
       Paths_symtegration
   hs-source-dirs:

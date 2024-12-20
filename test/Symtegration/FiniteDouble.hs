@@ -89,7 +89,7 @@ instance RealFloat FiniteDouble where
   decodeFloat (FiniteDouble x) = decodeFloat x
   encodeFloat x y = FiniteDouble $ encodeFloat x y
   isNaN (FiniteDouble x) = isNaN x || isInfinite x
-  isInfinite _ = False
+  isInfinite (FiniteDouble x) = isInfinite x
   isDenormalized (FiniteDouble x) = isDenormalized x
   isNegativeZero (FiniteDouble x) = isNegativeZero x
   isIEEE (FiniteDouble x) = isIEEE x

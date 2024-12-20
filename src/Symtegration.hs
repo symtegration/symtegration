@@ -21,21 +21,15 @@
 -- >>> import Symtegration
 -- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
 -- Just "(x / 2) * (z ** 2) + y * z"
---
--- For symbolic differentiation, use [automatic differentiation](https://hackage.haskell.org/package/ad).
--- For example,
---
--- >>> import Numeric.AD
--- >>> diff (\x -> x + 1) ("x" :: Expression)
--- Number 1
--- >>> toHaskell $ simplify $ diff (\x -> x ** 3 + 1) ("x" :: Expression)
--- "3 * (x ** 2)"
 module Symtegration
   ( -- * Symbolic representation
     Expression,
 
     -- * Integration
     integrate,
+
+    -- * Differentiation
+    differentiate,
 
     -- * Computation
     evaluate,
@@ -59,6 +53,7 @@ module Symtegration
 where
 
 import Data.Text (Text)
+import Symtegration.Differentiation (differentiate)
 import Symtegration.Integration qualified as Integration
 import Symtegration.Symbolic (Expression, evaluate, fractionalEvaluate, toFunction)
 import Symtegration.Symbolic.Haskell (toHaskell)
