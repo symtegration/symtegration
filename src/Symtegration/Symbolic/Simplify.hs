@@ -19,4 +19,4 @@ simplify v e
   | otherwise = simplify v e' -- Another round.
   where
     e' = f e
-    f = SymbolicFolding.simplify . AlgebraicRingOrder.order v . NumericFolding.simplify
+    f = NumericFolding.simplify . SymbolicFolding.simplify . AlgebraicRingOrder.order v

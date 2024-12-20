@@ -13,7 +13,7 @@ import Numeric.AD
 import Symtegration.FiniteDouble
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Haskell
-import Symtegration.Symbolic.Simplify.RecursiveHeuristic
+import Symtegration.Symbolic.Simplify
 import Test.Hspec
 import Test.QuickCheck
 
@@ -34,8 +34,8 @@ antiderivativeProperty integrate m e x =
         label "integration success" $
           counterexample ("derivative = " <> Text.unpack (toHaskell e)) $
             counterexample ("antiderivative = " <> Text.unpack (toHaskell integrated)) $
-              counterexample ("simplified derivative = " <> Text.unpack (toHaskell $ simplify e)) $
-                counterexample ("simplified antiderivative = " <> Text.unpack (toHaskell $ simplify integrated)) $
+              counterexample ("simplified derivative = " <> Text.unpack (toHaskell $ simplify v e)) $
+                counterexample ("simplified antiderivative = " <> Text.unpack (toHaskell $ simplify v integrated)) $
                   Near (FiniteDouble (f' x)) `shouldBe` Near (FiniteDouble (f x))
       where
         -- The original function and the derivative of the integral should behave similarly.

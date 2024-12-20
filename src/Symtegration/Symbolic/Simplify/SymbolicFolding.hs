@@ -99,6 +99,7 @@ binary (_ :**: Number 0) = Number 1
 binary (x :**: Number 1) = x
 binary ((x :**: y) :**: z) =
   x :**: simplify (y :*: z)
+-- Fold subtraction.
 binary e@(x :-: y)
   | x == y = Number 0
   | otherwise = e

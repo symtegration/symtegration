@@ -73,6 +73,7 @@ instance Floating FiniteDouble where
   asinh = unaryOp asinh
   acosh = unaryOp acosh
   atanh = unaryOp atanh
+  (**) = binOp (**)
 
 instance Real FiniteDouble where
   toRational (FiniteDouble x) = toRational x

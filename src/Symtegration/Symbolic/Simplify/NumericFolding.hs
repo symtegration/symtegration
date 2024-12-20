@@ -81,9 +81,8 @@ binary ((x :/: y) :/: z) = simplify $ x :/: (y :*: z)
 binary (Number n :/: Number m) = reduceRatio n m
 -- Fold exponentiation.
 binary e@(Number 0 :**: Number 0) = e
-binary (Number 0 :**: _) = Number 0
+binary (Number _ :**: Number 0) = Number 1
 binary (Number 1 :**: _) = Number 1
-binary (Number _ :**: 0) = Number 1
 binary (Number n :**: Number m)
   | m >= 0 = Number (n ^ m)
   | otherwise = Number 1 :/: Number (n ^ (-m))
