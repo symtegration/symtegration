@@ -47,7 +47,7 @@ module Symtegration
     -- simplify results as appropriate.  One may want to explicitly simplify
     -- mathematical expressions when used with other packages, however,
     -- such as when using [Numeric.AD](https://hackage.haskell.org/package/ad)
-    -- for differentiation.
+    -- directly for differentiation.
     simplify,
   )
 where

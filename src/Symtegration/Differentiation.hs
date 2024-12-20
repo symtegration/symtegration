@@ -26,7 +26,7 @@ import Symtegration.Symbolic.Simplify
 -- >>> toHaskell $ differentiate "x" $ "a" * sin "x"
 -- "a * (cos x)"
 --
--- This uses 'diff' in "Numeric.AD".
+-- This uses [Numeric.AD](https://hackage.haskell.org/package/ad).
 differentiate ::
   -- | Symbol representing the variable.
   Text ->
