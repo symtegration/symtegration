@@ -33,7 +33,7 @@ dependencies:
 - base >= 4.18 && < 4.21
 - containers >= 0.6 && < 0.8
 - text >= 2.0 && < 2.2
-- text-show >= 3.10 && < 3.11
+- text-show >= 3.10 && < 3.12
 
 library:
   source-dirs: src
