@@ -16,7 +16,6 @@ on:
 
 jobs:
   cabal:
-    # We will test only lower and upper bounds.
     strategy:
       matrix:
         os:
@@ -24,7 +23,10 @@ jobs:
 
         ghc:
           - "9.6.6"
+          - "9.8.4"
           - "9.10.1"
+
+      fail-fast: false
 
     name: cabal / ${{ matrix.os }} / ghc ${{ matrix.ghc }}
     runs-on: ${{ matrix.os }}
