@@ -17,6 +17,10 @@ integrate v (x :**: (Negate' (Number n :/: Number m))) =
   integrate v $ x :**: (Number (-n) :/: Number m)
 integrate v (x :**: (Negate' (Number n))) =
   integrate v $ x :**: Number (-n)
+integrate v e@(Number _) = (:*:) e <$> integrate v (Symbol v :**: Number 0)
+integrate v e@(Symbol v')
+  | v == v' = integrate v $ e :**: Number 1
+  | otherwise = (:*:) e <$> integrate v (Number 1)
 integrate v (x@(Symbol s) :**: Number n)
   | s == v, -1 <- n = Just $ Log' x
   | s == v = Just $ (x :**: Number (n + 1)) :/: Number (n + 1)

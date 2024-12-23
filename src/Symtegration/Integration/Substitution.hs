@@ -4,7 +4,7 @@
 -- Copyright: Copyright 2024 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
-module Symtegration.Integration.Substitution where
+module Symtegration.Integration.Substitution (integrate) where
 
 import Data.Foldable (asum)
 import Data.Text (Text)
