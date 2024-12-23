@@ -26,6 +26,10 @@ jobs:
           - "9.8.4"
           - "9.10.1"
 
+        include:
+          - ghc: "9.6.6"
+            flags : "--prefer-oldest"
+
       fail-fast: false
 
     name: cabal / ${{ matrix.os }} / ghc ${{ matrix.ghc }}
@@ -49,7 +53,7 @@ jobs:
 
       - name: Build
         run: |
-          cabal configure --disable-optimization --enable-tests --write-ghc-environment-files=always
+          cabal configure --disable-optimization --enable-tests --write-ghc-environment-files=always ${{ matrix.flags }}
           cabal build
 
       - name: Test
