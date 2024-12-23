@@ -13,13 +13,28 @@ import Symtegration.Symbolic
 
 -- $setup
 -- >>> import Symtegration.Symbolic.Haskell
--- >>> import Symtegration.Symbolic.Simplify
+-- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic
 
--- |
+-- | Integrates by substitution.
+--
+-- Specifically, if for
+--
+-- \[ \int f(g(x)) h(x) \, dx\]
+--
+-- it is the case that \(\frac{dg(x)}{dx} = h(x)\), then compute \(\int f(v) \, dv\) and substitute with \(v=g(x)\).
+--
 -- >>> import Symtegration.Integration.Trigonometric qualified as Trigonometric
--- >>> toHaskell <$> simplify "x" <$> integrate [Trigonometric.integrate] "x" (sin ("a" * "x" + 1))
+-- >>> toHaskell <$> simplify <$> integrate [Trigonometric.integrate] "x" (sin ("a" * "x" + 1))
 -- Just "(1 / a) * (negate (cos (a * x + 1)))"
-integrate :: [Text -> Expression -> Maybe Expression] -> Text -> Expression -> Maybe Expression
+integrate ::
+  -- | Integration algorithms to try after substitution.
+  [Text -> Expression -> Maybe Expression] ->
+  -- | Symbol for the variable.
+  Text ->
+  -- | Expression to integrate.
+  Expression ->
+  -- | Integral, if derived.
+  Maybe Expression
 integrate fs v (x :*: UnaryApply func y)
   | Number 0 <- d = Nothing -- Argument is constant.
   | x' == y',
@@ -34,6 +49,7 @@ integrate fs v (e@(UnaryApply _ _) :*: x) = integrate fs v $ x :*: e
 integrate fs v e@(UnaryApply _ _) = integrate fs v $ Number 1 :*: e
 integrate _ _ _ = Nothing
 
+-- | Use the given functions to integrate the given expression.
 integrateSubstitution :: [Text -> Expression -> Maybe Expression] -> Text -> Expression -> Maybe Expression
 integrateSubstitution fs v e = asum $ map (\f -> f v e) fs
 
@@ -52,7 +68,14 @@ factor v e@(x :*: (y :*: z))
   | otherwise = (Number 1, e)
 factor v e | isConstant v e = (e, Number 1) | otherwise = (Number 1, e)
 
-isConstant :: Text -> Expression -> Bool
+-- | Returns whether an expression contains the variable.
+isConstant ::
+  -- | Symbol for the variable.
+  Text ->
+  -- | Expression to check.
+  Expression ->
+  -- | Whether the expression is a constant.
+  Bool
 isConstant _ (Number _) = True
 isConstant v (Symbol s) = s /= v
 isConstant v (UnaryApply _ x) = isConstant v x
