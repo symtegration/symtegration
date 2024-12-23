@@ -62,7 +62,7 @@ library
     , base >=4.18 && <4.21
     , containers >=0.6 && <0.8
     , text >=2.0 && <2.2
-    , text-show >=3.10 && <3.12
+    , text-show ==3.10.*
   default-language: GHC2021
 
 test-suite examples
@@ -81,7 +81,7 @@ test-suite examples
     , doctest-parallel ==0.3.*
     , symtegration
     , text >=2.0 && <2.2
-    , text-show >=3.10 && <3.12
+    , text-show ==3.10.*
   default-language: GHC2021
 
 test-suite spec
@@ -126,5 +126,5 @@ test-suite spec
     , hspec ==2.11.*
     , symtegration
     , text >=2.0 && <2.2
-    , text-show >=3.10 && <3.12
+    , text-show ==3.10.*
   default-language: GHC2021
