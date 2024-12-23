@@ -21,8 +21,9 @@ import Symtegration.Symbolic
 -- Just "(1 / a) * (negate (cos (a * x + 1)))"
 integrate :: [Text -> Expression -> Maybe Expression] -> Text -> Expression -> Maybe Expression
 integrate fs v (x :*: UnaryApply func y)
-  | Number 0 <- d = Nothing
+  | Number 0 <- d = Nothing -- Argument is constant.
   | x' == y',
+    -- Re-use v as the variable, as it is the one symbol guaranteed not to appear outside the argument.
     Just e <- integrateSubstitution fs v (UnaryApply func (Symbol v)) =
       Just $ (c :/: d) :*: substitute e (\s -> if s == v then Just y else Nothing)
   | otherwise = Nothing

@@ -42,6 +42,7 @@ binary e@(Negate' x :+: y)
   | x == y = Number 0
   | otherwise = e
 binary (Number 0 :+: x) = x
+binary (x :+: (Number 0 :+: y)) = simplify $ x :+: y
 binary e@((Number n :*: x) :+: ((Number m :*: y) :+: z))
   | x == y = (Number (m + n) :*: x) :+: z
   | otherwise = e
