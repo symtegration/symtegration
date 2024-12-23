@@ -1,4 +1,6 @@
 name: HLint
+permissions: read-all
+
 on:
   push:
     branches:

@@ -1,4 +1,6 @@
 name: Ormolu
+permissions: read-all
+
 on:
   push:
     branches:
