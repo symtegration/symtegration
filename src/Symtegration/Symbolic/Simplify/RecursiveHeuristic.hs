@@ -69,6 +69,8 @@ binary e@((x :**: y) :*: x')
 binary e@(x :*: (x' :**: y'))
   | x == x' = x :**: simplify (1 :+: y')
   | otherwise = e
+binary e@(x :*: (y :/: z)) | x == z = y | otherwise = e
+binary e@((x :/: y) :*: z) | y == z = x | otherwise = e
 binary (Number m :-: Number n) = Number $ m - n
 binary (x :-: 0) = x
 binary (x :-: (Negate' y)) = binary (x :+: y)

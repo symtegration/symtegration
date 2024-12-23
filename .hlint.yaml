@@ -7,3 +7,6 @@
 
 # Warn on use of partial functions
 - group: {name: partial, enabled: true}
+
+# Hints that go against my own preference.
+- ignore: {name: "Use record patterns"}
