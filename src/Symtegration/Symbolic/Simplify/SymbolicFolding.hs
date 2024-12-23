@@ -27,7 +27,7 @@ simplify (BinaryApply func x y) =
 --
 -- The arguments should already have been simplified.
 unary :: Expression -> Expression
-unary (Negate' (Negate' x)) = x
+unary (Negate' (Negate' x)) = simplify x
 unary e = e
 
 -- | Folds symbolic terms for binary expressions.
@@ -42,30 +42,30 @@ binary e@(Negate' x :+: y)
   | x == y = Number 0
   | otherwise = e
 binary (Number 0 :+: x) = x
-binary (x :+: (Number 0 :+: y)) = simplify $ x :+: y
+binary (x :+: Number 0) = x
 binary e@((Number n :*: x) :+: ((Number m :*: y) :+: z))
-  | x == y = (Number (m + n) :*: x) :+: z
+  | x == y = simplify $ (Number (m + n) :*: x) :+: z
   | otherwise = e
 binary e@((Number n :*: x) :+: (y :+: z))
-  | x == y = (Number (n + 1) :*: x) :+: z
+  | x == y = simplify $ (Number (n + 1) :*: x) :+: z
   | otherwise = e
 binary e@(x :+: ((Number n :*: y) :+: z))
-  | x == y = (Number (n + 1) :*: x) :+: z
+  | x == y = simplify (Number (n + 1) :*: x) :+: z
   | otherwise = e
 binary e@((Number n :*: x) :+: (Number m :*: y))
-  | x == y = Number (n + m) :*: x
+  | x == y = simplify $ Number (n + m) :*: x
   | otherwise = e
 binary e@(x :+: (Number n :*: y))
-  | x == y = Number (n + 1) :*: x
+  | x == y = simplify $ Number (n + 1) :*: x
   | otherwise = e
 binary e@((Number n :*: x) :+: y)
-  | x == y = Number (n + 1) :*: x
+  | x == y = simplify $ Number (n + 1) :*: x
   | otherwise = e
 binary e@(x :+: (y :+: z))
-  | x == y = Number 2 :*: x :+: z
+  | x == y = simplify $ Number 2 :*: x :+: z
   | otherwise = e
 binary e@(x :+: y)
-  | x == y = Number 2 :*: x
+  | x == y = simplify $ Number 2 :*: x
   | otherwise = e
 -- Fold multiplication.
 binary (Number 0 :*: _) = Number 0
@@ -73,33 +73,33 @@ binary (_ :*: Number 0) = Number 0
 binary (x :*: Number 1) = x
 binary (Number 1 :*: x) = x
 binary e@(x :*: (y :**: Number n))
-  | x == y = x :**: Number (n + 1)
+  | x == y = simplify $ x :**: Number (n + 1)
   | otherwise = e
 binary e@((x :**: y) :*: (x' :**: y'))
-  | x == x' = x :**: simplify (y :+: y')
+  | x == x' = simplify $ x :**: (y :+: y')
   | otherwise = e
 binary e@(x :*: ((y :**: Number n) :*: z))
-  | x == y = (x :**: Number (n + 1)) :*: z
+  | x == y = simplify $ (x :**: Number (n + 1)) :*: z
   | otherwise = e
 binary e@((x :**: Number n) :*: (y :*: z))
-  | x == y = (x :**: Number (n + 1)) :*: z
+  | x == y = simplify $ (x :**: Number (n + 1)) :*: z
   | otherwise = e
 binary e@(x :*: (y :*: z))
-  | x == y = (x :**: Number 2) :*: z
+  | x == y = simplify $ (x :**: Number 2) :*: z
   | otherwise = e
 binary e@(x :*: y)
-  | x == y = x :**: Number 2
+  | x == y = simplify $ x :**: Number 2
   | otherwise = e
 -- Fold division.
 binary (x :/: (y :/: z)) =
-  simplify (x :*: z) :/: y
+  simplify $ (x :*: z) :/: y
 binary ((x :/: y) :/: z) =
-  x :/: simplify (y :*: z)
+  simplify $ x :/: (y :*: z)
 -- Fold powers.
 binary (_ :**: Number 0) = Number 1
 binary (x :**: Number 1) = x
 binary ((x :**: y) :**: z) =
-  x :**: simplify (y :*: z)
+  simplify $ x :**: (y :*: z)
 -- Fold subtraction.
 binary e@(x :-: y)
   | x == y = Number 0

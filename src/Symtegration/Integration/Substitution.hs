@@ -51,10 +51,12 @@ integrate fs v (x :*: BinaryApply func y z)
   -- Re-use v as the variable, as it is the one symbol guaranteed not to appear outside the argument.
   | c /= Number 0,
     x' == y',
+    isConstant v z,
     Just e <- integrateSubstitution fs v (BinaryApply func (Symbol v) z) =
       Just $ (b :/: c) :*: substitute e (\s -> if s == v then Just y else Nothing)
   | d /= Number 0,
     x' == z',
+    isConstant v y,
     Just e <- integrateSubstitution fs v (BinaryApply func y (Symbol v)) =
       Just $ (b :/: d) :*: substitute e (\s -> if s == v then Just z else Nothing)
   | otherwise = Nothing

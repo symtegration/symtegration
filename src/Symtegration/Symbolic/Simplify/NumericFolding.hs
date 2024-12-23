@@ -56,6 +56,8 @@ unary e = e
 -- The arguments should already have been simplified.
 binary :: Expression -> Expression
 -- Fold addition.
+binary (Number 0 :+: x) = x
+binary (x :+: Number 0) = x
 binary (Number n :+: Number m) = Number (n + m)
 binary ((Number n :/: Number m) :+: Number k) = reduceRatio (n + m * k) m
 binary (Number n :+: (Number m :/: Number k)) = reduceRatio (n * k + m) k
@@ -65,6 +67,10 @@ binary ((Number n :+: x) :+: Number m) = Number (n + m) :+: x
 binary (Number n :+: (x :+: Number m)) = Number (n + m) :+: x
 binary (Number n :+: (Number m :+: x)) = Number (n + m) :+: x
 -- Fold multiplication.
+binary (Number 0 :*: _) = Number 0
+binary (_ :*: Number 0) = Number 0
+binary (Number 1 :*: x) = x
+binary (x :*: Number 1) = x
 binary (Number n :*: Number m) = Number (n * m)
 binary (Number n :*: (Number m :/: Number k)) = reduceRatio (n * m) k
 binary ((Number n :/: Number m) :*: Number k) = reduceRatio (n * k) m
