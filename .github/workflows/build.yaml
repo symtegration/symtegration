@@ -42,7 +42,9 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
-          path: ~/.cabal
+          path: |
+            ~/.cabal
+            ~/.ghcup
           key: cabal-${{ matrix.os }}-${{ matrix.ghc }}-${{ hashFiles('symtegration.cabal') }}
           restore-keys: cabal-${{ matrix.os }}-${{ matrix.ghc }}-
 
@@ -73,7 +75,9 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
-          path: ~/.stack
+          path: |
+            ~/.ghcup
+            ~/.stack
           key: stack-${{ hashFiles('stack.yaml', 'package.yaml') }}
           restore-keys: stack-
 
