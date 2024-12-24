@@ -10,7 +10,6 @@
 module Symtegration.Symbolic.LaTeX (toLaTeX) where
 
 import Data.Text (Text)
-import Data.Text qualified as Text
 import Symtegration.Symbolic
 import TextShow (showt)
 
@@ -25,9 +24,7 @@ import TextShow (showt)
 -- "e^{x}"
 toLaTeX :: Expression -> Text
 toLaTeX (Number n) = showt n
-toLaTeX (Symbol s)
-  | LT <- Text.compareLength s 2 = s
-  | otherwise = "\\mathrm{" <> s <> "}"
+toLaTeX (Symbol s) = s
 toLaTeX (UnaryApply func x) = unary func x
 toLaTeX (BinaryApply func x y) = binary func x y
 
