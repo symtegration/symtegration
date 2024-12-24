@@ -1,6 +1,6 @@
 -- |
 -- Module: Symtegration.Integration.Term
--- Description: Integrates individual terms in an expression separately.
+-- Description: Integrates a single term.
 -- Copyright: Copyright 2024 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
@@ -8,26 +8,28 @@ module Symtegration.Integration.Term (integrate) where
 
 import Data.Foldable (asum)
 import Data.Text (Text)
+import Symtegration.Integration.Factor
 import Symtegration.Symbolic
+import Symtegration.Symbolic.Simplify
 
 -- $setup
 -- >>> import Symtegration.Symbolic.Haskell
 -- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic
 
--- | Integrate term by term, using direct methods on each term.
+-- | Integrate a single term, separating out the constant factor and
+-- applying direct methods to the non-constant factor.
 --
--- >>> import Symtegration.Integration.Polynomial qualified as P
 -- >>> import Symtegration.Integration.Trigonometric qualified as T
--- >>> let f = "x" + sin "x"
--- >>> P.rationalIntegrate "x" f
--- Nothing
+-- >>> let f = "a" * sin "x"
 -- >>> T.integrate "x" f
 -- Nothing
--- >>> let g = integrate [P.rationalIntegrate, T.integrate] "x" f
+-- >>> let g = integrate [T.integrate] "x" f
 -- >>> toHaskell . simplify <$> g
--- Just "(1 / 2) * (x ** 2) + (negate (cos x))"
+-- Just "a * (negate (cos x))"
+--
+-- Assumes the expression has had algebraic ring ordering applied.
 integrate ::
-  -- | Functions for directly integrating each term.
+  -- | Functions for directly integrating the non-constant factor.
   [Text -> Expression -> Maybe Expression] ->
   -- | The variable being integrated over.
   Text ->
@@ -35,16 +37,7 @@ integrate ::
   Expression ->
   -- | The integral, if successful.
   Maybe Expression
-integrate fs v (Negate' x) =
-  UnaryApply Negate <$> integrate fs v x
-integrate fs v (x :-: y) =
-  integrate fs v (x :+: Negate' y)
-integrate fs v (x@(_ :+: _) :+: y@(_ :+: _)) =
-  BinaryApply Add <$> integrate fs v x <*> integrate fs v y
-integrate fs v (x@(_ :+: _) :+: y) =
-  BinaryApply Add <$> integrate fs v x <*> asum [f v y | f <- fs]
-integrate fs v (x :+: y@(_ :+: _)) =
-  BinaryApply Add <$> asum [f v x | f <- fs] <*> integrate fs v y
-integrate fs v (x :+: y) =
-  BinaryApply Add <$> asum [f v x | f <- fs] <*> asum [f v y | f <- fs]
-integrate _ _ _ = Nothing
+integrate fs v e = asum $ map (\f -> (:*:) c <$> f v u) fs
+  where
+    e' = simplify v e
+    (c, u) = factor v e'

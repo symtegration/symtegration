@@ -14,13 +14,13 @@
 --
 -- >>> import Symtegration
 -- >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
--- Just "(x ** 4) + x"
+-- Just "x + (x ** 4)"
 --
 -- For another example, with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):
 --
 -- >>> import Symtegration
 -- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
--- Just "(x / 2) * (z ** 2) + y * z"
+-- Just "y * z + x * (1 / 2) * (z ** 2)"
 module Symtegration
   ( -- * Symbolic representation
     Expression,
@@ -70,13 +70,13 @@ import Symtegration.Symbolic.Simplify.RecursiveHeuristic (simplify)
 -- where all the coefficients are numbers:
 --
 -- >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
--- Just "(x ** 4) + x"
+-- Just "x + (x ** 4)"
 --
 -- It can also return indefinite integrals when the coefficients
 -- are symbolic, as with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):
 --
 -- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
--- Just "(x / 2) * (z ** 2) + y * z"
+-- Just "y * z + x * (1 / 2) * (z ** 2)"
 integrate ::
   -- | The symbol representing the variable being integrated over.
   Text ->

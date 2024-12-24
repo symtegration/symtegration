@@ -26,9 +26,9 @@ can be integrated.  For example:
 ```haskell
 >>> import Symtegration
 >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
-Just "(x ** 4) + x"
+Just "x + (x ** 4)"
 >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
-Just "(x / 2) * (z ** 2) + y * z"
+Just "y * z + x * (1 / 2) * (z ** 2)"
 ```
 
 Concrete numbers can also be computed from these integrals.  For example:
@@ -58,7 +58,7 @@ and compute approximate or exact values from these integrals.
 ```haskell
 >>> :load Symtegration
 >>> toHaskell <$> integrate "x" ("a" * "x" ** 4 + "x" + "b")
-Just "(a / 5) * (x ** 5) + (1 / 2) * (x ** 2) + b * x"
+Just "b * x + (1 / 2) * (x ** 2) + a * ((x ** 5) / 5)"
 >>>
 >>> let (Just p) = integrate "x" ("x" ** 2)
 >>> evaluate p (\case "x" -> Just 1)

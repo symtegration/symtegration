@@ -5,10 +5,12 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration.FactorSpec (spec) where
 
-import Data.Text (Text)
+import Data.Text (Text, unpack)
 import Symtegration.Integration.Factor
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Arbitrary
+import Symtegration.Symbolic.Haskell
+import Symtegration.Symbolic.Simplify
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
@@ -27,7 +29,18 @@ spec = parallel $ do
   describe "factor" $ do
     prop "into non-constant and constant factors" $
       forAll genVariable $ \e ->
-        factor var e `shouldSatisfy` (\(x, y) -> isConstant var x && not (isConstant var y))
+        counterexample ("e = " <> unpack (toHaskell $ simplify var e)) $
+          factor var (simplify var e) `shouldSatisfy`
+          (\(x, y) -> isConstant var x && (not (isConstant var y) || y == Number 1))
+
+    prop "variable portion has no multiplicative constant" $
+      forAll genVariable $ \e ->
+        counterexample ("e = " <> unpack (toHaskell $ simplify var e)) $
+          factor var (simplify var e) `shouldSatisfy` (\(_, x) -> notConstantFactors x || x == Number 1)
+
+notConstantFactors :: Expression -> Bool
+notConstantFactors (x :*: y) = notConstantFactors x && notConstantFactors y
+notConstantFactors x = not (isConstant var x)
 
 genConstant :: Gen Expression
 genConstant = sized $ \case

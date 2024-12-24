@@ -98,7 +98,11 @@ compareExpressions v x y
     compareDegree = do
       xd <- degree v x
       yd <- degree v y
-      return $ compare xd yd
+      case (xd, yd) of
+        (0, 0) -> return EQ
+        (0, _) -> return LT
+        (_, 0) -> return GT
+        _ -> return $ compare xd yd
     comparePseudoDegree = compare (pseudoDegree v x) (pseudoDegree v y)
     compareOp = compare (expressionOrder v x) (expressionOrder v y)
 
