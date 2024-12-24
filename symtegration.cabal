@@ -34,6 +34,7 @@ library
       Symtegration
       Symtegration.Differentiation
       Symtegration.Integration
+      Symtegration.Integration.Factor
       Symtegration.Integration.Polynomial
       Symtegration.Integration.Powers
       Symtegration.Integration.Substitution
@@ -91,6 +92,7 @@ test-suite spec
   other-modules:
       Symtegration.ErrorDouble
       Symtegration.FiniteDouble
+      Symtegration.Integration.FactorSpec
       Symtegration.Integration.PolynomialSpec
       Symtegration.Integration.PowersSpec
       Symtegration.Integration.Properties
