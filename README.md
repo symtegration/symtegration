@@ -6,7 +6,11 @@ It offers the following:
 
 *   Symbolic integration of mathematical expressions.
 
-    *   Currently, only simple integration of polynomials is supported.
+    *   Integration of polynomials.
+
+    *   Integration of trigonometric functions.
+
+    *   Integration by substitution.
 
 *   Symbolic representation of mathematical expressions.
 
