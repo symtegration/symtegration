@@ -18,6 +18,7 @@ import Symtegration.Symbolic
 -- Terms will be ordered according to a deterministic set of rules.
 -- The re-ordering aims to make it easier to identify common factors and terms.
 -- Terms with higher integral powers of the variable are sorted later.
+-- Addition and multiplication will be re-arranged to associate to the left.
 --
 -- >>> toHaskell $ order "x" $ "x" + 1
 -- "1 + x"

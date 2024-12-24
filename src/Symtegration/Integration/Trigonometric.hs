@@ -13,6 +13,15 @@ module Symtegration.Integration.Trigonometric (integrate) where
 import Data.Text (Text)
 import Symtegration.Symbolic
 
+-- $setup
+-- >>> import Symtegration.Symbolic.Haskell
+
+-- | Integrates trigonometric functions required by the 'Floating' type class.
+--
+-- >>> toHaskell <$> integrate "x" (sin "x")
+-- Just "negate (cos x)"
+-- >>> toHaskell <$> integrate "x" (cos "x")
+-- Just "sin x"
 integrate :: Text -> Expression -> Maybe Expression
 integrate _ (Number _) = Nothing
 integrate _ (Symbol _) = Nothing

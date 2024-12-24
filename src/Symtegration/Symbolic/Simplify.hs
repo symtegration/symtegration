@@ -8,7 +8,7 @@
 -- Supports the simplification of the symbolic representation for a mathematical expression.
 -- This is aimed towards making it easier to find common factors for the purpose of integration.
 -- It requires the specification of which symbol represents the variable.
-module Symtegration.Symbolic.Simplify where
+module Symtegration.Symbolic.Simplify (simplify) where
 
 import Data.Text (Text)
 import Symtegration.Symbolic

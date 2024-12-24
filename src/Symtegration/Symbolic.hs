@@ -27,7 +27,7 @@ module Symtegration.Symbolic
 
     -- | Pattern synonyms are defined to make it more convenient to pattern match on 'Expression'.
 
-    -- | Constants
+    -- ** Constants
     pattern Pi',
 
     -- ** Unary functions
