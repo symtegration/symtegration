@@ -16,7 +16,12 @@ import Symtegration.Symbolic
 -- (BinaryApply Multiply (Number 2) (Symbol "a"),UnaryApply Sin (Symbol "x"))
 --
 -- Assumes algebraic ring ordering has been applied to the term.
-factor :: Text -> Expression -> (Expression, Expression)
+factor ::
+  -- | Symbol for the variable.
+  Text ->
+  -- | Term to separate into constant and non-constant portions.
+  Expression ->
+  (Expression, Expression)
 factor _ e@(Number _) = (e, Number 1)
 factor v e@(Symbol s) | v == s = (Number 1, e) | otherwise = (e, Number 1)
 factor v e@(UnaryApply _ x) | isConstant v x = (e, Number 1) | otherwise = (Number 1, e)
