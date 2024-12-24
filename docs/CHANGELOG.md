@@ -8,4 +8,18 @@ and this project adheres to the
 
 ## Unreleased
 
-## 0.1.0.0 - YYYY-MM-DD
+## 0.1.0 - 2024-12-24
+
+*   Symbolic representation.
+
+*   Simplification.
+
+*   Basic integration support.
+
+    *   Integration of polynomials.
+
+    *   Integration of trigonometric functions.
+
+    *   Integration of exponential and logarithmic functions.
+
+    *   Integration by substitution.
