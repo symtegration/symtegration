@@ -26,7 +26,7 @@ integrate v e =
       Polynomial.symbolicIntegrate v e',
       Powers.integrate v e',
       Trigonometric.integrate v e',
-      Substitution.integrate [Trigonometric.integrate] v e'
+      Substitution.integrate [Powers.integrate, Trigonometric.integrate] v e'
     ]
   where
     e' = simplify v e
