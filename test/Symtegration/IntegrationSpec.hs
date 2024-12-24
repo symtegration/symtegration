@@ -9,6 +9,7 @@ import Data.Map qualified as Map
 import Data.Text (Text)
 import Symtegration.FiniteDouble
 import Symtegration.Integration
+import Symtegration.Integration.Exponential qualified as Exponential
 import Symtegration.Integration.Powers qualified as Powers
 import Symtegration.Integration.Properties qualified as Properties
 import Symtegration.Integration.Trigonometric qualified as Trigonometric
@@ -31,6 +32,9 @@ spec = parallel $ do
 
       prop "for trigonometric integration" $
         antiderivativeProperty Trigonometric.integrate
+
+      prop "for integration of exponential and logarithmic functions" $
+        antiderivativeProperty Exponential.integrate
 
       prop "for general integration" $
         antiderivativeProperty integrate
