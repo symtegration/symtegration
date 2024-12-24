@@ -10,6 +10,8 @@ It offers the following:
 
     *   Integration of trigonometric functions.
 
+    *   Integration of exponential and logarithmic functions.
+
     *   Integration by substitution.
 
 *   Symbolic representation of mathematical expressions.
