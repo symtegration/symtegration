@@ -16,14 +16,14 @@ import Symtegration.Symbolic
 
 -- | Integrate term by term and returns the sum, using direct methods on each term.
 --
--- >>> import Symtegration.Integration.Polynomial qualified as P
+-- >>> import Symtegration.Integration.Powers qualified as P
 -- >>> import Symtegration.Integration.Trigonometric qualified as T
 -- >>> let f = "x" + sin "x"
--- >>> P.rationalIntegrate "x" f
+-- >>> P.integrate "x" f
 -- Nothing
 -- >>> T.integrate "x" f
 -- Nothing
--- >>> let g = integrate [P.rationalIntegrate, T.integrate] "x" f
+-- >>> let g = integrate [P.integrate, T.integrate] "x" f
 -- >>> toHaskell . simplify <$> g
 -- Just "(1 / 2) * (x ** 2) + (negate (cos x))"
 integrate ::

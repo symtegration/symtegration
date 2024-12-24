@@ -7,7 +7,7 @@ module Symtegration.Integration.SubstitutionSpec (spec) where
 
 import Data.Map qualified as Map
 import Data.Text (Text)
-import Symtegration.Integration.Polynomial qualified as Polynomial
+import Symtegration.Integration.Powers qualified as Powers
 import Symtegration.Integration.Properties
 import Symtegration.Integration.Substitution
 import Symtegration.Integration.Trigonometric qualified as Trigonometric
@@ -22,7 +22,7 @@ spec = parallel $ do
     prop "powers and trigonometric functions mixed" $
       forAll genExpression $ \e x ->
         antiderivativeProperty
-          (integrate [Polynomial.rationalIntegrate, Trigonometric.integrate])
+          (integrate [Powers.integrate, Trigonometric.integrate])
           (Map.singleton var x)
           e
           x

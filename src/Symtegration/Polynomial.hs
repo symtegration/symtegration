@@ -16,11 +16,8 @@ module Symtegration.Polynomial
     -- * Algorithms
     divide,
     extendedEuclidean,
-    integrate,
   )
 where
-
-import Data.Monoid (Sum (..))
 
 -- $setup
 -- >>> import Data.Ratio ((%))
@@ -134,12 +131,3 @@ extendedEuclidean u v = descend u v 1 0 0 1
         (q, r) = divide a b
         r1 = a1 - q * b1
         r2 = a2 - q * b2
-
--- | Return the indefinite integral for the given polynomial.
---
--- >>> integrate (power 3 + 1 :: IndexedPolynomial)
--- (1 % 4)x^4 + x
-integrate :: (Polynomial p e c, Num (p e c), Fractional c) => p e c -> p e c
-integrate p = getSum $ foldTerms integrateTerm p
-  where
-    integrateTerm e c = Sum $ scale (c / (fromIntegral e + 1)) $ power $ e + 1
