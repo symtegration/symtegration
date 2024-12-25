@@ -90,6 +90,12 @@ Number 1
 
 [automatic differentiation]: https://hackage.haskell.org/package/ad
 
+## Changes
+
+See [`CHANGELOG.md`] for what has changed.
+
+[`CHANGELOG.md`]: docs/CHANGELOG.md
+
 ## Code of conduct
 
 Be nice; see [`CODE_OF_CONDUCT.md`] for details.
