@@ -22,41 +22,71 @@ import TextShow (showt)
 --
 -- >>> toLaTeX $ exp "x"
 -- "e^{x}"
+-- >>> toLaTeX $ "x" + 4 * sin "y"
+-- "x + 4 \\sin y"
 toLaTeX :: Expression -> Text
 toLaTeX (Number n) = showt n
 toLaTeX (Symbol s) = s
 toLaTeX (UnaryApply func x) = unary func x
+toLaTeX (x@(_ :*: _) :+: y@(_ :*: _)) = toLaTeX x <> " + " <> toLaTeX y
+toLaTeX (x@(_ :*: _) :+: y@(_ :+: _)) = toLaTeX x <> " + " <> toLaTeX y
+toLaTeX (x@(_ :+: _) :+: y@(_ :*: _)) = toLaTeX x <> " + " <> toLaTeX y
+toLaTeX (x :+: y@(_ :*: _)) = asArg x <> " + " <> toLaTeX y
+toLaTeX (x@(_ :*: _) :+: y) = toLaTeX x <> " + " <> asArg y
+toLaTeX (x@(_ :+: _) :+: y@(_ :+: _)) = toLaTeX x <> " + " <> toLaTeX y
+toLaTeX (x@(_ :+: _) :+: y) = toLaTeX x <> " + " <> asArg y
+toLaTeX (x :+: y@(_ :+: _)) = asArg x <> " + " <> toLaTeX y
+toLaTeX (x@(_ :*: Number _) :*: y@(Number _ :*: _)) = toLaTeX x <> " \\times " <> toLaTeX y
+toLaTeX (x@(Number _) :*: y@(Number _ :*: _)) = toLaTeX x <> " \\times " <> toLaTeX y
+toLaTeX (x@(_ :*: Number _) :*: y@(Number _)) = toLaTeX x <> " \\times " <> toLaTeX y
+toLaTeX (x@(_ :*: _) :*: y@(_ :*: _)) = toLaTeX x <> " " <> toLaTeX y
+toLaTeX (x :*: y@(_ :*: _)) = asArg x <> " " <> toLaTeX y
+toLaTeX (x@(_ :*: _) :*: y) = toLaTeX x <> " " <> asArg y
 toLaTeX (BinaryApply func x y) = binary func x y
 
 -- | Converts unary functions into LaTeX.
 unary :: UnaryFunction -> Expression -> Text
-unary Negate x = "-" <> par (toLaTeX x)
+unary Negate x = "-" <> asArg x
 unary Abs x = "\\left\\lvert " <> toLaTeX x <> " \\right\\rvert"
 unary Signum x = "\\mathrm{signum}" <> par (toLaTeX x)
-unary Exp x = "e^{" <> toLaTeX x <> "}"
-unary Log x = "\\log" <> par (toLaTeX x)
-unary Sqrt x = "\\sqrt{" <> toLaTeX x <> "}"
-unary Sin x = "\\sin" <> par (toLaTeX x)
-unary Cos x = "\\cos" <> par (toLaTeX x)
-unary Tan x = "\\tan" <> par (toLaTeX x)
-unary Asin x = "\\arcsin" <> par (toLaTeX x)
-unary Acos x = "\\arccos" <> par (toLaTeX x)
-unary Atan x = "\\arctan" <> par (toLaTeX x)
-unary Sinh x = "\\sinh" <> par (toLaTeX x)
-unary Cosh x = "\\cosh" <> par (toLaTeX x)
-unary Tanh x = "\\tanh" <> par (toLaTeX x)
-unary Asinh x = "\\sinh^{-1}" <> par (toLaTeX x)
-unary Acosh x = "\\cosh^{-1}" <> par (toLaTeX x)
-unary Atanh x = "\\tanh^{-1}" <> par (toLaTeX x)
+unary Exp x = "e^" <> brace (toLaTeX x)
+unary Log x = "\\log " <> asArg x
+unary Sqrt x = "\\sqrt" <> brace (toLaTeX x)
+unary Sin x = "\\sin " <> asArg x
+unary Cos x = "\\cos " <> asArg x
+unary Tan x = "\\tan " <> asArg x
+unary Asin x = "\\sin^{-1} " <> asArg x
+unary Acos x = "\\cos^{-1} " <> asArg x
+unary Atan x = "\\tan^{-1} " <> asArg x
+unary Sinh x = "\\sinh " <> asArg x
+unary Cosh x = "\\cosh " <> asArg x
+unary Tanh x = "\\tanh " <> asArg x
+unary Asinh x = "\\sinh^{-1} " <> asArg x
+unary Acosh x = "\\cosh^{-1} " <> asArg x
+unary Atanh x = "\\tanh^{-1} " <> asArg x
 
 -- | Converts binary functions into LaTeX.
 binary :: BinaryFunction -> Expression -> Expression -> Text
-binary Add x y = par (toLaTeX x) <> " + " <> par (toLaTeX y)
-binary Multiply x y = par (toLaTeX x) <> " \\times " <> par (toLaTeX y)
-binary Subtract x y = par (toLaTeX x) <> " - " <> par (toLaTeX y)
-binary Divide x y = "\\frac{" <> toLaTeX x <> "}{" <> toLaTeX y <> "}"
-binary Power x y = par (toLaTeX x) <> "^{" <> toLaTeX y <> "}"
-binary LogBase x y = "\\log_{" <> toLaTeX x <> "}" <> par (toLaTeX y)
+binary Add x y = asArg x <> " + " <> asArg y
+binary Multiply x y@(Number _) = asArg x <> " \\times " <> asArg y
+binary Multiply x y = asArg x <> " " <> asArg y
+binary Subtract x y = asArg x <> " - " <> asArg y
+binary Divide x y = "\\frac" <> brace (toLaTeX x) <> brace (toLaTeX y)
+binary Power x y = asArg x <> "^" <> brace (toLaTeX y)
+binary LogBase x y = "\\log_" <> brace (toLaTeX x) <> asArg y
+
+asArg :: Expression -> Text
+asArg e@(Number n) | n >= 0 = toLaTeX e | otherwise = par $ toLaTeX e
+asArg e@(Symbol _) = toLaTeX e
+asArg e@(Negate' _) = par $ toLaTeX e
+asArg e@(UnaryApply _ _) = toLaTeX e
+asArg e@(_ :/: _) = toLaTeX e
+asArg e@(Number _ :**: _) = par $ toLaTeX e
+asArg e@(_ :**: _) = toLaTeX e
+asArg e = par $ toLaTeX e
 
 par :: Text -> Text
 par s = "\\left(" <> s <> "\\right)"
+
+brace :: Text -> Text
+brace s = "{" <> s <> "}"
