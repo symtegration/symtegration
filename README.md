@@ -72,24 +72,6 @@ Just (1 % 3)
 
 [GHCi]: https://downloads.haskell.org/ghc/latest/docs/users_guide/ghci.html
 
-## Differentiation
-
-This library does not offer symbolic differentiation on its own.
-Symbolic derivatives can be obtained using [automatic differentiation]
-on the symbolic represenation of a mathematical expression.
-
-For example,
-
-```haskell
->>> import Numeric.AD
->>> diff (\x -> x + 1) ("x" :: Expression)
-Number 1
->>> toHaskell $ simplify $ diff (\x -> x ** 3 + 1) ("x" :: Expression)
-"3 * (x ** 2)"
-```
-
-[automatic differentiation]: https://hackage.haskell.org/package/ad
-
 ## Changes
 
 See [`CHANGELOG.md`] for what has changed.
