@@ -18,6 +18,7 @@ module Symtegration.Polynomial
     extendedEuclidean,
     greatestCommonDivisor,
     differentiate,
+    squarefree,
   )
 where
 
@@ -101,9 +102,8 @@ divide ::
 divide p q = go 0 p
   where
     go quotient remainder
-      | remainder == 0 = (quotient, remainder)
-      | delta < 0 = (quotient, remainder)
-      | otherwise = go (quotient + t) (remainder - q * t)
+      | remainder /= 0, delta >= 0 = go (quotient + t) (remainder - q * t)
+      | otherwise = (quotient, remainder)
       where
         delta = degree remainder - degree q
         t = scale (leadingCoefficient remainder / leadingCoefficient q) $ power delta
@@ -160,3 +160,38 @@ differentiate p = getSum $ foldTerms diffTerm p
   where
     diffTerm 0 _ = Sum 0
     diffTerm e c = Sum $ scale (fromIntegral e * c) $ power (e - 1)
+
+-- | Returns the squarefree factorization of the given polynomial.
+--
+-- Specifically, for a polynomial \(p\), find \([p_1, p_2, \ldots, p_n]\) such that
+--
+-- \[ p = \sum_{k=1}^n p_k^k \]
+--
+-- where all \(p_k\) are squarefree, i.e., there is no polynomial \(q\) such that \(q^2 = p_k\).
+--
+-- For example, the squarefree factorization of \(x^8 + 6x^6 + 12x^4 + 8x^2\)
+-- is \(x^2 (x^2 + 2)^3\):
+--
+-- >>> squarefree (power 8 + scale 6 (power 6) + scale 12 (power 4) + scale 8 (power 2) :: IndexedPolynomial)
+-- [1,x,x^2 + 2]
+squarefree :: (Polynomial p e c, Eq (p e c), Num (p e c), Fractional c) => p e c -> [p e c]
+squarefree 0 = [0]
+squarefree p
+  | (x : xs) <- factor u v = scale c x : xs
+  | otherwise = [scale c 1]
+  where
+    c = leadingCoefficient p
+    q = scale (1 / c) p
+    q' = differentiate q
+    g = normalize $ greatestCommonDivisor q q'
+    (u, _) = q `divide` g
+    (v, _) = q' `divide` g
+    normalize r = scale (1 / leadingCoefficient r) r
+    factor s y
+      | z == 0 = [s]
+      | otherwise = f : factor s' y'
+      where
+        z = y - differentiate s
+        f = normalize $ greatestCommonDivisor s z
+        (s', _) = s `divide` f
+        (y', _) = z `divide` f

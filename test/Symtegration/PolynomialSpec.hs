@@ -58,3 +58,18 @@ spec = parallel $ do
       prop "compute derivative of compound polynomials" $ \a b ->
         differentiate (a + b :: IndexedPolynomial)
           `shouldBe` differentiate a + differentiate b
+
+    describe "squarefree factorization" $ do
+      prop "divides polynomial" $ \p ->
+        let qs = squarefree p :: [IndexedPolynomial]
+         in counterexample (show qs) $
+              conjoin $
+                map (\q -> counterexample (show q) $ snd (p `divide` q) === 0) qs
+
+      prop "multiplies to polynomial" $ \p ->
+        let qs = squarefree p :: [IndexedPolynomial]
+            prod :: Int -> [IndexedPolynomial] -> IndexedPolynomial
+            prod _ [] = 1
+            prod k (x : xs) = x ^ k * prod (k + 1) xs
+         in counterexample (show qs) $
+              prod 1 qs `shouldBe` p
