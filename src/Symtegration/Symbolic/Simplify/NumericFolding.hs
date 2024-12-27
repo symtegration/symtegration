@@ -33,15 +33,16 @@ import Symtegration.Symbolic
 simplify :: Expression -> Expression
 simplify e@(Number _) = e
 simplify e@(Symbol _) = e
-simplify (UnaryApply func x) =
-  unary $ UnaryApply func $ simplify x
-simplify (BinaryApply func x y) =
-  binary $ BinaryApply func (simplify x) (simplify y)
+simplify (UnaryApply func x) = unary $ UnaryApply func $ simplify x
+simplify (BinaryApply func x y) = binary $ BinaryApply func (simplify x) (simplify y)
 
 -- | Simplify computations involving numeric constants in unary expressions.
 -- The arguments should already have been simplified.
 unary :: Expression -> Expression
 unary (Negate' (Number n)) = Number (-n)
+unary (Negate' (Number n :/: Number m))
+  | m < 0 = simplify $ Number n :/: Number (-m)
+  | otherwise = simplify $ Number (-n) :/: Number m
 unary (Abs' (Number n)) = Number $ abs n
 unary (Signum' (Number n)) = Number $ signum n
 unary (Exp' x) = simplifyExp x
