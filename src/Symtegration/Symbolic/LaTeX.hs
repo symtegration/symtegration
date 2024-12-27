@@ -55,20 +55,20 @@ unary Negate x = "-" <> asArg x
 unary Abs x = "\\left\\lvert " <> toLaTeX x <> " \\right\\rvert"
 unary Signum x = "\\mathrm{signum}" <> par (toLaTeX x)
 unary Exp x = "e^" <> brace (toLaTeX x)
-unary Log x = "\\log " <> asArg x
+unary Log x = "\\log " <> asNamedFunctionArg x
 unary Sqrt x = "\\sqrt" <> brace (toLaTeX x)
-unary Sin x = "\\sin " <> asArg x
-unary Cos x = "\\cos " <> asArg x
-unary Tan x = "\\tan " <> asArg x
-unary Asin x = "\\sin^{-1} " <> asArg x
-unary Acos x = "\\cos^{-1} " <> asArg x
-unary Atan x = "\\tan^{-1} " <> asArg x
-unary Sinh x = "\\sinh " <> asArg x
-unary Cosh x = "\\cosh " <> asArg x
-unary Tanh x = "\\tanh " <> asArg x
-unary Asinh x = "\\sinh^{-1} " <> asArg x
-unary Acosh x = "\\cosh^{-1} " <> asArg x
-unary Atanh x = "\\tanh^{-1} " <> asArg x
+unary Sin x = "\\sin " <> asNamedFunctionArg x
+unary Cos x = "\\cos " <> asNamedFunctionArg x
+unary Tan x = "\\tan " <> asNamedFunctionArg x
+unary Asin x = "\\sin^{-1} " <> asNamedFunctionArg x
+unary Acos x = "\\cos^{-1} " <> asNamedFunctionArg x
+unary Atan x = "\\tan^{-1} " <> asNamedFunctionArg x
+unary Sinh x = "\\sinh " <> asNamedFunctionArg x
+unary Cosh x = "\\cosh " <> asNamedFunctionArg x
+unary Tanh x = "\\tanh " <> asNamedFunctionArg x
+unary Asinh x = "\\sinh^{-1} " <> asNamedFunctionArg x
+unary Acosh x = "\\cosh^{-1} " <> asNamedFunctionArg x
+unary Atanh x = "\\tanh^{-1} " <> asNamedFunctionArg x
 
 -- | Converts binary functions into LaTeX.
 binary :: BinaryFunction -> Expression -> Expression -> Text
@@ -78,7 +78,7 @@ binary Multiply x y = asArg x <> " " <> asArg y
 binary Subtract x y = asArg x <> " - " <> asArg y
 binary Divide x y = "\\frac" <> brace (toLaTeX x) <> brace (toLaTeX y)
 binary Power x y = asArg x <> "^" <> brace (toLaTeX y)
-binary LogBase x y = "\\log_" <> brace (toLaTeX x) <> asArg y
+binary LogBase x y = "\\log_" <> brace (toLaTeX x) <> asNamedFunctionArg y
 
 asArg :: Expression -> Text
 asArg e@(Number n) | n >= 0 = toLaTeX e | otherwise = par $ toLaTeX e
@@ -89,6 +89,17 @@ asArg e@(_ :/: _) = toLaTeX e
 asArg e@(Number _ :**: _) = par $ toLaTeX e
 asArg e@(_ :**: _) = toLaTeX e
 asArg e = par $ toLaTeX e
+
+-- For arguments to named functions such as "sin" which do not always delimit their arguments.
+-- E.g., it is preferred that "1 + sin x" be "1 + sin x" and not "1 + (sin x)",
+-- but we want "cos (sin x)" to be "cos (sin x)" and not "cos sin x".
+asNamedFunctionArg :: Expression -> Text
+asNamedFunctionArg e@(Exp' _) = asArg e
+asNamedFunctionArg e@(Abs' _) = asArg e
+asNamedFunctionArg e@(Sqrt' _) = asArg e
+asNamedFunctionArg e@(UnaryApply _ _) = par $ toLaTeX e
+asNamedFunctionArg e@(LogBase' _ _) = par $ toLaTeX e
+asNamedFunctionArg e = asArg e
 
 par :: Text -> Text
 par s = "\\left(" <> s <> "\\right)"

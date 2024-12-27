@@ -58,3 +58,5 @@ spec = parallel $ describe "toLaTeX" $ do
   it "x * y ** z" $ toLaTeX ("x" * "y" ** "z") `shouldBe` "x y^{z}"
 
   it "logBase x y * z" $ toLaTeX (logBase "x" "y" * "z") `shouldBe` "\\left(\\log_{x}y\\right) z"
+
+  it "cos (log x)" $ toLaTeX (cos (log "x")) `shouldBe` "\\cos \\left(\\log x\\right)"
