@@ -10,7 +10,7 @@ import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Indexed.Arbitrary ()
 import Test.Hspec
 import Test.Hspec.QuickCheck
-import Test.QuickCheck
+import Test.QuickCheck hiding (scale)
 
 spec :: Spec
 spec = parallel $ do
@@ -41,3 +41,15 @@ spec = parallel $ do
         degree a > 0 && degree b > 0 ==>
           let (_, _, g :: IndexedPolynomial) = extendedEuclidean a b
            in snd (divide (s * a + t * b) g) `shouldBe` 0
+
+    describe "differentiation" $ do
+      prop "computes derivative of constant" $ \c ->
+        differentiate (scale c (power 0) :: IndexedPolynomial) `shouldBe` 0
+
+      prop "computes derivative of integral power" $ \(Positive e) c ->
+        differentiate (scale c (power e) :: IndexedPolynomial)
+          `shouldBe` scale (fromIntegral e * c) (power (e - 1))
+
+      prop "compute derivative of compound polynomials" $ \a b ->
+        differentiate (a + b :: IndexedPolynomial)
+          `shouldBe` differentiate a + differentiate b

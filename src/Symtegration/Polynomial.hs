@@ -16,8 +16,11 @@ module Symtegration.Polynomial
     -- * Algorithms
     divide,
     extendedEuclidean,
+    differentiate,
   )
 where
+
+import Data.Monoid (Sum (..))
 
 -- $setup
 -- >>> import Data.Ratio ((%))
@@ -131,3 +134,13 @@ extendedEuclidean u v = descend u v 1 0 0 1
         (q, r) = divide a b
         r1 = a1 - q * b1
         r2 = a2 - q * b2
+
+-- | Returns the derivative of the given polynomial.
+--
+-- >>> differentiate (power 2 + power 1 :: IndexedPolynomial)
+-- 2x + 1
+differentiate :: (Polynomial p e c, Num (p e c), Num c) => p e c -> p e c
+differentiate p = getSum $ foldTerms diffTerm p
+  where
+    diffTerm 0 _ = Sum 0
+    diffTerm e c = Sum $ scale (fromIntegral e * c) $ power (e - 1)
