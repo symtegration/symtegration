@@ -16,6 +16,7 @@ module Symtegration.Polynomial
     -- * Algorithms
     divide,
     extendedEuclidean,
+    greatestCommonDivisor,
     differentiate,
   )
 where
@@ -134,6 +135,21 @@ extendedEuclidean u v = descend u v 1 0 0 1
         (q, r) = divide a b
         r1 = a1 - q * b1
         r2 = a2 - q * b2
+
+-- | Returns the greatest common divisor btween two polynomials.
+--
+-- Convenient wrapper over 'extendedEuclidean' which only returns the greatest common divisor.
+greatestCommonDivisor ::
+  (Polynomial p e c, Eq (p e c), Num (p e c), Fractional c) =>
+  -- | Polynomial \(p\).
+  p e c ->
+  -- | Polynomial \(q\).
+  p e c ->
+  -- | \(\gcd(p,q)\).
+  p e c
+greatestCommonDivisor p q = g
+  where
+    (_, _, g) = extendedEuclidean p q
 
 -- | Returns the derivative of the given polynomial.
 --

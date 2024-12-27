@@ -42,6 +42,11 @@ spec = parallel $ do
           let (_, _, g :: IndexedPolynomial) = extendedEuclidean a b
            in snd (divide (s * a + t * b) g) `shouldBe` 0
 
+    describe "greatest common divisor" $ do
+      prop "is consistent with extended Euclidean algorithm" $ \a b ->
+        let (_, _, g :: IndexedPolynomial) = extendedEuclidean a b
+         in greatestCommonDivisor a b `shouldBe` g
+
     describe "differentiation" $ do
       prop "computes derivative of constant" $ \c ->
         differentiate (scale c (power 0) :: IndexedPolynomial) `shouldBe` 0
