@@ -39,6 +39,14 @@ spec = parallel $ describe "toLaTeX" $ do
 
   it "sin x * 3" $ toLaTeX (sin "x" * 3) `shouldBe` "\\sin x \\times 3"
 
+  it "abs x * y" $ toLaTeX (abs "x" * "y") `shouldBe` "\\left\\lvert x \\right\\rvert y"
+
+  it "signum x * y" $ toLaTeX (signum "x" * "y") `shouldBe` "\\mathrm{signum}\\left(x\\right) y"
+
+  it "exp x * y" $ toLaTeX (exp "x" * "y") `shouldBe` "e^{x} y"
+
+  it "sin x * y" $ toLaTeX (sin "x" * "y") `shouldBe` "\\left(\\sin x\\right) y"
+
   it "(-2) * (-5)" $ toLaTeX ((-2) * (-5)) `shouldBe` "\\left(-2\\right) \\left(-5\\right)"
 
   it "sin x * cos y" $ toLaTeX (sin "x" * cos "y") `shouldBe` "\\sin x \\cos y"
@@ -48,3 +56,5 @@ spec = parallel $ describe "toLaTeX" $ do
   it "x * y" $ toLaTeX ("x" * "y") `shouldBe` "x y"
 
   it "x * y ** z" $ toLaTeX ("x" * "y" ** "z") `shouldBe` "x y^{z}"
+
+  it "logBase x y * z" $ toLaTeX (logBase "x" "y" * "z") `shouldBe` "\\left(\\log_{x}y\\right) z"
