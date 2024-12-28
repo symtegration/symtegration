@@ -17,6 +17,7 @@ module Symtegration.Polynomial
     -- * Algorithms
     divide,
     extendedEuclidean,
+    diophantineEuclidean,
     greatestCommonDivisor,
     differentiate,
     squarefree,
@@ -152,6 +153,38 @@ extendedEuclidean u v = descend u v 1 0 0 1
         (q, r) = divide a b
         r1 = a1 - q * b1
         r2 = a2 - q * b2
+
+-- | Solves \(sa + tb = c\) for given polynomials \(a\), \(b\), and \(c\).
+-- It will be the case that either \(s=0\) or
+-- the degree of \(s\) will be less than the degree of \(b\).
+--
+-- >>> let a = power 4 - 2 * power 3 - 6 * power 2 + 12 * power 1 + 15 :: IndexedPolynomial
+-- >>> let b = power 3 + power 2 - 4 * power 1 - 4 :: IndexedPolynomial
+-- >>> let c = power 2 - 1 :: IndexedPolynomial
+-- >>> diophantineEuclidean a b c
+-- Just (((-1) % 5)x^2 + (4 % 5)x + ((-3) % 5),(1 % 5)x^3 + ((-7) % 5)x^2 + (16 % 5)x + (-2))
+--
+-- If there is no such \((s,t)\), then 'Nothing' is returned.
+diophantineEuclidean ::
+  (Polynomial p e c, Eq (p e c), Num (p e c), Fractional c) =>
+  -- | Polynomial \(a\).
+  p e c ->
+  -- | Polynomial \(b\).
+  p e c ->
+  -- | Polynomial \(c\).
+  p e c ->
+  -- | \((s,t)\) such that \(sa + tb = c\).
+  Maybe (p e c, p e c)
+diophantineEuclidean a b c
+  | r /= 0 = Nothing
+  | s' /= 0, degree s' >= degree b = Just (r', t' + q' * a)
+  | otherwise = Just (s', t')
+  where
+    (s, t, g) = extendedEuclidean a b
+    (q, r) = divide c g
+    s' = q * s
+    t' = q * t
+    (q', r') = divide s' b
 
 -- | Returns the greatest common divisor btween two polynomials.
 --

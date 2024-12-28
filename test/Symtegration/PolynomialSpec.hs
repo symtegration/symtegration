@@ -55,6 +55,21 @@ spec = parallel $ do
           let (_, _, g :: IndexedPolynomial) = extendedEuclidean a b
            in snd (divide (s * a + t * b) g) `shouldBe` 0
 
+    describe "diophantine extended Euclidean algorithm" $ do
+      prop "solves for (s,t)" $ \a b c ->
+        degree a > 0 && degree b > 0 && degree c > 0 ==>
+          let p Nothing =
+                label "no solution" $
+                  snd (c `divide` greatestCommonDivisor a b) `shouldSatisfy` (/= 0)
+              p (Just (s, t)) =
+                label "solved" $
+                  counterexample ("(s,t) = " <> show (s, t)) $
+                    conjoin
+                      [ s * a + t * b === (c :: IndexedPolynomial),
+                        disjoin [s === 0, property $ degree s < degree b]
+                      ]
+           in p (diophantineEuclidean a b c)
+
     describe "greatest common divisor" $ do
       prop "is consistent with extended Euclidean algorithm" $ \a b ->
         let (_, _, g :: IndexedPolynomial) = extendedEuclidean a b
