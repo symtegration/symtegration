@@ -14,6 +14,19 @@ import Test.QuickCheck hiding (scale)
 
 spec :: Spec
 spec = parallel $ do
+  describe "monic" $ do
+    prop "is zero for zero" $
+      monic 0 `shouldBe` (0 :: IndexedPolynomial)
+
+    prop "has leading coefficient of one" $ \p ->
+      p /= 0 ==> leadingCoefficient (monic p :: IndexedPolynomial) `shouldBe` 1
+
+    prop "is rational multiple of original polynomial" $ \p ->
+      let p' = monic p :: IndexedPolynomial
+          (q, r) = p `divide` p'
+       in counterexample (show p') $
+            conjoin [r `shouldBe` 0, degree q `shouldBe` 0]
+
   describe "polynomial algorithms" $ do
     describe "division" $ do
       prop "matches multiplication" $ \a b ->

@@ -12,6 +12,7 @@
 module Symtegration.Polynomial
   ( -- * Polynomials
     Polynomial (..),
+    monic,
 
     -- * Algorithms
     divide,
@@ -53,6 +54,8 @@ class (Integral e, Num c) => Polynomial p e c where
   --
   -- >>> leadingCoefficient (6 * power 3 + 2 * power 2 :: IndexedPolynomial)
   -- 6 % 1
+  --
+  -- The leading coefficient is never zero unless the polynomial itself is zero.
   leadingCoefficient :: p e c -> c
 
   -- | Fold the terms, i.e., the powers and coefficients, using the given monoid.
@@ -80,6 +83,20 @@ class (Integral e, Num c) => Polynomial p e c where
   -- >>> power 5 :: IndexedPolynomial
   -- x^5
   power :: e -> p e c
+
+-- | Scale the polynomial so that its leading coefficient is one.
+--
+-- >>> monic $ 4 * power 2 + 4 * power 1 + 4 :: IndexedPolynomial
+-- x^2 + x + 1
+--
+-- The exception is when the polynomial is zero.
+--
+-- >>> monic 0 :: IndexedPolynomial
+-- 0
+monic :: (Polynomial p e c, Eq c, Fractional c) => p e c -> p e c
+monic p
+  | leadingCoefficient p == 0 = p
+  | otherwise = scale (1 / leadingCoefficient p) p
 
 -- | Polynomial division.  It returns the quotient polynomial and the remainder polynomial.
 --
@@ -172,9 +189,9 @@ differentiate p = getSum $ foldTerms diffTerm p
 -- For example, the squarefree factorization of \(x^8 + 6x^6 + 12x^4 + 8x^2\)
 -- is \(x^2 (x^2 + 2)^3\):
 --
--- >>> squarefree (power 8 + scale 6 (power 6) + scale 12 (power 4) + scale 8 (power 2) :: IndexedPolynomial)
+-- >>> squarefree (power 8 + 6 * power 6 + 12 * power 4 + 8 * power 2 :: IndexedPolynomial)
 -- [1,x,x^2 + 2]
-squarefree :: (Polynomial p e c, Eq (p e c), Num (p e c), Fractional c) => p e c -> [p e c]
+squarefree :: (Polynomial p e c, Eq (p e c), Num (p e c), Eq c, Fractional c) => p e c -> [p e c]
 squarefree 0 = [0]
 squarefree p
   | (x : xs) <- factor u v = scale c x : xs
@@ -183,15 +200,14 @@ squarefree p
     c = leadingCoefficient p
     q = scale (1 / c) p
     q' = differentiate q
-    g = normalize $ greatestCommonDivisor q q'
+    g = monic $ greatestCommonDivisor q q'
     (u, _) = q `divide` g
     (v, _) = q' `divide` g
-    normalize r = scale (1 / leadingCoefficient r) r
     factor s y
       | z == 0 = [s]
       | otherwise = f : factor s' y'
       where
         z = y - differentiate s
-        f = normalize $ greatestCommonDivisor s z
+        f = monic $ greatestCommonDivisor s z
         (s', _) = s `divide` f
         (y', _) = z `divide` f
