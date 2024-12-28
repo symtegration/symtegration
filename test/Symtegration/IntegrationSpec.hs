@@ -12,6 +12,7 @@ import Symtegration.Integration
 import Symtegration.Integration.Exponential qualified as Exponential
 import Symtegration.Integration.Powers qualified as Powers
 import Symtegration.Integration.Properties qualified as Properties
+import Symtegration.Integration.Rational qualified as Rational
 import Symtegration.Integration.Trigonometric qualified as Trigonometric
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Arbitrary
@@ -35,6 +36,9 @@ spec = parallel $ do
 
       prop "for integration of exponential and logarithmic functions" $
         antiderivativeProperty Exponential.integrate
+
+      prop "for rational functions" $
+        antiderivativeProperty Rational.integrate
 
       prop "for general integration" $
         antiderivativeProperty integrate

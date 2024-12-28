@@ -37,6 +37,7 @@ library
       Symtegration.Integration.Exponential
       Symtegration.Integration.Factor
       Symtegration.Integration.Powers
+      Symtegration.Integration.Rational
       Symtegration.Integration.Substitution
       Symtegration.Integration.Sum
       Symtegration.Integration.Term
@@ -97,6 +98,7 @@ test-suite spec
       Symtegration.Integration.FactorSpec
       Symtegration.Integration.PowersSpec
       Symtegration.Integration.Properties
+      Symtegration.Integration.RationalSpec
       Symtegration.Integration.SubstitutionSpec
       Symtegration.Integration.SumSpec
       Symtegration.Integration.TermSpec

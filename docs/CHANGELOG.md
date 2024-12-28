@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+*   Integration of rational functions using Hermite reduction.
+
 *   Improvements to LaTeX output.
 
 ## 0.1.0 - 2024-12-24

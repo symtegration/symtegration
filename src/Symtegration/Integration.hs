@@ -10,6 +10,7 @@ import Data.Foldable (asum)
 import Data.Text (Text)
 import Symtegration.Integration.Exponential qualified as Exponential
 import Symtegration.Integration.Powers qualified as Powers
+import Symtegration.Integration.Rational qualified as Rational
 import Symtegration.Integration.Substitution qualified as Substitution
 import Symtegration.Integration.Sum qualified as Sum
 import Symtegration.Integration.Term qualified as Term
@@ -28,7 +29,7 @@ integrate v e = asum $ map (\f -> f v e') withTermSum
 
 -- | Functions which directly integrate.
 base :: [Text -> Expression -> Maybe Expression]
-base = [Powers.integrate, Exponential.integrate, Trigonometric.integrate]
+base = [Powers.integrate, Exponential.integrate, Trigonometric.integrate, Rational.integrate]
 
 -- | Includes integration of a term using other integration functions.
 withTerm :: [Text -> Expression -> Maybe Expression]
