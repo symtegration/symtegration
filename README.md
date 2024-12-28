@@ -94,6 +94,12 @@ See [`SECURITY.md`] for details.
 
 [`SECURITY.md`]: docs/SECURITY.md
 
+## Contributing
+
+See [`CONTRIBUTING.md`] for details.
+
+[`CONTRIBUTING.md`]: docs/CONTRIBUTING.md
+
 ## License
 
 Apache 2.0; see [`LICENSE`] for details.
