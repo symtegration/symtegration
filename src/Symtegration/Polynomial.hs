@@ -59,6 +59,12 @@ class (Integral e, Num c) => Polynomial p e c where
   -- The leading coefficient is never zero unless the polynomial itself is zero.
   leadingCoefficient :: p e c -> c
 
+  -- | Returns the polynomial without the leading term.
+  --
+  -- >>> deleteLeadingTerm (2 * power 3 + power 1 + 2 :: IndexedPolynomial)
+  -- x + 2
+  deleteLeadingTerm :: p e c -> p e c
+
   -- | Fold the terms, i.e., the powers and coefficients, using the given monoid.
   -- Only terms with non-zero coefficients will be folded.
   -- Folding is ordered from higher to lower terms.
@@ -120,11 +126,17 @@ divide ::
 divide p q = go 0 p
   where
     go quotient remainder
-      | remainder /= 0, delta >= 0 = go (quotient + t) (remainder - q * t)
+      | remainder /= 0, delta >= 0 = go (quotient + t) (remainder' - qt')
       | otherwise = (quotient, remainder)
       where
         delta = degree remainder - degree q
         t = scale (leadingCoefficient remainder / leadingCoefficient q) $ power delta
+        -- remainder and q * t will have the same leading coefficients.
+        -- Subtract them without the leading terms.
+        -- Not necessary for purely numeric coefficients,
+        -- but guarantees the cancellation of the leading terms when coefficients are symbolic.
+        remainder' = deleteLeadingTerm remainder
+        qt' = deleteLeadingTerm $ q * t
 
 -- | The extended Euclidean algorithm.  For polynomials \(p\) and \(q\),
 -- it returns the greatest common divisor between \(p\) and \(q\).
