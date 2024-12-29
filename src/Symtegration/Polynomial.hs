@@ -16,6 +16,7 @@ module Symtegration.Polynomial
 
     -- * Algorithms
     divide,
+    pseudoDivide,
     extendedEuclidean,
     diophantineEuclidean,
     greatestCommonDivisor,
@@ -137,6 +138,44 @@ divide p q = go 0 p
         -- but guarantees the cancellation of the leading terms when coefficients are symbolic.
         remainder' = deleteLeadingTerm remainder
         qt' = deleteLeadingTerm $ q * t
+
+-- | Polynomial pseudo-division.  It returns the pseudo-quotient and pseudo-remainder polynomials.
+--
+-- Equivalent to \(b^{\delta+1} p\) divided by \(q\),
+-- where \(p\) and \(q\) are polynomials with integer coefficients,
+-- \(b\) is the leading coefficient of \(q\) and \(\delta=\max(-1, \deg(p) - \deg(q))\).
+-- This guarantees the pseudo-quotient and pseudo-remainder exist,
+-- even when the quotient and remainder do not when only integer coefficients are allowed.
+--
+-- For example, with \(p = 3x^3 + x^2 + x + 5\) and \(q = 5x^2 - 3x + 1\),
+-- it is the case that \(5^2p = (15x + 14)q + (52x + 111)\):
+--
+-- >>> let p = 3 * power 3 + power 2 + power 1 + 5 :: IndexedPolynomial
+-- >>> let q = 5 * power 2 - 3 * power 1 + 1 :: IndexedPolynomial
+-- >>> pseudoDivide p q
+-- (15x + 14,52x + 111)
+pseudoDivide ::
+  (Polynomial p e c, Eq (p e c), Num (p e c), Num c) =>
+  -- | Dividend polynomial being pseudo-divided.
+  p e c ->
+  -- | Divisor polynomial pseudo-dividing the dividend.
+  p e c ->
+  -- | Pseudo-quotient and pseudo-remainder.
+  (p e c, p e c)
+pseudoDivide p q = go (1 + degree p - degree q) 0 p
+  where
+    b = leadingCoefficient q
+    go n quotient remainder
+      | remainder /= 0, delta >= 0 = go (n - 1) quotient' remainder'
+      | otherwise = (scale (b ^ n) quotient, scale (b ^ n) remainder)
+      where
+        delta = degree remainder - degree q
+        t = scale (leadingCoefficient remainder) (power delta)
+        quotient' = scale b quotient + t
+        -- Subtract with the leading terms deleted.
+        -- The leading terms cancel out numerically,
+        -- but guarantee cancellation when the coefficients are symbolic.
+        remainder' = deleteLeadingTerm (scale b remainder) - deleteLeadingTerm (t * q)
 
 -- | The extended Euclidean algorithm.  For polynomials \(p\) and \(q\),
 -- it returns the greatest common divisor between \(p\) and \(q\).

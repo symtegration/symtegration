@@ -39,6 +39,23 @@ spec = parallel $ do
           let (_, r) = divide a b
            in degree r `shouldSatisfy` (< degree (b :: IndexedPolynomial))
 
+    describe "pseudo-division" $ do
+      prop "matches division for integer coefficients" $
+        let genCoefficient = fromIntegral <$> (arbitrarySizedIntegral :: Gen Integer)
+            genPower = power <$> arbitrarySizedNatural :: Gen IndexedPolynomial
+            genIntPolynomial = sized $ \case
+              0 -> scale <$> genCoefficient <*> genPower
+              n ->
+                oneof
+                  [ resize 0 genIntPolynomial,
+                    resize (n `div` 2) $ (+) <$> genIntPolynomial <*> genIntPolynomial,
+                    resize (n `div` 2) $ (*) <$> genIntPolynomial <*> genIntPolynomial
+                  ]
+         in forAll genIntPolynomial $ \a -> forAll genIntPolynomial $ \b ->
+              let delta = max (-1) (degree a - degree b)
+                  x = leadingCoefficient b ^ (1 + delta)
+               in pseudoDivide a b `shouldBe` divide (scale x a) b
+
     describe "extended Euclidean algorithm" $ do
       prop "gets common divisor" $ \a b ->
         degree a > 0 && degree b > 0 ==>
