@@ -96,10 +96,7 @@ spec = parallel $ do
                       r@(resultant, _) = subresultant x y
                       resultant' = a ^ length as * b ^ length bs * product [u - v | u <- as, v <- bs]
                    in counterexample (show r) $
-                        conjoin
-                          [ degree resultant `shouldBe` 0,
-                            leadingCoefficient resultant `shouldBe` resultant'
-                          ]
+                        resultant `shouldBe` resultant'
 
       prop "is polynomial remainder sequence" $ \a b ->
         let (_, prs) = subresultant a b

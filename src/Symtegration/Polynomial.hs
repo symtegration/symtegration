@@ -258,11 +258,11 @@ greatestCommonDivisor p q = g
 -- | Returns the resultant and the subresultant polynomial remainder sequence for the given polynomials.
 --
 -- >>> subresultant (power 2 + 1) (power 2 - 1 :: IndexedPolynomial)
--- (4,[x^2 + 1,x^2 + (-1),(-2),0])
+-- (4 % 1,[x^2 + 1,x^2 + (-1),(-2),0])
 -- >>> subresultant (2 * power 2 - 3 * power 1 + 1) (5 * power 2 + power 1 - 6 :: IndexedPolynomial)
--- (0,[2x^2 + (-3)x + 1,5x^2 + x + (-6),17x + (-17),0])
+-- (0 % 1,[2x^2 + (-3)x + 1,5x^2 + x + (-6),17x + (-17),0])
 -- >>> subresultant (power 3 + 2 * power 2 + 3 * power 1 + 4) (5 * power 2 + 6 * power 1 + 7 :: IndexedPolynomial)
--- (832,[x^3 + 2x^2 + 3x + 4,5x^2 + 6x + 7,16x + 72,4160,0])
+-- (832 % 1,[x^3 + 2x^2 + 3x + 4,5x^2 + 6x + 7,16x + 72,4160,0])
 --
 -- === __Reference__
 --
@@ -277,7 +277,7 @@ subresultant ::
   -- | Second element in the remainder sequence.
   p e c ->
   -- | The resultant and the subresultant polynomial remainder sequence.
-  (p e c, [p e c])
+  (c, [p e c])
 subresultant p q = (resultantFromSequence rs betas, rs)
   where
     (rs, betas) = subresultantRemainderSequence (p, q) gamma beta
@@ -318,13 +318,12 @@ resultantFromSequence ::
   -- | Sequence of \(\beta_i\) used for deriving the subresultant PRS.
   [c] ->
   -- | Resultant.
-  p e c
+  c
 resultantFromSequence rs betas = go rs betas 1 1
   where
     go (r : r' : r'' : rs') (beta : betas') c s
       | [] <- rs', degree r' > 0 = 0
-      | [] <- rs', degree r' == 1 = r''
-      | [] <- rs' = scale (s * c) (r' ^ degree r)
+      | [] <- rs' = s * c * leadingCoefficient r' ^ degree r
       | otherwise = go (r' : r'' : rs') betas' c' s'
       where
         s' | odd (degree r), odd (degree r') = -s | otherwise = s
