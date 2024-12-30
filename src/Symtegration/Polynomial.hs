@@ -20,6 +20,7 @@ module Symtegration.Polynomial
     extendedEuclidean,
     diophantineEuclidean,
     greatestCommonDivisor,
+    subresultant,
     differentiate,
     squarefree,
   )
@@ -162,7 +163,9 @@ pseudoDivide ::
   p e c ->
   -- | Pseudo-quotient and pseudo-remainder.
   (p e c, p e c)
-pseudoDivide p q = go (1 + degree p - degree q) 0 p
+pseudoDivide p q
+  | degree p < degree q = (0, p)
+  | otherwise = go (1 + degree p - degree q) 0 p
   where
     b = leadingCoefficient q
     go n quotient remainder
@@ -251,6 +254,84 @@ greatestCommonDivisor ::
 greatestCommonDivisor p q = g
   where
     (_, _, g) = extendedEuclidean p q
+
+-- | Returns the resultant and the subresultant polynomial remainder sequence for the given polynomials.
+--
+-- >>> subresultant (power 2 + 1) (power 2 - 1 :: IndexedPolynomial)
+-- (4,[x^2 + 1,x^2 + (-1),(-2),0])
+-- >>> subresultant (2 * power 2 - 3 * power 1 + 1) (5 * power 2 + power 1 - 6 :: IndexedPolynomial)
+-- (0,[2x^2 + (-3)x + 1,5x^2 + x + (-6),17x + (-17),0])
+-- >>> subresultant (power 3 + 2 * power 2 + 3 * power 1 + 4) (5 * power 2 + 6 * power 1 + 7 :: IndexedPolynomial)
+-- (832,[x^3 + 2x^2 + 3x + 4,5x^2 + 6x + 7,16x + 72,4160,0])
+--
+-- === __Reference__
+--
+-- See sections 1.4 and 1.5 in
+-- [/Symbolic Integration I: Transcendental Functions/](https://doi.org/10.1007/b138171)
+-- by Manuel Bronstein for the definition of resultants, subresultants,
+-- polynomial remainder sequences, and subresultant polynomial remainder sequences.
+subresultant ::
+  (Polynomial p e c, Eq (p e c), Num (p e c), Num e, Fractional c) =>
+  -- | First element in the remainder sequence.
+  p e c ->
+  -- | Second element in the remainder sequence.
+  p e c ->
+  -- | The resultant and the subresultant polynomial remainder sequence.
+  (p e c, [p e c])
+subresultant p q = (resultantFromSequence rs betas, rs)
+  where
+    (rs, betas) = subresultantRemainderSequence (p, q) gamma beta
+    gamma = -1
+    beta = (-1) ^^ (1 + delta)
+    delta = degree p - degree q
+
+-- | Derives the subresultant polynomial remainder sequence for 'subresultant'.
+-- Constructs \(\gamma_i\), \(\beta_i\), and the remainder sequence as it goes along.
+-- Returns the remainder sequence and the sequence of \(\beta_i\).
+subresultantRemainderSequence ::
+  (Polynomial p e c, Eq (p e c), Num (p e c), Num e, Fractional c) =>
+  -- | The previous and current remainders in the sequence.
+  (p e c, p e c) ->
+  -- | \(\gamma_i\) as defined for the subresultant PRS.
+  c ->
+  -- | \(\beta_i\) as defined for the subresultant PRS.
+  c ->
+  -- | Polynomial remainder sequence and sequence of \(\beta_i\).
+  ([p e c], [c])
+subresultantRemainderSequence (rprev, rcurr) gamma beta
+  | rcurr /= 0 = (rprev : rs, beta : betas)
+  | otherwise = ([rprev, rcurr], [beta])
+  where
+    (rs, betas) = subresultantRemainderSequence (rcurr, rnext) gamma' beta'
+    (_, r) = pseudoDivide rprev rcurr
+    delta = degree rcurr - degree rprev
+    rnext = scale (1 / beta) r
+    gamma' = (-leadingCoefficient rprev) ^^ delta * gamma ^^ (1 - delta)
+    beta' = (-leadingCoefficient rcurr) * gamma' ^ (degree rcurr - degree rnext)
+
+-- | Constructs the resultant based on the subresultant polynomial remainder sequence
+-- and the sequence of \(\beta_i\) used to construct the subresultant PRS.
+resultantFromSequence ::
+  (Polynomial p e c, Eq (p e c), Num (p e c), Num e, Fractional c) =>
+  -- | Subresultant polynomial remainder sequence.
+  [p e c] ->
+  -- | Sequence of \(\beta_i\) used for deriving the subresultant PRS.
+  [c] ->
+  -- | Resultant.
+  p e c
+resultantFromSequence rs betas = go rs betas 1 1
+  where
+    go (r : r' : r'' : rs') (beta : betas') c s
+      | [] <- rs', degree r' > 0 = 0
+      | [] <- rs', degree r' == 1 = r''
+      | [] <- rs' = scale (s * c) (r' ^ degree r)
+      | otherwise = go (r' : r'' : rs') betas' c' s'
+      where
+        s' | odd (degree r), odd (degree r') = -s | otherwise = s
+        c' = c * ((beta / (lc ^^ (1 + delta))) ^ degree r') * (lc ^ (degree r - degree r''))
+        lc = leadingCoefficient r'
+        delta = degree r - degree r'
+    go _ _ _ _ = 0
 
 -- | Returns the derivative of the given polynomial.
 --

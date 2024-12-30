@@ -40,21 +40,11 @@ spec = parallel $ do
            in degree r `shouldSatisfy` (< degree (b :: IndexedPolynomial))
 
     describe "pseudo-division" $ do
-      prop "matches division for integer coefficients" $
-        let genCoefficient = fromIntegral <$> (arbitrarySizedIntegral :: Gen Integer)
-            genPower = power <$> arbitrarySizedNatural :: Gen IndexedPolynomial
-            genIntPolynomial = sized $ \case
-              0 -> scale <$> genCoefficient <*> genPower
-              n ->
-                oneof
-                  [ resize 0 genIntPolynomial,
-                    resize (n `div` 2) $ (+) <$> genIntPolynomial <*> genIntPolynomial,
-                    resize (n `div` 2) $ (*) <$> genIntPolynomial <*> genIntPolynomial
-                  ]
-         in forAll genIntPolynomial $ \a -> forAll genIntPolynomial $ \b ->
-              let delta = max (-1) (degree a - degree b)
-                  x = leadingCoefficient b ^ (1 + delta)
-               in pseudoDivide a b `shouldBe` divide (scale x a) b
+      prop "matches division for integer coefficients" $ \a b ->
+        b /= 0 ==>
+          let delta = max (-1) (degree a - degree b)
+              x = leadingCoefficient b ^ (1 + delta)
+           in pseudoDivide a b `shouldBe` divide (scale x a) (b :: IndexedPolynomial)
 
     describe "extended Euclidean algorithm" $ do
       prop "gets common divisor" $ \a b ->
@@ -88,6 +78,42 @@ spec = parallel $ do
       prop "is consistent with extended Euclidean algorithm" $ \a b ->
         let (_, _, g :: IndexedPolynomial) = extendedEuclidean a b
          in greatestCommonDivisor a b `shouldBe` g
+
+    describe "subresultant polynomial remainder sequence" $ do
+      prop "resultant is zero iff gcd has non-zero degree" $ \a b ->
+        b /= 0 ==>
+          let (resultant, _) = subresultant a (b :: IndexedPolynomial)
+           in resultant == 0 `shouldBe` degree (greatestCommonDivisor a b) > 0
+
+      modifyMaxSize (const 10) $
+        prop "resultant has expected value" $
+          forAll (arbitrarySizedFractional `suchThat` (/= 0)) $ \a ->
+            forAll (arbitrarySizedFractional `suchThat` (/= 0)) $ \b ->
+              forAll (listOf1 arbitrarySizedFractional) $ \as ->
+                forAll (listOf1 arbitrarySizedFractional) $ \bs ->
+                  let x = scale a $ product [power 1 - scale t 1 | t <- as] :: IndexedPolynomial
+                      y = scale b $ product [power 1 - scale t 1 | t <- bs] :: IndexedPolynomial
+                      r@(resultant, _) = subresultant x y
+                      resultant' = a ^ length as * b ^ length bs * product [u - v | u <- as, v <- bs]
+                   in counterexample (show r) $
+                        conjoin
+                          [ degree resultant `shouldBe` 0,
+                            leadingCoefficient resultant `shouldBe` resultant'
+                          ]
+
+      prop "is polynomial remainder sequence" $ \a b ->
+        let (_, prs) = subresultant a b
+            -- Whether z is a numeric multiple of prem(x, y).
+            fromPseudoRemainder (x, y, z)
+              | y == 0 = z == 0
+              | prem == 0 = z == 0
+              | otherwise = degree q == 0 && r == 0
+              where
+                (_, prem) = pseudoDivide x y
+                (q, r) = divide z (prem :: IndexedPolynomial)
+            isPolynomialRemainderSequence xs =
+              all fromPseudoRemainder $ zip3 xs (drop 1 xs) (drop 2 xs)
+         in prs `shouldSatisfy` isPolynomialRemainderSequence
 
     describe "differentiation" $ do
       prop "computes derivative of constant" $ \c ->

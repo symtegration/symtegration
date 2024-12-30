@@ -18,10 +18,10 @@ any contributions under the same license.
 
 ### Background material
 
-[Symbolic Integration I, Transcendental Functions] by Manuel Bronstein
+/[Symbolic Integration I: Transcendental Functions]/ by Manuel Bronstein
 is a primary reference for the algorithms used by this project.
 
-[Symbolic Integration I, Transcendental Functions]: https://doi.org/10.1007/b138171
+[Symbolic Integration I: Transcendental Functions]: https://doi.org/10.1007/b138171
 
 ## Contribution process
 
