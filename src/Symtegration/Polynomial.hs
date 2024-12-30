@@ -278,12 +278,16 @@ subresultant ::
   p e c ->
   -- | The resultant and the subresultant polynomial remainder sequence.
   (c, [p e c])
-subresultant p q = (resultantFromSequence rs betas, rs)
+subresultant p q
+  | degree p >= degree q = (resultantFromSequence rs betas, rs)
+  | otherwise = ((-1) ^ (degree p * degree q) * resultant, prs)
   where
     (rs, betas) = subresultantRemainderSequence (p, q) gamma beta
     gamma = -1
     beta = (-1) ^^ (1 + delta)
     delta = degree p - degree q
+
+    (resultant, prs) = subresultant q p
 
 -- | Derives the subresultant polynomial remainder sequence for 'subresultant'.
 -- Constructs \(\gamma_i\), \(\beta_i\), and the remainder sequence as it goes along.
