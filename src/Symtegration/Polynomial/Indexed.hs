@@ -4,7 +4,12 @@
 -- Copyright: Copyright 2024 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
-module Symtegration.Polynomial.Indexed (IndexedPolynomial, IndexedSymbolicPolynomial) where
+module Symtegration.Polynomial.Indexed
+  ( IndexedPolynomial,
+    IndexedSymbolicPolynomial,
+    IndexedPolynomialWith,
+  )
+where
 
 import Data.IntMap (IntMap)
 import Data.IntMap qualified as IntMap
@@ -19,13 +24,18 @@ import TextShow
 
 -- | Polynomial representation which maps the power of each term to its coefficient.
 -- Exponents are represented with 'Int', while coefficients are represented with 'Rational'.
--- It is an instance of the 'Polynomial' typeclass.
-type IndexedPolynomial = P Int Rational
+-- It is an instance of the 'Polynomial' type class.
+type IndexedPolynomial = IndexedPolynomialWith Rational
 
 -- | Polynomial representation which maps the power of each term to its coefficient.
 -- Exponents are represented with 'Int', while coefficients are represented with 'Expression'.
--- It is an instance of the 'Polynomial' typeclass.
-type IndexedSymbolicPolynomial = P Int Expression
+-- It is an instance of the 'Polynomial' type class.
+type IndexedSymbolicPolynomial = IndexedPolynomialWith Expression
+
+-- | Polynomial representation which maps the power of each term to its coefficient.
+-- Exponents are represented with 'Int'.  Coefficients have a type as specified by the type parameter.
+-- These types are an instance of the 'Polynomial' type class.
+type IndexedPolynomialWith a = P Int a
 
 -- | Type with two type parameters so that it can be an instance of 'Polynomial'.
 -- The first type parameter is not involved in the data constructor;
