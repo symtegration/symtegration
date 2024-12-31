@@ -69,6 +69,8 @@ data RationalFunction = RationalFunction IndexedPolynomial IndexedPolynomial
 instance Show RationalFunction where
   show (RationalFunction n d) = "(" <> show n <> ") / (" <> show d <> ")"
 
+-- | The numerator and denominator in the results
+-- for '(+)', '(-)', '(*)', and 'negate' will be coprime.
 instance Num RationalFunction where
   (RationalFunction x y) + (RationalFunction u v) =
     toRationalFunction (x * v + u * y) (y * v)
