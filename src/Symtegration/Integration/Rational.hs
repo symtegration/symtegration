@@ -120,8 +120,7 @@ toRationalFunction x y = RationalFunction x' y'
 -- \[ \int \frac{A}{D} \, dx = g + \int h \, dx \]
 --
 -- If preconditions are satisfied, i.e., \(D \neq 0\) and \(A\) and \(D\) are coprime,
--- then \(h\) will have a squarefree denominator, and its numerator should have
--- a smaller degree than its denominator.
+-- then \(h\) will have a squarefree denominator.
 --
 -- \(g\) is returned as a list of rational functions which sum to \(g\)
 -- instead of a single rational function, because the former could sometimes
