@@ -37,6 +37,22 @@ spec = parallel $ do
        in counterexample (show r) $
             greatestCommonDivisor d (differentiate d) `shouldSatisfy` ((==) 0 . degree)
 
+    prop "adds back to original rational function" $ \(NonZero p) (NonZero q) ->
+      let f = toRationalFunction p q
+          r@(gs, h) = hermiteReduce $ toRationalFunction p q
+
+          -- Manually derive derivative of g = sum gs.
+          RationalFunction x y = sum gs
+          x' = y * differentiate x - x * differentiate y
+          y' = y * y
+          g' = toRationalFunction x' y'
+
+          -- With leading coefficients factored out and numerator and denominator coprime,
+          -- the representation of a rational function should be unique.
+          rep (RationalFunction u v) =
+            (leadingCoefficient u / leadingCoefficient v, RationalFunction (monic u) (monic v))
+       in counterexample (show r) $ rep (g' + h) `shouldBe` rep f
+
 -- | For generating arbitrary rational functions with rational number coefficients.
 newtype Rat = Rat Expression deriving (Eq, Show)
 
