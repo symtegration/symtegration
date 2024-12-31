@@ -67,6 +67,7 @@ fromExpression t (x :**: (Number n))
   | n >= 0 = (^ n) <$> fromExpression t x
   | otherwise = Nothing
 fromExpression _ (_ :**: _) = Nothing
+fromExpression _ (_ :/: Number 0) = Nothing
 fromExpression _ (Number n :/: Number m) = Just $ scale r 1
   where
     r = fromInteger n / fromInteger m
