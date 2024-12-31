@@ -85,7 +85,7 @@ spec = parallel $ do
           let (resultant, _) = subresultant a (b :: IndexedPolynomial)
            in resultant == 0 `shouldBe` degree (greatestCommonDivisor a b) > 0
 
-      modifyMaxSize (const 10) $
+      modifyMaxSize (const 25) $
         prop "resultant has expected value" $
           forAll (arbitrarySizedFractional `suchThat` (/= 0)) $ \a ->
             forAll (arbitrarySizedFractional `suchThat` (/= 0)) $ \b ->
@@ -94,7 +94,7 @@ spec = parallel $ do
                   let x = scale a $ product [power 1 - scale t 1 | t <- as] :: IndexedPolynomial
                       y = scale b $ product [power 1 - scale t 1 | t <- bs] :: IndexedPolynomial
                       r@(resultant, _) = subresultant x y
-                      resultant' = a ^ length as * b ^ length bs * product [u - v | u <- as, v <- bs]
+                      resultant' = a ^ length bs * b ^ length as * product [u - v | u <- as, v <- bs]
                    in counterexample (show r) $
                         resultant `shouldBe` resultant'
 
@@ -111,6 +111,11 @@ spec = parallel $ do
             isPolynomialRemainderSequence xs =
               all fromPseudoRemainder $ zip3 xs (drop 1 xs) (drop 2 xs)
          in prs `shouldSatisfy` isPolynomialRemainderSequence
+
+      prop "has zero as last element in sequence" $ \a b ->
+        let (_, prs) = subresultant a (b :: IndexedPolynomial)
+         in counterexample (show prs) $
+              drop (length prs - 1) prs `shouldBe` [0]
 
     describe "differentiation" $ do
       prop "computes derivative of constant" $ \c ->

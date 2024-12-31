@@ -262,7 +262,7 @@ greatestCommonDivisor p q = g
 -- >>> subresultant (2 * power 2 - 3 * power 1 + 1) (5 * power 2 + power 1 - 6 :: IndexedPolynomial)
 -- (0 % 1,[2x^2 + (-3)x + 1,5x^2 + x + (-6),17x + (-17),0])
 -- >>> subresultant (power 3 + 2 * power 2 + 3 * power 1 + 4) (5 * power 2 + 6 * power 1 + 7 :: IndexedPolynomial)
--- (832 % 1,[x^3 + 2x^2 + 3x + 4,5x^2 + 6x + 7,16x + 72,4160,0])
+-- (832 % 1,[x^3 + 2x^2 + 3x + 4,5x^2 + 6x + 7,16x + 72,832,0])
 --
 -- === __Reference__
 --
@@ -280,11 +280,11 @@ subresultant ::
   (c, [p e c])
 subresultant p q
   | degree p >= degree q = (resultantFromSequence rs betas, rs)
-  | otherwise = ((-1) ^ (degree p * degree q) * resultant, prs)
+  | otherwise = ((-1) ^ (degree q * degree p) * resultant, prs)
   where
     (rs, betas) = subresultantRemainderSequence (p, q) gamma beta
     gamma = -1
-    beta = (-1) ^^ (1 + delta)
+    beta = (-1) ^ (1 + delta)
     delta = degree p - degree q
 
     (resultant, prs) = subresultant q p
@@ -308,10 +308,12 @@ subresultantRemainderSequence (rprev, rcurr) gamma beta
   where
     (rs, betas) = subresultantRemainderSequence (rcurr, rnext) gamma' beta'
     (_, r) = pseudoDivide rprev rcurr
-    delta = degree rcurr - degree rprev
     rnext = scale (1 / beta) r
-    gamma' = (-leadingCoefficient rprev) ^^ delta * gamma ^^ (1 - delta)
-    beta' = (-leadingCoefficient rcurr) * gamma' ^ (degree rcurr - degree rnext)
+    lc = leadingCoefficient rcurr
+    delta = degree rprev - degree rcurr
+    delta' = degree rcurr - degree rnext
+    gamma' = ((-lc) ^ delta) * (gamma ^^ (1 - delta))
+    beta' = (-lc) * (gamma' ^ delta')
 
 -- | Constructs the resultant based on the subresultant polynomial remainder sequence
 -- and the sequence of \(\beta_i\) used to construct the subresultant PRS.
@@ -327,11 +329,12 @@ resultantFromSequence rs betas = go rs betas 1 1
   where
     go (r : r' : r'' : rs') (beta : betas') c s
       | [] <- rs', degree r' > 0 = 0
+      | [] <- rs', degree r == 1 = leadingCoefficient r'
       | [] <- rs' = s * c * leadingCoefficient r' ^ degree r
       | otherwise = go (r' : r'' : rs') betas' c' s'
       where
         s' | odd (degree r), odd (degree r') = -s | otherwise = s
-        c' = c * ((beta / (lc ^^ (1 + delta))) ^ degree r') * (lc ^ (degree r - degree r''))
+        c' = c * ((beta / (lc ^ (1 + delta))) ^ degree r') * (lc ^ (degree r - degree r''))
         lc = leadingCoefficient r'
         delta = degree r - degree r'
     go _ _ _ _ = 0
