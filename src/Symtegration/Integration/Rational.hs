@@ -95,6 +95,13 @@ toRationalFunction x y = RationalFunction x' y'
 -- the sum of @gs@ is equal to \(g\) and @h@ is equal to \(h\) in the following:
 --
 -- \[ \frac{A}{D} = \frac{dg}{dx} + h \]
+--
+-- This is equivalent to the following:
+--
+-- \[ \int \frac{A}{D} = g + \int h \, dx \]
+--
+-- \(h\) will have a squarefree denominator, and its numerator should have
+-- a smaller degree than its denominator.
 hermiteReduce :: RationalFunction -> ([RationalFunction], RationalFunction)
 hermiteReduce h@(RationalFunction _ 0) = ([], h)
 hermiteReduce h@(RationalFunction x y)
