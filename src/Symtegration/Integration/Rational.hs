@@ -6,10 +6,20 @@
 -- Maintainer: dev@chungyc.org
 --
 -- Integrates rational functions.
--- Rational functions are ratios of two polynomials,
--- not functions of rational numbers.
+-- Rational functions are ratios of two polynomials, not functions of rational numbers.
 -- Only rational number coefficients are supported.
-module Symtegration.Integration.Rational (integrate) where
+module Symtegration.Integration.Rational
+  ( -- * Integration
+    integrate,
+
+    -- * Support
+
+    -- | Functions and types useful when integrating rational functions.
+    hermiteReduce,
+    toRationalFunction,
+    RationalFunction (..),
+  )
+where
 
 import Data.Text (Text)
 import Symtegration.Integration.Powers qualified as Powers
@@ -42,9 +52,11 @@ integrate v e
     integrate' n d = (+) (sum (map fromRationalFunction g)) <$> logs
       where
         (g, h) = hermiteReduce $ toRationalFunction n d
+
         -- For now, try to integrate by powers.
         -- We will want something more complete for this remaining portion eventually.
         logs = Substitution.integrate [Powers.integrate] v (simplify v $ fromRationalFunction h)
+
         fromRationalFunction (RationalFunction u w) = u' / w'
           where
             u' = toExpression v toRationalCoefficient u
@@ -53,6 +65,9 @@ integrate v e
 -- | Represents the ratio of two polynomials with rational number coefficients.
 data RationalFunction = RationalFunction IndexedPolynomial IndexedPolynomial
   deriving (Eq)
+
+instance Show RationalFunction where
+  show (RationalFunction n d) = "(" <> show n <> ") / (" <> show d <> ")"
 
 instance Num RationalFunction where
   (RationalFunction x y) + (RationalFunction u v) =
@@ -89,19 +104,26 @@ toRationalFunction x y = RationalFunction x' y'
 -- | Applies Hermite reduction to a rational function.
 -- Returns a list of rational functions whose sums add up to the integral
 -- and a rational function which remains to be integrated.
+-- Only rational functions with rational number coefficients and
+-- where the numerator and denominator are coprime are supported.
 --
 -- Specifically, for rational function \(x = \frac{A}{D}\),
--- where \(A\) and \(D\) are coprime, then for return value @(gs, h)@,
+-- where \(A\) and \(D\) are coprime polynomials, then for return value @(gs, h)@,
 -- the sum of @gs@ is equal to \(g\) and @h@ is equal to \(h\) in the following:
 --
 -- \[ \frac{A}{D} = \frac{dg}{dx} + h \]
 --
 -- This is equivalent to the following:
 --
--- \[ \int \frac{A}{D} = g + \int h \, dx \]
+-- \[ \int \frac{A}{D} \, dx = g + \int h \, dx \]
 --
--- \(h\) will have a squarefree denominator, and its numerator should have
+-- If preconditions are satisfied, i.e., \(D \neq 0\) and \(A\) and \(D\) are coprime,
+-- then \(h\) will have a squarefree denominator, and its numerator should have
 -- a smaller degree than its denominator.
+--
+-- \(g\) is returned as a list of rational functions which sum to \(g\)
+-- instead of a single rational function, because the former could sometimes
+-- be simpler to read.
 hermiteReduce :: RationalFunction -> ([RationalFunction], RationalFunction)
 hermiteReduce h@(RationalFunction _ 0) = ([], h)
 hermiteReduce h@(RationalFunction x y)
