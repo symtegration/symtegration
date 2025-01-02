@@ -12,11 +12,15 @@ module Symtegration.Integration.Rational
   ( -- * Integration
     integrate,
 
+    -- * Algorithms
+
+    -- | Algorithms used for integrating rational functions.
+    hermiteReduce,
+    rationalIntegralLogTerms,
+
     -- * Support
 
     -- | Functions and types useful when integrating rational functions.
-    hermiteReduce,
-    rationalIntegralLogTerms,
     toRationalFunction,
     RationalFunction (..),
   )
