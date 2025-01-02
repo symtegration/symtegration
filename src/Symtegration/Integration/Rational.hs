@@ -164,7 +164,7 @@ toRationalFunction x y = RationalFunction x' y'
 -- Only rational functions with rational number coefficients and
 -- where the numerator and denominator are coprime are supported.
 --
--- Specifically, for rational function \(x = \frac{A}{D}\),
+-- Specifically, for rational function \(f = \frac{A}{D}\),
 -- where \(A\) and \(D\) are coprime polynomials, then for return value @(gs, h)@,
 -- the sum of @gs@ is equal to \(g\) and @h@ is equal to \(h\) in the following:
 --
