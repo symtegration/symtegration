@@ -9,7 +9,7 @@ import Data.Map qualified as Map
 import Data.Text (Text)
 import Symtegration.Integration.Properties
 import Symtegration.Integration.Rational
-import Symtegration.Polynomial
+import Symtegration.Polynomial hiding (integrate)
 import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Indexed.Arbitrary ()
 import Symtegration.Polynomial.Symbolic

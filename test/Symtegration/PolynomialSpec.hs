@@ -125,9 +125,18 @@ spec = parallel $ do
         differentiate (scale c (power e) :: IndexedPolynomial)
           `shouldBe` scale (fromIntegral e * c) (power (e - 1))
 
-      prop "compute derivative of compound polynomials" $ \a b ->
+      prop "computes derivative of compound polynomials" $ \a b ->
         differentiate (a + b :: IndexedPolynomial)
           `shouldBe` differentiate a + differentiate b
+
+    describe "integration" $ do
+      prop "computes integral of integral power" $ \(NonNegative e) c ->
+        integrate (scale c (power e) :: IndexedPolynomial)
+          `shouldBe` scale (c / (1 + fromIntegral e)) (power (e + 1))
+
+      prop "computes integral of compound polynomials" $ \a b ->
+        integrate (a + b :: IndexedPolynomial)
+          `shouldBe` integrate a + integrate b
 
     describe "squarefree factorization" $ do
       prop "divides polynomial" $ \p ->

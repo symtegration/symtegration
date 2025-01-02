@@ -27,7 +27,7 @@ import Data.Monoid (Sum (..))
 import Data.Text (Text)
 import Symtegration.Integration.Powers qualified as Powers
 import Symtegration.Integration.Substitution qualified as Substitution
-import Symtegration.Polynomial
+import Symtegration.Polynomial hiding (integrate)
 import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Symbolic
 import Symtegration.Symbolic
@@ -35,7 +35,7 @@ import Symtegration.Symbolic.Simplify
 
 -- $setup
 -- >>> :set -w
--- >>> import Symtegration.Polynomial
+-- >>> import Symtegration.Polynomial hiding (integrate)
 -- >>> import Symtegration.Polynomial.Indexed
 -- >>> import Symtegration.Symbolic.Haskell
 -- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic

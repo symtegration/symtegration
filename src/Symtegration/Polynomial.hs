@@ -23,6 +23,7 @@ module Symtegration.Polynomial
     greatestCommonDivisor,
     subresultant,
     differentiate,
+    integrate,
     squarefree,
   )
 where
@@ -369,6 +370,15 @@ differentiate p = getSum $ foldTerms diffTerm p
   where
     diffTerm 0 _ = Sum 0
     diffTerm e c = Sum $ scale (fromIntegral e * c) $ power (e - 1)
+
+-- | Returns the integral of the given polynomial.
+--
+-- >>> integrate (power 2 + power 1 :: IndexedPolynomial)
+-- (1 % 3)x^3 + (1 % 2)x^2
+integrate :: (Polynomial p e c, Num (p e c), Fractional c) => p e c -> p e c
+integrate p = getSum $ foldTerms integrateTerm p
+  where
+    integrateTerm e c = Sum $ scale (c / (1 + fromIntegral e)) $ power (e + 1)
 
 -- | Returns the squarefree factorization of the given polynomial.
 --
