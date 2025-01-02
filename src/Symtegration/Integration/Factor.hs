@@ -28,8 +28,8 @@ factor v e@(Symbol s) | v == s = (Number 1, e) | otherwise = (e, Number 1)
 factor v e@(UnaryApply _ x) | isConstant v x = (e, Number 1) | otherwise = (Number 1, e)
 factor v e@(x :*: (y :*: z))
   | isConstant v x, isConstant v y, isConstant v z = (e, Number 1)
-  | isConstant v x, isConstant v y = (simplify v $ x :*: (y :*: c), z')
-  | isConstant v x = (simplify v $ x :*: d, y')
+  | isConstant v x, isConstant v y = (simplifyForVariable v $ x :*: (y :*: c), z')
+  | isConstant v x = (simplifyForVariable v $ x :*: d, y')
   | otherwise = (Number 1, e)
   where
     (c, z') = factor v z

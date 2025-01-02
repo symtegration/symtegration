@@ -33,7 +33,7 @@ import Data.Monoid (Sum (..))
 -- $setup
 -- >>> import Data.Ratio ((%))
 -- >>> import Symtegration.Symbolic
--- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic
+-- >>> import Symtegration.Symbolic.Simplify
 -- >>> import Symtegration.Polynomial.Indexed
 
 -- | Polynomials must support the operations specified in this type class.

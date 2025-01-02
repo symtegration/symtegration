@@ -14,7 +14,7 @@ import Symtegration.Symbolic
 
 -- $setup
 -- >>> import Symtegration.Symbolic.Haskell
--- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic
+-- >>> import Symtegration.Symbolic.Simplify
 
 -- | Integrates by substitution.
 --
@@ -26,7 +26,7 @@ import Symtegration.Symbolic
 --
 -- >>> import Symtegration.Integration.Trigonometric qualified as Trigonometric
 -- >>> toHaskell <$> simplify <$> integrate [Trigonometric.integrate] "x" (sin ("a" * "x" + 1))
--- Just "(1 / a) * (negate (cos (a * x + 1)))"
+-- Just "(negate (cos (1 + a * x))) * (1 / a)"
 integrate ::
   -- | Integration algorithms to try after substitution.
   [Text -> Expression -> Maybe Expression] ->

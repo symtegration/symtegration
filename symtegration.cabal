@@ -52,7 +52,6 @@ library
       Symtegration.Symbolic.Simplify
       Symtegration.Symbolic.Simplify.AlgebraicRingOrder
       Symtegration.Symbolic.Simplify.NumericFolding
-      Symtegration.Symbolic.Simplify.RecursiveHeuristic
       Symtegration.Symbolic.Simplify.SymbolicFolding
   other-modules:
       Paths_symtegration
@@ -115,7 +114,6 @@ test-suite spec
       Symtegration.Symbolic.Simplify.AlgebraicRingOrderSpec
       Symtegration.Symbolic.Simplify.NumericFoldingSpec
       Symtegration.Symbolic.Simplify.Properties
-      Symtegration.Symbolic.Simplify.RecursiveHeuristicSpec
       Symtegration.Symbolic.Simplify.SymbolicFoldingSpec
       Symtegration.SymbolicSpec
       Paths_symtegration

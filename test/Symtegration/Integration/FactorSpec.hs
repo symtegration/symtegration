@@ -29,14 +29,15 @@ spec = parallel $ do
   describe "factor" $ do
     prop "into non-constant and constant factors" $
       forAll genVariable $ \e ->
-        counterexample ("e = " <> unpack (toHaskell $ simplify var e)) $
-          factor var (simplify var e)
+        counterexample ("e = " <> unpack (toHaskell $ simplifyForVariable var e)) $
+          factor var (simplifyForVariable var e)
             `shouldSatisfy` (\(x, y) -> isConstant var x && (not (isConstant var y) || y == Number 1))
 
     prop "variable portion has no multiplicative constant" $
       forAll genVariable $ \e ->
-        counterexample ("e = " <> unpack (toHaskell $ simplify var e)) $
-          factor var (simplify var e) `shouldSatisfy` (\(_, x) -> notConstantFactors x || x == Number 1)
+        counterexample ("e = " <> unpack (toHaskell $ simplifyForVariable var e)) $
+          factor var (simplifyForVariable var e)
+            `shouldSatisfy` (\(_, x) -> notConstantFactors x || x == Number 1)
 
 notConstantFactors :: Expression -> Bool
 notConstantFactors (x :*: y) = notConstantFactors x && notConstantFactors y

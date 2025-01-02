@@ -14,10 +14,10 @@ import Symtegration.Symbolic.Simplify
 
 -- $setup
 -- >>> import Symtegration.Symbolic.Haskell
--- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic
+-- >>> import Symtegration.Symbolic.Simplify
 
 -- | Integrate a single term, separating out the constant factor and
--- applying direct methods to the non-constant factor.
+-- applying direct integration methods to the non-constant factor.
 --
 -- >>> import Symtegration.Integration.Trigonometric qualified as T
 -- >>> let f = "a" * sin "x"
@@ -39,5 +39,5 @@ integrate ::
   Maybe Expression
 integrate fs v e = asum $ map (\f -> (:*:) c <$> f v u) fs
   where
-    e' = simplify v e
+    e' = simplifyForVariable v e
     (c, u) = factor v e'

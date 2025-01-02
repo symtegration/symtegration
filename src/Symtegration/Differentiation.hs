@@ -34,7 +34,7 @@ differentiate ::
   Expression ->
   -- | The derivative.
   Expression
-differentiate v e = simplify v $ diff f $ Symbol v
+differentiate v e = simplifyForVariable v $ diff f $ Symbol v
   where
     f = toFunction e assign
     assign x

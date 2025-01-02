@@ -12,7 +12,7 @@ import Symtegration.Symbolic
 
 -- $setup
 -- >>> import Symtegration.Symbolic.Haskell
--- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic
+-- >>> import Symtegration.Symbolic.Simplify
 
 -- | Integrate term by term and returns the sum, using direct methods on each term.
 --
@@ -25,7 +25,7 @@ import Symtegration.Symbolic
 -- Nothing
 -- >>> let g = integrate [P.integrate, T.integrate] "x" f
 -- >>> toHaskell . simplify <$> g
--- Just "(1 / 2) * (x ** 2) + (negate (cos x))"
+-- Just "(-1) * (cos x) + (1 / 2) * (x ** 2)"
 integrate ::
   -- | Functions for directly integrating each term.
   [Text -> Expression -> Maybe Expression] ->

@@ -45,13 +45,13 @@ import Symtegration.Symbolic.Simplify
 --
 -- >>> let p = "x" ** 7 - 24 * "x" ** 4 - 4 * "x" ** 2 + 8 * "x" - 8
 -- >>> let q = "x" ** 8 + 6 * "x" ** 6 + 12 * "x" ** 4 + 8 * "x" ** 2
--- >>> toHaskell . simplify "" <$> integrate "x" (p / q)
+-- >>> toHaskell . simplify <$> integrate "x" (p / q)
 -- Just "(3 / (2 + (x ** 2))) + ((4 + 8 * (x ** 2)) / (4 * x + 4 * (x ** 3) + (x ** 5))) + (log x)"
 --
 -- For another example, \(\int \frac{36}{x^5-2x^4-2x^3+4x^2+x-2} \, dx = \frac{12x+6}{x^2-1} + 4 \log \left( x - 2 \right) - 4 \log \left( x + 1 \right)\):
 --
 -- >>> let f = 36 / ("x" ** 5 - 2 * "x" ** 4 - 2 * "x" ** 3 + 4 * "x" ** 2 + "x" - 2)
--- >>> toHaskell . simplify "" <$> integrate "x" f
+-- >>> toHaskell . simplify <$> integrate "x" f
 -- Just "(-4) * (log (8 + 8 * x)) + 4 * (log (16 + (-8) * x)) + ((6 + 12 * x) / ((-1) + (x ** 2)))"
 integrate :: Text -> Expression -> Maybe Expression
 integrate v e
@@ -61,7 +61,7 @@ integrate v e
       integrate' n d
   | otherwise = Nothing
   where
-    e' = simplify v e
+    e' = simplifyForVariable v e
     integrate' n d = (+) reduced . (+) poly <$> logs
       where
         -- Integrals directly from Hermite reduction.

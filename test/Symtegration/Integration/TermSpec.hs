@@ -25,7 +25,7 @@ spec = parallel $ do
     prop "for constant multiplied by simple term" $ \x ->
       forAll genConstant $ \c ->
         forAll genVariableTerm $ \e ->
-          let e' = simplify var $ c :*: e
+          let e' = simplifyForVariable var $ c :*: e
               fs = [Powers.integrate, Trigonometric.integrate]
            in counterexample ("e' = " <> unpack (toHaskell e')) $
                 antiderivativeProperty (integrate fs) (Map.singleton var x) e' x

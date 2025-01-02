@@ -25,7 +25,7 @@ import Symtegration.Symbolic.Simplify
 integrate :: Text -> Expression -> Maybe Expression
 integrate v e = asum $ map (\f -> f v e') withTermSum
   where
-    e' = simplify v e
+    e' = simplifyForVariable v e
 
 -- | Functions which directly integrate.
 base :: [Text -> Expression -> Maybe Expression]

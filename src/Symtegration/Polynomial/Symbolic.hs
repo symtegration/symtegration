@@ -127,13 +127,13 @@ withSymbolicCoefficients (fromSymbol, _) = (fromSymbol', toCoefficient)
 --
 -- >>> let (Just p) = fromExpression (forVariable "x") (3 * "x"**4 + 1) :: Maybe IndexedPolynomial
 -- >>> toHaskell $ simplify $ toExpression "x" toRationalCoefficient p
--- "3 * (x ** 4) + 1"
+-- "1 + 3 * (x ** 4)"
 --
 -- To evaluate the coefficients symbolically, use 'toSymbolicCoefficient'.
 --
 -- >>> let (Just p) = fromExpression (withSymbolicCoefficients (forVariable "x")) (("a"+"b") * "x"**4 + 1) :: Maybe IndexedSymbolicPolynomial
 -- >>> toHaskell $ simplify $ toExpression "x" toSymbolicCoefficient p
--- "(a + b) * (x ** 4) + 1"
+-- "1 + (a + b) * (x ** 4)"
 toExpression :: (Polynomial p e c) => Text -> (c -> Expression) -> p e c -> Expression
 toExpression x cf p = getSum $ foldTerms convert p
   where
