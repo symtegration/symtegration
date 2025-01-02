@@ -8,6 +8,7 @@ module Symtegration.Symbolic.Simplify.AlgebraicRingOrder (order) where
 
 import Data.List (sortBy)
 import Data.Text (Text)
+import Data.Set qualified as Set
 import Symtegration.Symbolic
 
 -- $setup
@@ -85,6 +86,8 @@ compareExpressions v x y
   | (Just GT) <- compareDegree = GT
   | LT <- comparePseudoDegree = LT
   | GT <- comparePseudoDegree = GT
+  | LT <- compareSymbolCount = LT
+  | GT <- compareSymbolCount = GT
   | LT <- compareOp = LT
   | GT <- compareOp = GT
   | Number n <- x, Number m <- y = compare n m
@@ -106,6 +109,7 @@ compareExpressions v x y
         (_, 0) -> return GT
         _ -> return $ compare xd yd
     comparePseudoDegree = compare (pseudoDegree v x) (pseudoDegree v y)
+    compareSymbolCount = compare (symbolCount x) (symbolCount y)
     compareOp = compare (expressionOrder v x) (expressionOrder v y)
 
 -- | The integral power of the variable for a particular expression.
@@ -129,6 +133,14 @@ pseudoDegree v (Symbol s) | v == s = 1 | otherwise = 0
 pseudoDegree v (Negate' x) = pseudoDegree v x
 pseudoDegree v (UnaryApply _ x) = pseudoDegree v x
 pseudoDegree v (BinaryApply _ x y) = pseudoDegree v x + pseudoDegree v y
+
+symbolCount :: Expression -> Int
+symbolCount x = Set.size $ collect x
+  where
+    collect (Number _) = Set.empty
+    collect (Symbol s) = Set.singleton s
+    collect (UnaryApply _ u) = collect u
+    collect (BinaryApply _ u v) = Set.union (collect u) (collect v)
 
 -- | A fixed order between functions and operators.
 -- Ignores the actual values the functins and operators are given.

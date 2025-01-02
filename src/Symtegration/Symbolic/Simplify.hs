@@ -42,7 +42,7 @@ simplify = simplifyForVariable ""
 -- >>> toHaskell $ simplifyForVariable "x" $ "a" ** 143 + "x" + "b" ** 2
 -- "(a ** 143) + (b ** 2) + x"
 -- >>> toHaskell $ simplifyForVariable "x" $ "a" * "x" + "x" + "b ** 2" + "x" ** 2
--- "b ** 2 + a * x + x + (x ** 2)"
+-- "b ** 2 + x + a * x + (x ** 2)"
 simplifyForVariable ::
   -- | Symbol for the variable.
   Text ->

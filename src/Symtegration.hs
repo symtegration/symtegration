@@ -20,7 +20,7 @@
 --
 -- >>> import Symtegration
 -- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
--- Just "x * (1 / 2) * (z ** 2) + y * z"
+-- Just "(1 / 2) * x * (z ** 2) + y * z"
 module Symtegration
   ( -- * Symbolic representation
     Expression,
@@ -76,7 +76,7 @@ import Symtegration.Symbolic.Simplify (simplify)
 -- are symbolic, as with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):
 --
 -- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
--- Just "x * (1 / 2) * (z ** 2) + y * z"
+-- Just "(1 / 2) * x * (z ** 2) + y * z"
 integrate ::
   -- | The symbol representing the variable being integrated over.
   Text ->
