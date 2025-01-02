@@ -34,6 +34,7 @@ import Symtegration.Symbolic
 import Symtegration.Symbolic.Simplify
 
 -- $setup
+-- >>> :set -w
 -- >>> import Symtegration.Polynomial
 -- >>> import Symtegration.Polynomial.Indexed
 -- >>> import Symtegration.Symbolic.Haskell
