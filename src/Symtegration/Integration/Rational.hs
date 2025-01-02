@@ -37,14 +37,22 @@ import Symtegration.Symbolic.Simplify
 -- >>> import Symtegration.Polynomial hiding (integrate)
 -- >>> import Symtegration.Polynomial.Indexed
 -- >>> import Symtegration.Symbolic.Haskell
--- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic
+-- >>> import Symtegration.Symbolic.Simplify
 
 -- | Integrate a ratio of two polynomials with rational number coefficients.
 --
+-- For example, \(\int \frac{x^7-24x^4-4x^2+8x-8}{x^8+6x^6+12x^4+8x^2} \, dx = \frac{3}{x^2+2} + \frac{8x^2+4}{x^5+4x^3+4x} + \log x\):
+--
 -- >>> let p = "x" ** 7 - 24 * "x" ** 4 - 4 * "x" ** 2 + 8 * "x" - 8
 -- >>> let q = "x" ** 8 + 6 * "x" ** 6 + 12 * "x" ** 4 + 8 * "x" ** 2
--- >>> toHaskell . simplify <$> integrate "x" (p / q)
--- Just "(3 / ((x ** 2) + 2)) + ((8 * (x ** 2) + 4) / ((x ** 5) + 4 * (x ** 3) + 4 * x)) + (log x)"
+-- >>> toHaskell . simplify "" <$> integrate "x" (p / q)
+-- Just "(3 / (2 + (x ** 2))) + ((4 + 8 * (x ** 2)) / (4 * x + 4 * (x ** 3) + (x ** 5))) + (log x)"
+--
+-- For another example, \(\int \frac{36}{x^5-2x^4-2x^3+4x^2+x-2} \, dx = \frac{12x+6}{x^2-1} + 4 \log \left( x - 2 \right) - 4 \log \left( x + 1 \right)\):
+--
+-- >>> let f = 36 / ("x" ** 5 - 2 * "x" ** 4 - 2 * "x" ** 3 + 4 * "x" ** 2 + "x" - 2)
+-- >>> toHaskell . simplify "" <$> integrate "x" f
+-- Just "(-4) * (log (8 + 8 * x)) + 4 * (log (16 + (-8) * x)) + ((6 + 12 * x) / ((-1) + (x ** 2)))"
 integrate :: Text -> Expression -> Maybe Expression
 integrate v e
   | (x :/: y) <- e',
@@ -74,20 +82,28 @@ integrate v e
           | otherwise = Nothing
           where
             toLog (q', s) = do
-              roots <- solve q' :: Maybe [Rational]
+              roots <- solve q' :: Maybe [Expression]
               let ss = map (\x -> (x, mapCoefficients (toExpr x) s)) roots
-              return $ sum $ map (\(x, p) -> fromRational x * Log' (toExpression v toSymbolicCoefficient p)) ss
-            toExpr x p = getSum $ foldTerms (\e'' c -> Sum $ fromRational c * (fromRational x ^ e'')) p
+              return $ sum $ map (\(x, p) -> x * Log' (toExpression v toSymbolicCoefficient p)) ss
+            toExpr x p = getSum $ foldTerms (\e'' c -> Sum $ fromRational c * (x ** Number (fromIntegral e''))) p
 
         -- Derive the roots for the given polynomial.
         -- Incomplete for now.
+        solve :: IndexedPolynomial -> Maybe [Expression]
         solve p
-          | degree p == 1 = Just [(-coefficient p 0) / coefficient p 1]
+          | degree p == 1 = Just [fromRational $ (-coefficient p 0) / coefficient p 1]
           | degree p == 2 = solveQuadratic (coefficient p 2) (coefficient p 1) (coefficient p 0)
           | otherwise = Nothing
 
+        -- For now, ignores complex roots.
+        solveQuadratic :: Rational -> Rational -> Rational -> Maybe [Expression]
         solveQuadratic a b c
-          | sq == 0 = Just [(-b) / (2 * a)]
+          | sq == 0 = Just [fromRational $ (-b) / (2 * a)]
+          | sq > 0 =
+              Just
+                [ ((-fromRational b) + fromRational sq ** (1 / 2)) / (2 * fromRational a),
+                  ((-fromRational b) - fromRational sq ** (1 / 2)) / (2 * fromRational a)
+                ]
           | otherwise = Nothing
           where
             sq = b * b - 4 * a * c

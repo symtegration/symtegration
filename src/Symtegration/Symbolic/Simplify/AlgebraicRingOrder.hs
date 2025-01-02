@@ -39,30 +39,31 @@ order v (x :**: y) = order v x :**: order v y
 order v (LogBase' x y) = LogBase' (order v x) (order v y)
 order v e = fromAddList $ sortBy (compareExpressions v) orderedAddTerms
   where
-    terms = toAddMultiplyList e
+    terms = toAddMultiplyList v e
     orderedAddTerms = map (fromMultiplyList . sortBy (compareExpressions v)) terms
 
 -- | Gather additive terms formed out of multiplicative terms.
 -- No particular ordering should be expected.
-toAddMultiplyList :: Expression -> [[Expression]]
-toAddMultiplyList (x@(_ :+: _) :+: y@(_ :+: _)) = toAddMultiplyList x ++ toAddMultiplyList y
-toAddMultiplyList (x@(_ :+: _) :+: y) = toMultiplyList y : toAddMultiplyList x
-toAddMultiplyList (x :+: y@(_ :+: _)) = toMultiplyList x : toAddMultiplyList y
-toAddMultiplyList (x :+: y) = map toMultiplyList [x, y]
-toAddMultiplyList (x :-: y) = toAddMultiplyList (x :+: (Number (-1) :*: y))
-toAddMultiplyList x = [toMultiplyList x]
+toAddMultiplyList :: Text -> Expression -> [[Expression]]
+toAddMultiplyList v (x@(_ :+: _) :+: y@(_ :+: _)) = toAddMultiplyList v x ++ toAddMultiplyList v y
+toAddMultiplyList v (x@(_ :+: _) :+: y) = toMultiplyList v y : toAddMultiplyList v x
+toAddMultiplyList v (x :+: y@(_ :+: _)) = toMultiplyList v x : toAddMultiplyList v y
+toAddMultiplyList v (x :+: y) = map (toMultiplyList v) [x, y]
+toAddMultiplyList v (x :-: y) = toAddMultiplyList v (x :+: (Number (-1) :*: y))
+toAddMultiplyList v x = [toMultiplyList v x]
 
 -- | Gather multiplicative terms.
 -- No particular ordering should be expected.
-toMultiplyList :: Expression -> [Expression]
-toMultiplyList x@(Number _) = [x]
-toMultiplyList x@(Symbol _) = [x]
-toMultiplyList (Negate' x) = Number (-1) : toMultiplyList x
-toMultiplyList (x@(_ :*: _) :*: y@(_ :*: _)) = toMultiplyList x ++ toMultiplyList y
-toMultiplyList (x@(_ :*: _) :*: y) = y : toMultiplyList x
-toMultiplyList (x :*: y@(_ :*: _)) = x : toMultiplyList y
-toMultiplyList (x :*: y) = [x, y]
-toMultiplyList x = [x]
+toMultiplyList :: Text -> Expression -> [Expression]
+toMultiplyList v (x@(_ :*: _) :*: y@(_ :*: _)) = toMultiplyList v x ++ toMultiplyList v y
+toMultiplyList v (x@(_ :*: _) :*: y) = y : toMultiplyList v x
+toMultiplyList v (x :*: y@(_ :*: _)) = x : toMultiplyList v y
+toMultiplyList v (x :*: y) = [order v x, order v y]
+toMultiplyList _ x@(Number _) = [x]
+toMultiplyList _ x@(Symbol _) = [x]
+toMultiplyList v (Negate' x) = Number (-1) : toMultiplyList v x
+toMultiplyList v (UnaryApply func x) = [UnaryApply func $ order v x]
+toMultiplyList v (BinaryApply func x y) = [BinaryApply func (order v x) (order v y)]
 
 -- | Convert a list of sub-expressions for a multiplicative term into a single expression.
 fromMultiplyList :: [Expression] -> Expression
