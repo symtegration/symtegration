@@ -8,7 +8,11 @@ and this project adheres to the
 
 ## Unreleased
 
-*   Integration of rational functions using Hermite reduction.
+*   Integration of rational functions.
+
+    *   Hermite reduction.
+
+    *   Lazard-Rioboo-Trager integration.
 
 *   Improvements to LaTeX output.
 
