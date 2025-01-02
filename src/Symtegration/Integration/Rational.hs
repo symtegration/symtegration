@@ -222,7 +222,7 @@ hermiteReduce h@(RationalFunction x y)
 -- >>> fst . head <$> gs
 -- Just x^2 + (1 % 4)
 -- >>> foldTerms (\e c -> show (e, c) <> " ") . snd . head <$> gs
--- Just "(3,800x^3 + (-14)x) (2,(-400)x^2 + 7) (1,(-2440)x^3 + 32x) (0,792x^2 + (-16)) "
+-- Just "(0,792x^2 + (-16)) (1,(-2440)x^3 + 32x) (2,(-400)x^2 + 7) (3,800x^3 + (-14)x) "
 --
 -- so it is the case that
 --
