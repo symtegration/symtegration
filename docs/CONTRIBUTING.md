@@ -35,12 +35,14 @@ All external contributions require review.
 ### Coding standards
 
 Code should be pure to the extent possible, and partial functions should be avoided.
+User-visible entities should be documented with [Haddock], including examples if feasible.
 [HLint] should report no issues, and formatting should be according to [Ormolu].
 
 All changes should be accompanied by corresponding tests.
 Code should be tested with property-based tests to the extent possible.
 This project uses [Hspec] and [QuickCheck] for testing.
 
+[Haddock]: https://haskell-haddock.readthedocs.io/
 [HLint]: https://github.com/ndmitchell/hlint
 [Ormolu]: https://github.com/tweag/ormolu
 [Hspec]: https://hspec.github.io/
