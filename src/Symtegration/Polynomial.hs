@@ -13,6 +13,7 @@ module Symtegration.Polynomial
   ( -- * Polynomials
     Polynomial (..),
     monic,
+    mapCoefficients,
 
     -- * Algorithms
     divide,
@@ -30,6 +31,8 @@ import Data.Monoid (Sum (..))
 
 -- $setup
 -- >>> import Data.Ratio ((%))
+-- >>> import Symtegration.Symbolic
+-- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic
 -- >>> import Symtegration.Polynomial.Indexed
 
 -- | Polynomials must support the operations specified in this type class.
@@ -106,6 +109,24 @@ monic :: (Polynomial p e c, Eq c, Fractional c) => p e c -> p e c
 monic p
   | leadingCoefficient p == 0 = p
   | otherwise = scale (1 / leadingCoefficient p) p
+
+-- | Maps the coefficients in a polynomial to form another polynomial.
+--
+-- For example, it can be used to convert a polynomial with 'Rational' coefficients
+-- into a polynomial with 'Expression' coefficients.
+--
+-- >>> let p = 2 * power 1 + 1 :: IndexedPolynomial
+-- >>> let q = mapCoefficients fromRational p :: IndexedSymbolicPolynomial
+-- >>> simplify $ coefficient q 1
+-- Number 2
+mapCoefficients ::
+  (Polynomial p e c, Polynomial p e c', Num (p e c), Num (p e c')) =>
+  (c -> c') ->
+  p e c ->
+  p e c'
+mapCoefficients f p = getSum $ foldTerms convertTerm p
+  where
+    convertTerm e c = Sum $ scale (f c) (power e)
 
 -- | Polynomial division.  It returns the quotient polynomial and the remainder polynomial.
 --

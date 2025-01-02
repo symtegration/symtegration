@@ -61,7 +61,9 @@ spec = parallel $ do
       prop "fromRational" $ \x ->
         let n = fromInteger $ numerator x
             d = fromInteger $ denominator x
-         in fromRational x `shouldBe` BinaryApply Divide n d
+         in case d of
+              1 -> label "integer" $ fromRational x `shouldBe` n
+              _ -> label "fraction" $ fromRational x `shouldBe` BinaryApply Divide n d
 
     describe "Floating" $ do
       prop "pi" $ pi `shouldBe` Symbol "pi"

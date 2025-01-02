@@ -16,11 +16,14 @@ module Symtegration.Integration.Rational
 
     -- | Functions and types useful when integrating rational functions.
     hermiteReduce,
+    rationalIntegralLogTerms,
     toRationalFunction,
     RationalFunction (..),
   )
 where
 
+import Data.List (find)
+import Data.Monoid (Sum (..))
 import Data.Text (Text)
 import Symtegration.Integration.Powers qualified as Powers
 import Symtegration.Integration.Substitution qualified as Substitution
@@ -31,6 +34,8 @@ import Symtegration.Symbolic
 import Symtegration.Symbolic.Simplify
 
 -- $setup
+-- >>> import Symtegration.Polynomial
+-- >>> import Symtegration.Polynomial.Indexed
 -- >>> import Symtegration.Symbolic.Haskell
 -- >>> import Symtegration.Symbolic.Simplify.RecursiveHeuristic
 
@@ -88,6 +93,10 @@ instance Num RationalFunction where
 
   fromInteger n = RationalFunction (fromInteger n) 1
 
+instance Fractional RationalFunction where
+  fromRational q = RationalFunction (scale q 1) 1
+  recip (RationalFunction p q) = RationalFunction q p
+
 -- | Form a rational function from two polynomials.
 -- The polynomials will be reduced so that the numerator and denominator are coprime.
 toRationalFunction ::
@@ -144,3 +153,117 @@ hermiteReduce h@(RationalFunction x y)
           let g' = toRationalFunction b d : g
           reduce a' g' d'
       | otherwise = Just (g, toRationalFunction a divisor)
+
+-- | For rational function \(\frac{A}{D}\), where \(\deg(A) < \deg(D)\),
+-- and \(D\) is non-zero, squarefree, and coprime with \(A\),
+-- returns the components which form the logarithmic terms of \(\int \frac{A}{D} \, dx\).
+-- Specifically, when a list of \((Q_i(t), S_i(t, x))\) is returned,
+-- where \(Q_i(t)\) are polynomials of \(t\) and \(S_i(t, x)\) are polynomials of \(x\)
+-- with coefficients formed from polynomials of \(t\), then
+--
+-- \[
+-- \int \frac{A}{D} \, dx = \sum_{i=1}^n \sum_{a \in \{t \mid Q_i(t) = 0\}} a \log \left(S_i(a,x)\right)
+-- \]
+--
+-- For example,
+--
+-- >>> let p = power 4 - 3 * power 2 + 6 :: IndexedPolynomial
+-- >>> let q = power 6 - 5 * power 4 + 5 * power 2 + 4 :: IndexedPolynomial
+-- >>> let f = toRationalFunction p q
+-- >>> let gs = rationalIntegralLogTerms f
+-- >>> length <$> gs
+-- Just 1
+-- >>> fst . head <$> gs
+-- Just x^2 + (1 % 4)
+-- >>> foldTerms (\e c -> show (e, c) <> " ") . snd . head <$> gs
+-- Just "(3,800x^3 + (-14)x) (2,(-400)x^2 + 7) (1,(-2440)x^3 + 32x) (0,792x^2 + (-16)) "
+--
+-- so it is the case that
+--
+-- \[
+-- \int \frac{x^4-3x^2+6}{x^6-5x^4+5x^2+4} \, dx
+-- = \sum_{a \mid a^2+\frac{1}{4} = 0} a \log \left( (800a^3-14a)x^3+(-400a^2+7)x^2+(-2440a^3+32a)x + 792a^2-16 \right)
+-- \]
+--
+-- It may return 'Nothing' if \(\frac{A}{D}\) is not in the expected form.
+rationalIntegralLogTerms ::
+  RationalFunction ->
+  Maybe [(IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial)]
+rationalIntegralLogTerms (RationalFunction a d) = do
+  -- For A/D, get the resultant and subresultant polynomial remainder sequence
+  -- for D and (A - t * D').
+  let sa = mapCoefficients fromRational a
+  let sd = mapCoefficients fromRational d
+  let t = RationalFunction (power 1) 1
+  let (resultant, prs) = subresultant sd $ sa - scale t (differentiate sd)
+
+  -- Turn rational functions into polynomials if possible.
+  -- When the preconditions are satisfied, these should all be polynomials.
+  sd' <- toPolyCoefficients sd
+  resultant' <- toPoly resultant
+  prs' <- toMaybeList $ map toPolyCoefficients prs :: Maybe [IndexedPolynomialWith IndexedPolynomial]
+
+  -- Derive what make up the log terms in the integral.
+  let qs = squarefree resultant' :: [IndexedPolynomial]
+  let terms = zipWith (toTerm sd' prs') [1 ..] qs
+
+  -- Ignore log terms which end up being multiples of 0 = log 1.
+  return $ filter ((/=) 1 . snd) terms
+  where
+    toTerm ::
+      IndexedPolynomialWith IndexedPolynomial ->
+      [IndexedPolynomialWith IndexedPolynomial] ->
+      Int ->
+      IndexedPolynomial ->
+      (IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial)
+    toTerm sd prs i q
+      | degree q == 0 = (q, 1)
+      | i == degree d = (q, sd)
+      | (Just r) <- find ((==) i . degree) prs = derive q r
+      | otherwise = (q, 1)
+
+    derive ::
+      IndexedPolynomial ->
+      IndexedPolynomialWith IndexedPolynomial ->
+      (IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial)
+    derive q s = (q, s')
+      where
+        as = squarefree $ leadingCoefficient s
+        s' = foldl scalePoly s (zip ([1 ..] :: [Int]) as)
+          where
+            scalePoly x (j, u) =
+              getSum $ foldTerms (reduceTerm (monic $ greatestCommonDivisor u q ^ j)) x
+            reduceTerm v e c = Sum $ scale (exactDivide c v) $ power e
+            exactDivide u v = r
+              where
+                (r, _) = u `divide` v
+
+    -- Turn the rational function into a polynomial if possible.
+    toPoly :: RationalFunction -> Maybe IndexedPolynomial
+    toPoly (RationalFunction p q)
+      | degree q == 0 = Just p'
+      | otherwise = Nothing
+      where
+        p' = scale (1 / leadingCoefficient q) p
+
+    -- Turn the rational function coefficients into polynomial coefficients if possible.
+    toPolyCoefficients ::
+      IndexedPolynomialWith RationalFunction ->
+      Maybe (IndexedPolynomialWith IndexedPolynomial)
+    toPolyCoefficients p = reconstruct terms
+      where
+        terms = foldTerms (\e c -> [(e, toPoly c)]) p
+        reconstruct [] = Just 0
+        reconstruct ((_, Nothing) : _) = Nothing
+        reconstruct ((e, Just c) : xs)
+          | (Just p') <- reconstruct xs = Just $ scale c (power e) + p'
+          | otherwise = Nothing
+
+    -- If there are any nothings, then turn the list into nothing.
+    -- Otherwise, turn it into the list of just the elements.
+    toMaybeList :: [Maybe a] -> Maybe [a]
+    toMaybeList [] = Just []
+    toMaybeList (Nothing : _) = Nothing
+    toMaybeList (Just x : xs)
+      | (Just xs') <- toMaybeList xs = Just (x : xs')
+      | otherwise = Nothing

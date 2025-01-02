@@ -211,7 +211,7 @@ instance Num Expression where
 
 instance Fractional Expression where
   (/) = BinaryApply Divide
-  fromRational q = BinaryApply Divide n d
+  fromRational q | d == 1 = n | otherwise = BinaryApply Divide n d
     where
       n = Number $ numerator q
       d = Number $ denominator q
