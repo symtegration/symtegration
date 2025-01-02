@@ -20,7 +20,7 @@ It offers the following:
 
 *   Utility functions to make it easier to read the mathematical expressions.
     For example, deriving equivalent Haskell code for a mathematical expression,
-    and rudimentary support to simplify the symbolic representation.
+    and some support for simplifying symbolic representations.
 
 ## Integration
 

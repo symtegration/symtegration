@@ -16,6 +16,12 @@ and this project adheres to the
 
 *   Improvements to LaTeX output.
 
+*   Remove simplification based on recursive heuristics,
+    which were much more ad hoc.
+
+*   Make `foldTerms` order consistent with simplification order,
+    from lower to higher terms.
+
 ## 0.1.0 - 2024-12-24
 
 *   Symbolic representation.
