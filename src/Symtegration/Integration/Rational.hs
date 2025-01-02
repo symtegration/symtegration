@@ -25,9 +25,8 @@ where
 import Data.List (find)
 import Data.Monoid (Sum (..))
 import Data.Text (Text)
-import Symtegration.Integration.Powers qualified as Powers
-import Symtegration.Integration.Substitution qualified as Substitution
 import Symtegration.Polynomial hiding (integrate)
+import Symtegration.Polynomial qualified as Polynomial
 import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Symbolic
 import Symtegration.Symbolic
@@ -55,13 +54,43 @@ integrate v e
   | otherwise = Nothing
   where
     e' = simplify v e
-    integrate' n d = (+) (sum (map fromRationalFunction g)) <$> logs
+    integrate' n d = (+) reduced . (+) poly <$> logs
       where
+        -- Integrals directly from Hermite reduction.
         (g, h) = hermiteReduce $ toRationalFunction n d
+        reduced = sum $ map fromRationalFunction g
 
-        -- For now, try to integrate by powers.
-        -- We will want something more complete for this remaining portion eventually.
-        logs = Substitution.integrate [Powers.integrate] v (simplify v $ fromRationalFunction h)
+        -- Integrate polynomials left over from the Hermite reduction.
+        RationalFunction numer denom = h
+        (q, r) = numer `divide` denom
+        poly = toExpression v toRationalCoefficient $ Polynomial.integrate q
+
+        -- Derive the log terms in the integral.
+        h' = toRationalFunction r denom
+        logTerms = rationalIntegralLogTerms h'
+        logs :: Maybe Expression
+        logs
+          | (Just terms) <- logTerms = sum <$> toMaybeList (map toLog terms)
+          | otherwise = Nothing
+          where
+            toLog (q', s) = do
+              roots <- solve q' :: Maybe [Rational]
+              let ss = map (\x -> (x, mapCoefficients (toExpr x) s)) roots
+              return $ sum $ map (\(x, p) -> fromRational x * Log' (toExpression v toSymbolicCoefficient p)) ss
+            toExpr x p = getSum $ foldTerms (\e'' c -> Sum $ fromRational c * (fromRational x ^ e'')) p
+
+        -- Derive the roots for the given polynomial.
+        -- Incomplete for now.
+        solve p
+          | degree p == 1 = Just [(-coefficient p 0) / coefficient p 1]
+          | degree p == 2 = solveQuadratic (coefficient p 2) (coefficient p 1) (coefficient p 0)
+          | otherwise = Nothing
+
+        solveQuadratic a b c
+          | sq == 0 = Just [(-b) / (2 * a)]
+          | otherwise = Nothing
+          where
+            sq = b * b - 4 * a * c
 
         fromRationalFunction (RationalFunction u w) = u' / w'
           where
@@ -260,11 +289,11 @@ rationalIntegralLogTerms (RationalFunction a d) = do
           | (Just p') <- reconstruct xs = Just $ scale c (power e) + p'
           | otherwise = Nothing
 
-    -- If there are any nothings, then turn the list into nothing.
-    -- Otherwise, turn it into the list of just the elements.
-    toMaybeList :: [Maybe a] -> Maybe [a]
-    toMaybeList [] = Just []
-    toMaybeList (Nothing : _) = Nothing
-    toMaybeList (Just x : xs)
-      | (Just xs') <- toMaybeList xs = Just (x : xs')
-      | otherwise = Nothing
+-- If there are any nothings, then turn the list into nothing.
+-- Otherwise, turn it into the list of just the elements.
+toMaybeList :: [Maybe a] -> Maybe [a]
+toMaybeList [] = Just []
+toMaybeList (Nothing : _) = Nothing
+toMaybeList (Just x : xs)
+  | (Just xs') <- toMaybeList xs = Just (x : xs')
+  | otherwise = Nothing
