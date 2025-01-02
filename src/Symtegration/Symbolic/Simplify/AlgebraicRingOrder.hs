@@ -7,8 +7,8 @@
 module Symtegration.Symbolic.Simplify.AlgebraicRingOrder (order) where
 
 import Data.List (sortBy)
-import Data.Text (Text)
 import Data.Set qualified as Set
+import Data.Text (Text)
 import Symtegration.Symbolic
 
 -- $setup
