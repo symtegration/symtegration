@@ -41,18 +41,26 @@ import Symtegration.Symbolic.Simplify
 
 -- | Integrate a ratio of two polynomials with rational number coefficients.
 --
--- For example, \(\int \frac{x^7-24x^4-4x^2+8x-8}{x^8+6x^6+12x^4+8x^2} \, dx = \frac{3}{x^2+2} + \frac{8x^2+4}{x^5+4x^3+4x} + \log x\):
+-- For example,
 --
 -- >>> let p = "x" ** 7 - 24 * "x" ** 4 - 4 * "x" ** 2 + 8 * "x" - 8
 -- >>> let q = "x" ** 8 + 6 * "x" ** 6 + 12 * "x" ** 4 + 8 * "x" ** 2
 -- >>> toHaskell . simplify <$> integrate "x" (p / q)
 -- Just "(3 / (2 + (x ** 2))) + ((4 + 8 * (x ** 2)) / (4 * x + 4 * (x ** 3) + (x ** 5))) + (log x)"
 --
--- For another example, \(\int \frac{36}{x^5-2x^4-2x^3+4x^2+x-2} \, dx = \frac{12x+6}{x^2-1} + 4 \log \left( x - 2 \right) - 4 \log \left( x + 1 \right)\):
+-- so that
+--
+-- \[\int \frac{x^7-24x^4-4x^2+8x-8}{x^8+6x^6+12x^4+8x^2} \, dx = \frac{3}{x^2+2} + \frac{8x^2+4}{x^5+4x^3+4x} + \log x\]
+--
+-- For another example,
 --
 -- >>> let f = 36 / ("x" ** 5 - 2 * "x" ** 4 - 2 * "x" ** 3 + 4 * "x" ** 2 + "x" - 2)
 -- >>> toHaskell . simplify <$> integrate "x" f
 -- Just "(-4) * (log (8 + 8 * x)) + 4 * (log (16 + (-8) * x)) + ((6 + 12 * x) / ((-1) + (x ** 2)))"
+--
+-- so that
+--
+-- \[\int \frac{36}{x^5-2x^4-2x^3+4x^2+x-2} \, dx = \frac{12x+6}{x^2-1} + 4 \log \left( x - 2 \right) - 4 \log \left( x + 1 \right)\]
 integrate :: Text -> Expression -> Maybe Expression
 integrate v e
   | (x :/: y) <- e',
@@ -176,6 +184,17 @@ toRationalFunction x y = RationalFunction x' y'
 --
 -- If preconditions are satisfied, i.e., \(D \neq 0\) and \(A\) and \(D\) are coprime,
 -- then \(h\) will have a squarefree denominator.
+--
+-- For example,
+--
+-- >>> let p = power 7 - 24 * power 4 - 4 * power 2 + 8 * power 1 - 8 :: IndexedPolynomial
+-- >>> let q = power 8 + 6 * power 6 + 12 * power 4 + 8 * power 2 :: IndexedPolynomial
+-- >>> hermiteReduce $ toRationalFunction p q
+-- ([(3) / (x^2 + 2),(8x^2 + 4) / (x^5 + 4x^3 + 4x)],(1) / (x))
+--
+-- so that
+--
+-- \[\int \frac{x^7-24x^4-4x^2+8x-8}{x^8+6x^6+12x^4+8x^2} \, dx = \frac{3}{x^2+2}+\frac{8x^2+4}{x^5+4x^3+4x}+\int \frac{1}{x} \, dx\]
 --
 -- \(g\) is returned as a list of rational functions which sum to \(g\)
 -- instead of a single rational function, because the former could sometimes
