@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+## 0.2.0 - 2025-01-02
+
 *   Integration of rational functions.
 
     *   Hermite reduction.

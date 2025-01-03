@@ -1,9 +1,9 @@
 name:                symtegration
-version:             0.1.0
+version:             0.2.0
 github:              "chungyc/symtegration"
 author:              "Yoo Chung"
 maintainer:          "dev@chungyc.org"
-copyright:           Copyright 2024 Yoo Chung
+copyright:           Copyright 2025 Yoo Chung
 license:             Apache-2.0
 
 extra-source-files:
