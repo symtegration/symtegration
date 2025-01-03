@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+*   Output `pi` as `\pi` in LaTeX.
+
 ## 0.2.0 - 2025-01-02
 
 *   Integration of rational functions.
