@@ -26,6 +26,7 @@ import TextShow (showt)
 -- "x + 4 \\sin y"
 toLaTeX :: Expression -> Text
 toLaTeX (Number n) = showt n
+toLaTeX (Symbol "pi") = "\\pi"
 toLaTeX (Symbol s) = s
 toLaTeX (UnaryApply func x) = unary func x
 toLaTeX (x@(_ :*: _) :+: y@(_ :*: _)) = toLaTeX x <> " + " <> toLaTeX y
