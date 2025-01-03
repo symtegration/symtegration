@@ -17,7 +17,8 @@ module Symtegration.Integration.Rational
     -- | Algorithms used for integrating rational functions.
     hermiteReduce,
     rationalIntegralLogTerms,
-    complexLogToAtan,
+    complexLogTermToRealTerm,
+    complexLogTermToAtanTerm,
 
     -- * Support
 
@@ -322,14 +323,14 @@ rationalIntegralLogTerms (RationalFunction a d) = do
 --
 -- For example,
 --
--- >>> toHaskell $ simplify $ complexLogToAtan "x" (power 3 - 3 * power 1) (power 2 - 2)
+-- >>> toHaskell $ simplify $ complexLogTermToAtanTerm "x" (power 3 - 3 * power 1) (power 2 - 2)
 -- "2 * (atan x) + 2 * (atan (((-1) * x + (-1) * (x ** 5) + 3 * (x ** 3)) / (-2))) + 2 * (atan (x ** 3))"
 --
 -- so it is the case that
 --
 -- \[ \frac{d}{dx} \left( i \log \left( \frac{(x^3-3x) + i(x^2-2)}{(x^3-3x) - i(x^2-2)} \right) \right) =
 -- \frac{d}{dx} \left( 2 \tan^{-1} \left(\frac{x^5-3x^3+x}{2}\right) + 2 \tan^{-1} \left(x^3\right) + 2 \tan^{-1} x \right) \]
-complexLogToAtan ::
+complexLogTermToAtanTerm ::
   -- | Symbol for the variable.
   Text ->
   -- | Polynomial \(A\).
@@ -338,10 +339,10 @@ complexLogToAtan ::
   IndexedPolynomial ->
   -- | Sum \(f\) of inverse tangents.
   Expression
-complexLogToAtan v a b
+complexLogTermToAtanTerm v a b
   | r == 0 = 2 * atan (a' / b')
-  | degree a < degree b = complexLogToAtan v (-b) a
-  | otherwise = 2 * atan (s' / g') + complexLogToAtan v d c
+  | degree a < degree b = complexLogTermToAtanTerm v (-b) a
+  | otherwise = 2 * atan (s' / g') + complexLogTermToAtanTerm v d c
   where
     (_, r) = a `divide` b
     (d, c, g) = extendedEuclidean b (-a)
@@ -350,7 +351,85 @@ complexLogToAtan v a b
     g' = toExpression v toRationalCoefficient g
     s' = toExpression v toRationalCoefficient $ a * d + b * c
 
--- If there are any nothings, then turn the list into nothing.
+-- | For the ingredients of a complex logarithm, return the ingredients of a real function.
+--
+-- Specifically, for polynomials \((R(t), S(t,x))\) such that
+--
+-- \[
+-- \frac{df}{dx} = \frac{d}{dx} \sum_{\alpha \in \{ t \mid R(t) = 0 \}} \left( \alpha \log \left( S(\alpha,x) \right) \right)
+-- \]
+--
+-- then with return value \(((P(u,v), Q(u,v)), (A(u,v,x), B(u,v,x)))\),
+-- and a return value \(f_{u,v}\) from 'complexLogTermToAtanTerm' for \(A(u,v)\) and \(B(u,v)\), the real function is
+--
+-- \[
+-- \sum_{(a,b) \in \{(u,v) \mid P(u,v)=Q(u,v)=0, b > 0\}}
+--   \left( a \log \left( A(a,b,x)^2 + B(a,b,x)^2 \right) + b \log (f_{a,b}(x)) \right)
+-- + \sum_{a \in \{t \mid R(t)=0 \}} \left( a \log (S(a,x)) \right)
+-- \]
+complexLogTermToRealTerm ::
+  (IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial) ->
+  ( (IndexedPolynomialWith IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial),
+    (IndexedPolynomialWith (IndexedPolynomialWith IndexedPolynomial), IndexedPolynomialWith (IndexedPolynomialWith IndexedPolynomial))
+  )
+complexLogTermToRealTerm (q, s) = ((qp, qq), (sp, sq))
+  where
+    -- For all of the following, i is the imaginary number.
+    -- We use an i polynomial instead of Complex to represent complex numbers
+    -- because the Complex a is not an instance of the Num class unless a is
+    -- an instance of the RealFloat class.
+
+    -- We use polynomial coefficients to introduce a separate variable.
+    -- An alternative would have been to use Expression coefficients,
+    -- but this would require a guarantee that we can rewrite an Expression
+    -- down to the degree where we can tease apart the real and imaginary parts
+    -- in a complex number.
+
+    -- Compute q(u+iv) as an i polynomial with coefficients
+    -- of u polynomials with coefficients
+    -- of v polynomials with rational coefficients.
+    q' = getSum $ foldTerms reduceImaginary $ getSum $ foldTerms fromTerm q
+      where
+        fromTerm :: Int -> Rational -> Sum (IndexedPolynomialWith (IndexedPolynomialWith IndexedPolynomial))
+        fromTerm e c = Sum $ c' * (u + i * v) ^ e
+          where
+            c' = scale (scale (scale c 1) 1) 1
+        i = power 1
+        u = scale (power 1) 1
+        v = scale (scale (power 1) 1) 1
+    -- q' == qp + i * qq
+    (qp, qq) = (coefficient q' 0, coefficient q' 1)
+
+    -- Compute s(u+iv,x) as an i polynomial with coefficients
+    -- of x polynomials with coefficients
+    -- of u polynomials with coefficients
+    -- of v polynomials with rational coefficients.
+    s' = getSum $ foldTerms reduceImaginary $ getSum $ foldTerms fromTerm s
+      where
+        fromTerm :: Int -> IndexedPolynomial -> Sum (IndexedPolynomialWith (IndexedPolynomialWith (IndexedPolynomialWith IndexedPolynomial)))
+        fromTerm e c = Sum $ c' * x ^ e
+          where
+            c' = getSum $ foldTerms fromCoefficient c
+            fromCoefficient e' c'' = Sum $ c''' * (u * i * v) ^ e'
+              where
+                c''' = scale (scale (scale (scale c'' 1) 1) 1) 1
+        i = power 1
+        x = scale (power 1) 1
+        u = scale (scale (power 1) 1) 1
+        v = scale (scale (scale (power 1) 1) 1) 1
+    -- s' = sp + i * sq
+    (sp, sq) = (coefficient s' 0, coefficient s' 1)
+
+    -- For terms in polynomials of i, reduce them to the form x or i*x.
+    reduceImaginary :: (Eq a, Num a) => Int -> a -> Sum (IndexedPolynomialWith a)
+    reduceImaginary e c = Sum $ case e `mod` 4 of
+      0 -> scale c 1
+      1 -> scale c (power 1)
+      2 -> scale (-c) 1
+      3 -> scale (-c) (power 1)
+      _ -> 0 -- Not possible.
+
+-- | If there are any nothings, then turn the list into nothing.
 -- Otherwise, turn it into the list of just the elements.
 toMaybeList :: [Maybe a] -> Maybe [a]
 toMaybeList [] = Just []
