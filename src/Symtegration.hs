@@ -20,7 +20,7 @@
 --
 -- >>> import Symtegration
 -- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
--- Just "(1 / 2) * x * (z ** 2) + y * z"
+-- Just "y * z + (1 / 2) * x * (z ** 2)"
 module Symtegration
   ( -- * Symbolic representation
     Expression,
@@ -58,7 +58,7 @@ import Symtegration.Integration qualified as Integration
 import Symtegration.Symbolic (Expression, evaluate, fractionalEvaluate, toFunction)
 import Symtegration.Symbolic.Haskell (toHaskell)
 import Symtegration.Symbolic.LaTeX (toLaTeX)
-import Symtegration.Symbolic.Simplify (simplify)
+import Symtegration.Symbolic.Simplify (simplify, simplifyForVariable)
 
 -- |
 -- Returns the indefinite integral of a mathematical expression given
@@ -76,7 +76,7 @@ import Symtegration.Symbolic.Simplify (simplify)
 -- are symbolic, as with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):
 --
 -- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
--- Just "(1 / 2) * x * (z ** 2) + y * z"
+-- Just "y * z + (1 / 2) * x * (z ** 2)"
 integrate ::
   -- | The symbol representing the variable being integrated over.
   Text ->
@@ -84,4 +84,4 @@ integrate ::
   Expression ->
   -- | The indefinite integral, if derived.
   Maybe Expression
-integrate var expr = simplify <$> Integration.integrate var expr
+integrate var expr = simplifyForVariable var <$> Integration.integrate var expr
