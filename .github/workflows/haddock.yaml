@@ -9,6 +9,8 @@ on:
       - 'package.yaml'
       - '**.hs'
 
+  workflow_dispatch:
+
 jobs:
   haddock:
     name: haddock
