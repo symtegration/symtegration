@@ -17,6 +17,7 @@ module Symtegration.Integration.Rational
     -- | Algorithms used for integrating rational functions.
     hermiteReduce,
     rationalIntegralLogTerms,
+    complexLogToAtan,
 
     -- * Support
 
@@ -327,6 +328,47 @@ rationalIntegralLogTerms (RationalFunction a d) = do
         reconstruct ((e, Just c) : xs)
           | (Just p') <- reconstruct xs = Just $ scale c (power e) + p'
           | otherwise = Nothing
+
+-- | Given polynomials \(A\) and \(B\),
+-- return a sum \(f\) of inverse tangents such that the following is true.
+--
+-- \[
+-- \frac{df}{dx} = \frac{d}{dx} i \log \left( \frac{A + iB}{A - iB} \right)
+-- \]
+--
+-- This allows integrals to be evaluated with only real-valued functions.
+-- It also avoids the discontinuities in real-valued indefinite integrals which may result
+-- when the integral uses logarithms with complex arguments.
+--
+-- For example,
+--
+-- >>> toHaskell $ simplify $ complexLogToAtan "x" (power 3 - 3 * power 1) (power 2 - 2)
+-- "2 * (atan x) + 2 * (atan (((-1) * x + (-1) * (x ** 5) + 3 * (x ** 3)) / (-2))) + 2 * (atan (x ** 3))"
+--
+-- so it is the case that
+--
+-- \[ \frac{d}{dx} \left( i \log \left( \frac{(x^3-3x) + i(x^2-2)}{(x^3-3x) - i(x^2-2)} \right) \right) =
+-- \frac{d}{dx} \left( 2 \tan^{-1} \left(\frac{x^5-3x^3+x}{2}\right) + 2 \tan^{-1} \left(x^3\right) + 2 \tan^{-1} x \right) \]
+complexLogToAtan ::
+  -- | Symbol for the variable.
+  Text ->
+  -- | Polynomial \(A\).
+  IndexedPolynomial ->
+  -- | Polynomial \(B\).
+  IndexedPolynomial ->
+  -- | Sum \(f\) of inverse tangents.
+  Expression
+complexLogToAtan v a b
+  | r == 0 = 2 * atan (a' / b')
+  | degree a < degree b = complexLogToAtan v (-b) a
+  | otherwise = 2 * atan (s' / g') + complexLogToAtan v d c
+  where
+    (_, r) = a `divide` b
+    (d, c, g) = extendedEuclidean b (-a)
+    a' = toExpression v toRationalCoefficient a
+    b' = toExpression v toRationalCoefficient b
+    g' = toExpression v toRationalCoefficient g
+    s' = toExpression v toRationalCoefficient $ a * d + b * c
 
 -- If there are any nothings, then turn the list into nothing.
 -- Otherwise, turn it into the list of just the elements.

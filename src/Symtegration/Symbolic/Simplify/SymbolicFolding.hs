@@ -91,10 +91,10 @@ binary e@(x :*: y)
   | x == y = simplify $ x :**: Number 2
   | otherwise = e
 -- Fold division.
-binary (x :/: (y :/: z)) =
-  simplify $ (x :*: z) :/: y
-binary ((x :/: y) :/: z) =
-  simplify $ x :/: (y :*: z)
+binary (x :/: (y :/: z)) = simplify $ (x :*: z) :/: y
+binary ((x :/: y) :/: z) = simplify $ x :/: (y :*: z)
+binary (x :/: Number 1) = x
+binary (x :/: Number (-1)) = (-1) * x
 -- Fold powers.
 binary (_ :**: Number 0) = Number 1
 binary (x :**: Number 1) = x
