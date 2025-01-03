@@ -78,6 +78,16 @@ Just (1 % 3)
 
 [GHCi]: https://downloads.haskell.org/ghc/latest/docs/users_guide/ghci.html
 
+### Symblic integration in IHaskell
+
+Symtegration can also be used in [IHaskell] to do symbolic integration.
+Its use can be seen in an [example IHaskell notebook],
+which you try out by [running on mybinder.org].
+
+[IHaskell]: https://github.com/IHaskell/IHaskell
+[example IHaskell notebook]: https://github.com/chungyc/haskell-notebooks/blob/main/Symtegration.ipynb
+[running on mybinder.org]: https://mybinder.org/v2/gh/chungyc/ihaskell/custom?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fchungyc%252Fhaskell-notebooks%26urlpath%3Dlab%252Ftree%252Fhaskell-notebooks%252FSymtegration.ipynb%26branch%3Dmain
+
 ## Changes
 
 See [`CHANGELOG.md`] for what has changed.
