@@ -1,7 +1,7 @@
 -- |
 -- Module: Symtegration.Integration.Rational
 -- Description: Integration of rational functions.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
@@ -33,6 +33,7 @@ import Data.Text (Text)
 import Symtegration.Polynomial hiding (integrate)
 import Symtegration.Polynomial qualified as Polynomial
 import Symtegration.Polynomial.Indexed
+import Symtegration.Polynomial.Solve
 import Symtegration.Polynomial.Symbolic
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Simplify
@@ -99,27 +100,6 @@ integrate v e
               let ss = map (\x -> (x, mapCoefficients (toExpr x) s)) roots
               return $ sum $ map (\(x, p) -> x * Log' (toExpression v toSymbolicCoefficient p)) ss
             toExpr x p = getSum $ foldTerms (\e'' c -> Sum $ fromRational c * (x ** Number (fromIntegral e''))) p
-
-        -- Derive the roots for the given polynomial.
-        -- Incomplete for now.
-        solve :: IndexedPolynomial -> Maybe [Expression]
-        solve p
-          | degree p == 1 = Just [fromRational $ (-coefficient p 0) / coefficient p 1]
-          | degree p == 2 = solveQuadratic (coefficient p 2) (coefficient p 1) (coefficient p 0)
-          | otherwise = Nothing
-
-        -- For now, ignores complex roots.
-        solveQuadratic :: Rational -> Rational -> Rational -> Maybe [Expression]
-        solveQuadratic a b c
-          | sq == 0 = Just [fromRational $ (-b) / (2 * a)]
-          | sq > 0 =
-              Just
-                [ ((-fromRational b) + fromRational sq ** (1 / 2)) / (2 * fromRational a),
-                  ((-fromRational b) - fromRational sq ** (1 / 2)) / (2 * fromRational a)
-                ]
-          | otherwise = Nothing
-          where
-            sq = b * b - 4 * a * c
 
         fromRationalFunction (RationalFunction u w) = u' / w'
           where

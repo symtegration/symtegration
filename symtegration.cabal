@@ -45,6 +45,7 @@ library
       Symtegration.Integration.Trigonometric
       Symtegration.Polynomial
       Symtegration.Polynomial.Indexed
+      Symtegration.Polynomial.Solve
       Symtegration.Polynomial.Symbolic
       Symtegration.Symbolic
       Symtegration.Symbolic.Haskell
@@ -106,6 +107,7 @@ test-suite spec
       Symtegration.IntegrationSpec
       Symtegration.Polynomial.Indexed.Arbitrary
       Symtegration.Polynomial.IndexedSpec
+      Symtegration.Polynomial.SolveSpec
       Symtegration.Polynomial.SymbolicSpec
       Symtegration.PolynomialSpec
       Symtegration.Symbolic.Arbitrary
