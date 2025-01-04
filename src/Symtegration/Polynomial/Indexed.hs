@@ -64,6 +64,13 @@ instance TextShow (P Int Rational) where
         | 1 <- denominator r, r < 0 = showbParen True $ showb $ numerator r
         | otherwise = showbParen True $ showb r
 
+instance (Polynomial p e c, TextShow (p e c)) => Show (IndexedPolynomialWith (p e c)) where
+  show = unpack . showt
+
+instance (Polynomial p e c, TextShow (p e c)) => TextShow (IndexedPolynomialWith (p e c)) where
+  showb (P m) | IntMap.null m = "0"
+              | otherwise = showb $ IntMap.toList m
+
 instance (Eq a, Num a) => Num (P Int a) where
   (P p) + (P q) = P $ filterNonzero $ IntMap.unionWith (+) p q
 

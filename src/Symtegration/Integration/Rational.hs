@@ -367,6 +367,13 @@ complexLogTermToAtanTerm v a b
 --   \left( a \log \left( A(a,b,x)^2 + B(a,b,x)^2 \right) + b \log (f_{a,b}(x)) \right)
 -- + \sum_{a \in \{t \mid R(t)=0 \}} \left( a \log (S(a,x)) \right)
 -- \]
+--
+-- For example,
+--
+-- >>> let r = 4 * power 2 + 1 :: IndexedPolynomial
+-- >>> let s = power 3 + scale (2 * power 1) (power 2) - 3 * power 1 - scale (4 * power 1) 1 :: IndexedPolynomialWith IndexedPolynomial
+-- >>> complexLogTermToRealTerm (r, s)
+-- (([(0,(-4)x^2 + 1),(2,4)],[(1,8x)]),([(0,[(1,(-4))]),(1,[(0,(-3))]),(2,[(1,2)]),(3,[(0,1)])],[(0,[(0,(-4)x)]),(2,[(0,2x)])]))
 complexLogTermToRealTerm ::
   (IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial) ->
   ( (IndexedPolynomialWith IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial),
@@ -410,7 +417,7 @@ complexLogTermToRealTerm (q, s) = ((qp, qq), (sp, sq))
         fromTerm e c = Sum $ c' * x ^ e
           where
             c' = getSum $ foldTerms fromCoefficient c
-            fromCoefficient e' c'' = Sum $ c''' * (u * i * v) ^ e'
+            fromCoefficient e' c'' = Sum $ c''' * (u + i * v) ^ e'
               where
                 c''' = scale (scale (scale (scale c'' 1) 1) 1) 1
         i = power 1
@@ -423,11 +430,14 @@ complexLogTermToRealTerm (q, s) = ((qp, qq), (sp, sq))
     -- For terms in polynomials of i, reduce them to the form x or i*x.
     reduceImaginary :: (Eq a, Num a) => Int -> a -> Sum (IndexedPolynomialWith a)
     reduceImaginary e c = Sum $ case e `mod` 4 of
-      0 -> scale c 1
-      1 -> scale c (power 1)
-      2 -> scale (-c) 1
-      3 -> scale (-c) (power 1)
+      0 -> c'
+      1 -> c' * i
+      2 -> c' * (-1)
+      3 -> c' * (-i)
       _ -> 0 -- Not possible.
+      where
+        i = power 1
+        c' = scale c 1
 
 -- | If there are any nothings, then turn the list into nothing.
 -- Otherwise, turn it into the list of just the elements.
