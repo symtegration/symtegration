@@ -32,12 +32,11 @@ solve p
   | degree p == 2 = solveQuadratic (coefficient p 2) (coefficient p 1) (coefficient p 0)
   | otherwise = Nothing
 
--- | Returns the root for a polynomial of degree 1.
+-- | Returns the real root for a polynomial of degree 1.
 solveLinear :: Rational -> Rational -> Maybe [Expression]
 solveLinear a b = Just [fromRational ((-b) / a)]
 
--- | Returns the roots for a polynomial of degree 2.
--- For now, ignores complex roots.
+-- | Returns the real roots for a polynomial of degree 2.
 solveQuadratic :: Rational -> Rational -> Rational -> Maybe [Expression]
 solveQuadratic a b c
   | sq == 0 = Just [fromRational $ (-b) / (2 * a)]
