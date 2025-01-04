@@ -118,6 +118,7 @@ reduceRatio n 1 = Number n
 reduceRatio n m
   | m == d = Number (n `div` m)
   | m == -d = Number (n `div` m)
+  | n < 0, m < 0 = Number (-(n `div` d)) :/: Number (-(m `div` d))
   | otherwise = Number (n `div` d) :/: Number (m `div` d)
   where
     d = gcd n m
