@@ -1,7 +1,7 @@
 -- |
 -- Module: Symtegration.Polynomial.Indexed
 -- Description: A polynomial representation mapping the power of each term to its coefficient.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.Indexed
@@ -68,8 +68,9 @@ instance (Polynomial p e c, TextShow (p e c)) => Show (IndexedPolynomialWith (p 
   show = unpack . showt
 
 instance (Polynomial p e c, TextShow (p e c)) => TextShow (IndexedPolynomialWith (p e c)) where
-  showb (P m) | IntMap.null m = "0"
-              | otherwise = showb $ IntMap.toList m
+  showb (P m)
+    | IntMap.null m = "0"
+    | otherwise = showb $ IntMap.toList m
 
 instance (Eq a, Num a) => Num (P Int a) where
   (P p) + (P q) = P $ filterNonzero $ IntMap.unionWith (+) p q
