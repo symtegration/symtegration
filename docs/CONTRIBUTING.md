@@ -41,12 +41,14 @@ User-visible entities should be documented with [Haddock], including examples if
 All changes should be accompanied by corresponding tests.
 Code should be tested with property-based tests to the extent possible.
 This project uses [Hspec] and [QuickCheck] for testing.
+Examples in the Haddock documentation are tested using [`doctest-parallel`].
 
 [Haddock]: https://haskell-haddock.readthedocs.io/
 [HLint]: https://github.com/ndmitchell/hlint
 [Ormolu]: https://github.com/tweag/ormolu
 [Hspec]: https://hspec.github.io/
 [QuickCheck]: https://hackage.haskell.org/package/QuickCheck
+[`doctest-parallel`]: https://github.com/martijnbastiaan/doctest-parallel
 
 ### Dependencies
 
