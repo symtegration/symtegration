@@ -19,6 +19,8 @@ import Symtegration.Symbolic.Simplify
 -- >>> let s (x, y) = (toHaskell $ simplify x, toHaskell $ simplify y)
 -- >>> s $ factor "x" $ 2 * ("a" * sin "x")
 -- ("2 * a","sin x")
+-- >>> s $ factor "x" $ "a" / "x"
+-- ("a","1 / x")
 --
 -- Assumes algebraic ring ordering has been applied to the term.
 factor ::
@@ -42,6 +44,10 @@ factor v e@(x :*: y)
   | isConstant v x, isConstant v y = (e, Number 1)
   | isConstant v x = (x, y)
   | otherwise = (Number 1, e)
+factor v (x :/: y) = (constX :/: constY, varX :/: varY)
+  where
+    (constX, varX) = factor v x
+    (constY, varY) = factor v y
 factor v e | isConstant v e = (e, Number 1) | otherwise = (Number 1, e)
 
 -- | Returns whether an expression contains the variable.
