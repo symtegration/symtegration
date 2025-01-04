@@ -147,3 +147,8 @@ instance Eq Near where
     | otherwise = (x - y) / y < threshold
     where
       threshold = 1e-3
+
+instance Ord Near where
+  compare (Near x'@(FiniteDouble x)) (Near y'@(FiniteDouble y))
+    | x' == y' = EQ
+    | otherwise = compare x y
