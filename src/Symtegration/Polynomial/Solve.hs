@@ -45,7 +45,9 @@ solveQuadratic a b c
         [ ((-b') + sq' ** (1 / 2)) / (2 * a'),
           ((-b') - sq' ** (1 / 2)) / (2 * a')
         ]
-  | otherwise = Just []
+  -- Return Nothing for now.
+  -- Current use of solve assumes all roots, including complex roots, are found.
+  | otherwise = Nothing
   where
     sq = b * b - 4 * a * c
     sq' = fromRational sq
