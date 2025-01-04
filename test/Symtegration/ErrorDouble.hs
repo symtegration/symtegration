@@ -21,7 +21,7 @@ newtype DoubleWithError = DE (Double, Double) deriving (Eq, Ord)
 
 -- | Relative size of error to introduce to an individual 'Double' value.
 errorSize :: Double
-errorSize = 1e-8
+errorSize = 1e-5
 
 -- | Add some error to a 'Double' value.
 includeError :: Double -> DoubleWithError
