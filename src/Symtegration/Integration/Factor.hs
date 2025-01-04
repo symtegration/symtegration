@@ -10,11 +10,15 @@ import Data.Text (Text)
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Simplify
 
+-- $setup
+-- >>> import Symtegration
+
 -- | Factor a multiplicative term into a constant portion and the variable-dependent portion.
 -- E.g., \(2a x \sin x\) into \(2a\) and \(x \sin x\) when the variable is \(x\).
 --
--- >>> factor "x" $ 2 * ("a" * sin "x")
--- (BinaryApply Multiply (Number 2) (Symbol "a"),UnaryApply Sin (Symbol "x"))
+-- >>> let s (x, y) = (toHaskell $ simplify x, toHaskell $ simplify y)
+-- >>> s $ factor "x" $ 2 * ("a" * sin "x")
+-- ("2 * a","sin x")
 --
 -- Assumes algebraic ring ordering has been applied to the term.
 factor ::
