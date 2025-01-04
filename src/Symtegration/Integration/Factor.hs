@@ -44,7 +44,7 @@ factor v e@(x :*: y)
   | isConstant v x, isConstant v y = (e, Number 1)
   | isConstant v x = (x, y)
   | otherwise = (Number 1, e)
-factor v (x :/: y) = (constX :/: constY, varX :/: varY)
+factor v (x :/: y) = (simplify $ constX :/: constY, simplify $ varX :/: varY)
   where
     (constX, varX) = factor v x
     (constY, varY) = factor v y
