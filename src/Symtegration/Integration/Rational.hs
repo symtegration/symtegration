@@ -351,24 +351,26 @@ complexLogTermToAtan v a b
     g' = toExpression v toRationalCoefficient g
     s' = toExpression v toRationalCoefficient $ a * d + b * c
 
--- | For the ingredients of a complex logarithm, return the ingredients of a real function.
+-- | For the ingredients of a complex logarithm, return the ingredients of an equivalent real function in terms of an indefinite integral.
 --
--- Specifically, for polynomials \((R(t), S(t,x))\) such that
+-- Specifically, for polynomials \(\left(R(t), S(t,x)\right)\) such that
 --
 -- \[
 -- \frac{df}{dx} = \frac{d}{dx} \sum_{\alpha \in \{ t \mid R(t) = 0 \}} \left( \alpha \log \left( S(\alpha,x) \right) \right)
 -- \]
 --
--- then with return value \(((P(u,v), Q(u,v)), (A(u,v,x), B(u,v,x)))\),
--- and a return value \(f_{u,v}\) from 'complexLogTermToAtan' for \(A(u,v)\) and \(B(u,v)\), the real function is
+-- then with return value \(\left( \left(P(u,v), Q(u,v)\right), \left(A(u,v,x), B(u,v,x)\right) \right)\),
+-- and a return value \(g_{uv}\) from 'complexLogTermToAtan' for \(A(u,v)\) and \(B(u,v)\), the real function is
 --
 -- \[
+-- \frac{df}{dx} = \frac{d}{dx} \left(
 -- \sum_{(a,b) \in \{(u,v) \in (\mathbb{R}, \mathbb{R}) \mid P(u,v)=Q(u,v)=0, b > 0\}}
---   \left( a \log \left( A(a,b,x)^2 + B(a,b,x)^2 \right) + b \log (f_{a,b}(x)) \right)
+--   \left( a \log \left( A(a,b,x)^2 + B(a,b,x)^2 \right) + b \log (g_{ab}(x)) \right)
 -- + \sum_{a \in \{t \in \mathbb{R} \mid R(t)=0 \}} \left( a \log (S(a,x)) \right)
+-- \right)
 -- \]
 --
--- The return value are polynomials \(((P,Q), (A,B))\), where
+-- The return value are polynomials \(\left( (P,Q), (A,B) \right)\), where
 --
 -- * \(P\) is a \(u\)-polynomial, i.e., a polynomial with variable \(u\), with coefficients which are \(v\)-polynomials.
 --
