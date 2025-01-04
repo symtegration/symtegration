@@ -363,10 +363,20 @@ complexLogTermToAtan v a b
 -- and a return value \(f_{u,v}\) from 'complexLogTermToAtan' for \(A(u,v)\) and \(B(u,v)\), the real function is
 --
 -- \[
--- \sum_{(a,b) \in \{(u,v) \mid P(u,v)=Q(u,v)=0, b > 0\}}
+-- \sum_{(a,b) \in \{(u,v) \in (\mathbb{R}, \mathbb{R}) \mid P(u,v)=Q(u,v)=0, b > 0\}}
 --   \left( a \log \left( A(a,b,x)^2 + B(a,b,x)^2 \right) + b \log (f_{a,b}(x)) \right)
--- + \sum_{a \in \{t \mid R(t)=0 \}} \left( a \log (S(a,x)) \right)
+-- + \sum_{a \in \{t \in \mathbb{R} \mid R(t)=0 \}} \left( a \log (S(a,x)) \right)
 -- \]
+--
+-- The return value are polynomials \(((P,Q), (A,B))\), where
+--
+-- * \(P\) is a \(u\)-polynomial, i.e., a polynomial with variable \(u\), with coefficients which are \(v\)-polynomials.
+--
+-- * \(Q\) is a \(u\)-polynomial, with coefficients which are \(v\)-polynomials.
+--
+-- * \(A\) is an \(x\)-polynomial, with coefficients which are \(u\)-polynomials, which in turn have coefficients with \(v\)-polynomials.
+--
+-- * \(B\) is an \(x\)-polynomial, with coefficients which are \(u\)-polynomials, which in turn have coefficients with \(v\)-polynomials.
 --
 -- For example,
 --
@@ -374,6 +384,17 @@ complexLogTermToAtan v a b
 -- >>> let s = power 3 + scale (2 * power 1) (power 2) - 3 * power 1 - scale (4 * power 1) 1 :: IndexedPolynomialWith IndexedPolynomial
 -- >>> complexLogTermToRealTerm (r, s)
 -- (([(0,(-4)x^2 + 1),(2,4)],[(1,8x)]),([(0,[(1,(-4))]),(1,[(0,(-3))]),(2,[(1,2)]),(3,[(0,1)])],[(0,[(0,(-4)x)]),(2,[(0,2x)])]))
+--
+-- While the return value may be hard to parse, this means:
+--
+-- \[
+-- \begin{align*}
+-- P & = 4u^2 - 4v^2 + 1 \\
+-- Q & = 8uv \\
+-- A & = x^3 + 2ux^2 - 3x - 4u \\
+-- B & = 2vx^2 - 4v
+-- \end{align*}
+-- \]
 complexLogTermToRealTerm ::
   (IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial) ->
   ( (IndexedPolynomialWith IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial),
