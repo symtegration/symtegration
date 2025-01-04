@@ -5,7 +5,6 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.SolveSpec (spec) where
 
-import Data.Maybe (isJust)
 import Symtegration.FiniteDouble
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Indexed
@@ -28,10 +27,8 @@ spec = parallel $ do
     describe "quadratic polynomials" $ do
       prop "found roots are roots" $ \(NonZero a) b c ->
         let p = scale a (power 2) + scale b (power 1) + scale c (power 0)
-            roots = solve p
          in counterexample (show p) $
-              isJust roots ==>
-                solve p `shouldSatisfy` areRoots p
+              solve p `shouldSatisfy` areRoots p
 
 -- | Whether x is a root of p.
 isRoot :: IndexedPolynomial -> Expression -> Bool
@@ -42,8 +39,8 @@ isRoot p x
     p' = toExpression "x" toRationalCoefficient p
     f = toFunction p' (\case "x" -> id; _ -> undefined)
 
--- | Whether the given roots are indeed roots of the given polynomial.
--- If 'Nothing' is received in lieu of a list of roots, returns false.
+-- | Whether the given roots are indeed roots of the given polynomial,
+-- or if roots could not be found.
 areRoots :: IndexedPolynomial -> Maybe [Expression] -> Bool
-areRoots _ Nothing = False
+areRoots _ Nothing = True
 areRoots p (Just xs) = all (isRoot p) xs

@@ -17,7 +17,7 @@ import Symtegration.Symbolic
 -- >>> import Symtegration
 -- >>> import Symtegration.Polynomial
 
--- | Derive the roots for the given polynomial.
+-- | Derive the roots for the given polynomial.  Only real roots are returned.
 --
 -- >>> map (toHaskell . simplify) <$> solve (2 * power 1 - 6)
 -- Just ["3"]
@@ -25,7 +25,7 @@ import Symtegration.Symbolic
 -- >>> map (toHaskell . simplify) <$> solve (power 2 - 4)
 -- Just ["2","-2"]
 --
--- Incomplete for now.
+-- Returns 'Nothing' if the function does not know how to derive the roots.
 solve :: IndexedPolynomial -> Maybe [Expression]
 solve p
   | degree p == 1 = solveLinear (coefficient p 1) (coefficient p 0)
@@ -46,7 +46,7 @@ solveQuadratic a b c
         [ ((-b') + sq' ** (1 / 2)) / (2 * a'),
           ((-b') - sq' ** (1 / 2)) / (2 * a')
         ]
-  | otherwise = Nothing
+  | otherwise = Just []
   where
     sq = b * b - 4 * a * c
     sq' = fromRational sq
