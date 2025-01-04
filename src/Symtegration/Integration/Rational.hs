@@ -17,8 +17,8 @@ module Symtegration.Integration.Rational
     -- | Algorithms used for integrating rational functions.
     hermiteReduce,
     rationalIntegralLogTerms,
+    complexLogTermToAtan,
     complexLogTermToRealTerm,
-    complexLogTermToAtanTerm,
 
     -- * Support
 
@@ -323,14 +323,14 @@ rationalIntegralLogTerms (RationalFunction a d) = do
 --
 -- For example,
 --
--- >>> toHaskell $ simplify $ complexLogTermToAtanTerm "x" (power 3 - 3 * power 1) (power 2 - 2)
+-- >>> toHaskell $ simplify $ complexLogTermToAtan "x" (power 3 - 3 * power 1) (power 2 - 2)
 -- "2 * (atan x) + 2 * (atan (((-1) * x + (-1) * (x ** 5) + 3 * (x ** 3)) / (-2))) + 2 * (atan (x ** 3))"
 --
 -- so it is the case that
 --
 -- \[ \frac{d}{dx} \left( i \log \left( \frac{(x^3-3x) + i(x^2-2)}{(x^3-3x) - i(x^2-2)} \right) \right) =
 -- \frac{d}{dx} \left( 2 \tan^{-1} \left(\frac{x^5-3x^3+x}{2}\right) + 2 \tan^{-1} \left(x^3\right) + 2 \tan^{-1} x \right) \]
-complexLogTermToAtanTerm ::
+complexLogTermToAtan ::
   -- | Symbol for the variable.
   Text ->
   -- | Polynomial \(A\).
@@ -339,10 +339,10 @@ complexLogTermToAtanTerm ::
   IndexedPolynomial ->
   -- | Sum \(f\) of inverse tangents.
   Expression
-complexLogTermToAtanTerm v a b
+complexLogTermToAtan v a b
   | r == 0 = 2 * atan (a' / b')
-  | degree a < degree b = complexLogTermToAtanTerm v (-b) a
-  | otherwise = 2 * atan (s' / g') + complexLogTermToAtanTerm v d c
+  | degree a < degree b = complexLogTermToAtan v (-b) a
+  | otherwise = 2 * atan (s' / g') + complexLogTermToAtan v d c
   where
     (_, r) = a `divide` b
     (d, c, g) = extendedEuclidean b (-a)
@@ -360,7 +360,7 @@ complexLogTermToAtanTerm v a b
 -- \]
 --
 -- then with return value \(((P(u,v), Q(u,v)), (A(u,v,x), B(u,v,x)))\),
--- and a return value \(f_{u,v}\) from 'complexLogTermToAtanTerm' for \(A(u,v)\) and \(B(u,v)\), the real function is
+-- and a return value \(f_{u,v}\) from 'complexLogTermToAtan' for \(A(u,v)\) and \(B(u,v)\), the real function is
 --
 -- \[
 -- \sum_{(a,b) \in \{(u,v) \mid P(u,v)=Q(u,v)=0, b > 0\}}
