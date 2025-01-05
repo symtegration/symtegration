@@ -17,13 +17,13 @@ on:
 jobs:
   cabal:
     strategy:
+      # Test only lowest and highest bounds.
       matrix:
         os:
           - "ubuntu-latest"
 
         ghc:
           - "9.6.6"
-          - "9.8.4"
           - "9.10.1"
 
         include:
