@@ -30,11 +30,17 @@ spec = parallel $ do
                 e' `shouldSatisfy` simpleNumeric
 
 -- Numeric folding should be able to fold arithmetic on numbers
--- to either an integer or a fraction.
+-- to either an integer or a fraction.  The exception is if there
+-- is a divide by zero somewhere, which we intentionally leave alone.
 simpleNumeric :: Expression -> Bool
 simpleNumeric (Number _) = True
 simpleNumeric (Number _ :/: Number _) = True
-simpleNumeric _ = False
+simpleNumeric x = hasDivideByZero x
+  where
+    hasDivideByZero (_ :/: 0) = True
+    hasDivideByZero (UnaryApply _ u) = hasDivideByZero u
+    hasDivideByZero (BinaryApply _ u v) = hasDivideByZero u || hasDivideByZero v
+    hasDivideByZero _ = False
 
 -- | Generate arbitrary expression involving no symbols and which are
 -- guaranteed to reduce exactly to a simple numeric term.

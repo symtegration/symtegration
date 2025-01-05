@@ -28,7 +28,7 @@ module Symtegration.Integration.Rational
   )
 where
 
-import Data.List (find)
+import Data.List (find, intersect)
 import Data.Monoid (Sum (..))
 import Data.Text (Text)
 import Symtegration.Polynomial hiding (integrate)
@@ -68,6 +68,11 @@ import Symtegration.Symbolic.Simplify
 -- so that
 --
 -- \[\int \frac{36}{x^5-2x^4-2x^3+4x^2+x-2} \, dx = \frac{12x+6}{x^2-1} + 4 \log \left( x - 2 \right) - 4 \log \left( x + 1 \right)\]
+--
+-- >>> let p = "x" ** 4 - 3 * "x" ** 2 + 6
+-- >>> let q = "x" ** 6 - 5 * "x" ** 4 + 5 * "x" ** 2 + 4
+-- >>> toHaskell . simplify <$> integrate "x" (p / q)
+-- Just "(1 / 2) * (2 * (atan x) + 2 * (atan (((-107) * x + (-107) * (x ** 5) + 321 * (x ** 3)) / (-214))) + 2 * (atan (x ** 3)))"
 integrate :: Text -> Expression -> Maybe Expression
 integrate v e
   | (x :/: y) <- e',
@@ -284,27 +289,6 @@ rationalIntegralLogTerms (RationalFunction a d) = do
               where
                 (r, _) = u `divide` v
 
-    -- Turn the rational function into a polynomial if possible.
-    toPoly :: RationalFunction -> Maybe IndexedPolynomial
-    toPoly (RationalFunction p q)
-      | degree q == 0, q /= 0 = Just p'
-      | otherwise = Nothing
-      where
-        p' = scale (1 / leadingCoefficient q) p
-
-    -- Turn the rational function coefficients into polynomial coefficients if possible.
-    toPolyCoefficients ::
-      IndexedPolynomialWith RationalFunction ->
-      Maybe (IndexedPolynomialWith IndexedPolynomial)
-    toPolyCoefficients p = reconstruct terms
-      where
-        terms = foldTerms (\e c -> [(e, toPoly c)]) p
-        reconstruct [] = Just 0
-        reconstruct ((_, Nothing) : _) = Nothing
-        reconstruct ((e, Just c) : xs)
-          | (Just p') <- reconstruct xs = Just $ scale c (power e) + p'
-          | otherwise = Nothing
-
 -- | Given polynomials \(A\) and \(B\),
 -- return a sum \(f\) of inverse tangents such that the following is true.
 --
@@ -474,65 +458,124 @@ complexLogTermToRealExpression ::
   -- | Expression for the real function \(f\).
   Maybe Expression
 complexLogTermToRealExpression v (r, s)
-  | (Just xys) <- toRationalPairList (solveBivariatePolynomials p q),
+  | (Just xys) <- solveBivariatePolynomials p q,
+    (Just h) <- f xys,
     (Just zs) <- toRationalList (solve r) =
-      Just $ f xys + g zs
+      Just $ sum h + g zs
   | otherwise = Nothing
   where
-    ((p, q), (_, _)) = complexLogTermToRealTerm (r, s)
+    ((p, q), (a, b)) = complexLogTermToRealTerm (r, s)
 
-    f xys = sum $ do
-      (x, _) <- xys
-      a' <- undefined
-      b' <- undefined
-      return $ fromRational x * log (a' * a' + b' * b') + complexLogTermToAtan v undefined undefined
+    f :: [(Rational, Rational)] -> Maybe [Expression]
+    f xys = toMaybeList $ do
+      (x, y) <- filter ((>0) . snd) xys
+      let flatten'' = mapCoefficients (toExpr (fromRational y) fromRational) -- v-polynomials into Expressions.
+      let flatten' = mapCoefficients (toExpr (fromRational x) id . flatten'') -- u-polynomials into Expressions.
+      let flatten = toExpr (Symbol v) id . flatten' -- x-polynomials into Expressions.
+      -- a and b flattened into Expressions.
+      let a' = flatten a
+      let b' = flatten b
+      -- a and b flattened into x-polynomials with rational number coefficients.
+      return $ do
+        a'' <- convertCoefficients $ flatten' a
+        b'' <- convertCoefficients $ flatten' b
+        return $ fromRational x * log (a' * a' + b' * b') + fromRational y * complexLogTermToAtan v a'' b''
 
     g zs = sum $ do
       z <- zs
-      let s' = mapCoefficients (toExpr $ fromRational z) s
+      let s' = mapCoefficients (toExpr (fromRational z) fromRational) s
       return $ fromRational z * Log' (toExpression v toSymbolicCoefficient s')
 
     toRationalList :: Maybe [Expression] -> Maybe [Rational]
     toRationalList Nothing = Nothing
     toRationalList (Just []) = Just []
     toRationalList (Just (x : xs))
-      | (Just x'') <- convert x', (Just xs'') <- xs' = Just $ x'' : xs''
+      | (Just x'') <- convert (simplify x'), (Just xs'') <- xs' = Just $ x'' : xs''
       | otherwise = Nothing
       where
         x' = simplify x
         xs' = toRationalList $ Just xs
 
-    toRationalPairList :: Maybe [(Expression, Expression)] -> Maybe [(Rational, Rational)]
-    toRationalPairList Nothing = Nothing
-    toRationalPairList (Just []) = Just []
-    toRationalPairList (Just ((x, y) : xs))
-      | (Just x'') <- convert x', (Just y'') <- convert y', (Just xs'') <- xs' = Just $ (x'', y'') : xs''
-      | otherwise = Nothing
-      where
-        x' = simplify x
-        y' = simplify y
-        xs' = toRationalPairList $ Just xs
-
+    -- Convert a simplified Expression into a rational number.
     convert (Number n) = Just $ fromIntegral n
     convert (Number n :/: Number m) = Just $ fromIntegral n / fromIntegral m
     convert _ = Nothing
 
+    -- Convert polynomial with Expression coefficients into a polynomial with rational number coefficients.
+    convertCoefficients :: IndexedPolynomialWith Expression -> Maybe IndexedPolynomial
+    convertCoefficients x = sum . map (\(e,c) -> scale c (power e)) <$> toMaybeList (foldTerms (\e c -> [(e,) <$> convert (simplify c)]) x)
+
     -- Turns a polynomial into an Expression.
-    toExpr x u = getSum $ foldTerms (\e'' c -> Sum $ fromRational c * (x ** Number (fromIntegral e''))) u
+    -- Function h is used to turn the coefficient into an Expression.
+    toExpr x h u = getSum $ foldTerms (\e'' c -> Sum $ h c * (x ** Number (fromIntegral e''))) u
 
 -- | Returns the roots for two variables in two polynomials.
 --
--- Only supports rational roots.  If not all roots are rational, then it will return 'Nothing'.
+-- Only supports rational roots.  If not all real roots are rational, then it will return 'Nothing'.
 -- Returning all real roots would be preferable, but this is not supported at this time.
 --
 -- If the function cannot derive the roots otherwise, either, 'Nothing' will be returned as well.
---
--- For now, returns no real roots.
 solveBivariatePolynomials ::
   IndexedPolynomialWith IndexedPolynomial ->
   IndexedPolynomialWith IndexedPolynomial ->
-  Maybe [(Expression, Expression)]
-solveBivariatePolynomials _ _ = Just []
+  Maybe [(Rational, Rational)]
+solveBivariatePolynomials p q = do
+  let p' = toRationalFunctionCoefficients p
+  let q' = toRationalFunctionCoefficients q
+  resultant <- toPoly $ fst $ subresultant p' q'
+  vs' <- solve resultant
+  vs <- toMaybeList $ map (convert . simplify) vs'
+  concat <$> toMaybeList (map solveForU vs)
+  where
+    toRationalFunctionCoefficients = mapCoefficients (`toRationalFunction` 1)
+
+    -- For each v, returns list of (u,v) such that P(u,v)=Q(u,v)=0.
+    solveForU :: Rational -> Maybe [(Rational,Rational)]
+    solveForU v
+      | 0 <- p' = do
+          -- Any u will make p'=0 true, so we only need to solve p'.
+          u <- map (convert . simplify) <$> solve q'
+          map (,v) <$> toMaybeList u
+      | 0 <- q' = do
+          -- Any u will make q'=0 true, so we only need to solve p'.
+          u <- map (convert . simplify) <$> solve p'
+          map (,v) <$> toMaybeList u
+      | otherwise = do
+          up <- map (convert . simplify) <$> solve p'
+          uq <- map (convert . simplify) <$> solve q'
+          up' <- toMaybeList up
+          uq' <- toMaybeList uq
+          return $ map (,v) $ up' `intersect` uq'
+      where
+        p' = mapCoefficients (getSum . foldTerms (\e c -> Sum $ c * v ^ e)) p
+        q' = mapCoefficients (getSum . foldTerms (\e c -> Sum $ c * v ^ e)) q
+
+    -- Turn a simplified Expression into a rational number if possible.
+    convert :: Expression -> Maybe Rational
+    convert (Number n) = Just $ fromIntegral n
+    convert (Number n :/: Number m) = Just $ fromIntegral n / fromIntegral m
+    convert _ = Nothing
+
+-- | Turn the rational function into a polynomial if possible.
+toPoly :: RationalFunction -> Maybe IndexedPolynomial
+toPoly (RationalFunction p q)
+  | degree q == 0, q /= 0 = Just p'
+  | otherwise = Nothing
+  where
+    p' = scale (1 / leadingCoefficient q) p
+
+-- | Turn the rational function coefficients into polynomial coefficients if possible.
+toPolyCoefficients ::
+  IndexedPolynomialWith RationalFunction ->
+  Maybe (IndexedPolynomialWith IndexedPolynomial)
+toPolyCoefficients p = reconstruct terms
+  where
+    terms = foldTerms (\e c -> [(e, toPoly c)]) p
+    reconstruct [] = Just 0
+    reconstruct ((_, Nothing) : _) = Nothing
+    reconstruct ((e, Just c) : xs)
+      | (Just p') <- reconstruct xs = Just $ scale c (power e) + p'
+      | otherwise = Nothing
 
 -- | If there are any nothings, then turn the list into nothing.
 -- Otherwise, turn it into the list of just the elements.

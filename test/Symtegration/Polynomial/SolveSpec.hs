@@ -48,6 +48,12 @@ spec = parallel $ do
             sq = b * b - 4 * a * c
          in sq < 0 ==> solve p `shouldBe` Just []
 
+    describe "quartic polynomials" $ do
+      prop "found roots are roots" $ \(NonZero a) b c d e ->
+        let p = scale a (power 4) + scale b (power 3) + scale c (power 2) + scale d (power 1) + scale e 1
+         in counterexample (show p) $
+              solve p `shouldSatisfy` areRoots p
+
 -- | Whether x is a root of p.
 isRoot :: IndexedPolynomial -> Expression -> Bool
 isRoot p x
