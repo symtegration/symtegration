@@ -72,7 +72,8 @@ integrate :: Text -> Expression -> Maybe Expression
 integrate v e
   | (x :/: y) <- e',
     (Just n) <- fromExpression (forVariable v) x,
-    (Just d) <- fromExpression (forVariable v) y =
+    (Just d) <- fromExpression (forVariable v) y,
+    d /= 0 =
       integrate' n d
   | otherwise = Nothing
   where
@@ -292,7 +293,7 @@ rationalIntegralLogTerms (RationalFunction a d) = do
     -- Turn the rational function into a polynomial if possible.
     toPoly :: RationalFunction -> Maybe IndexedPolynomial
     toPoly (RationalFunction p q)
-      | degree q == 0 = Just p'
+      | degree q == 0, q /= 0 = Just p'
       | otherwise = Nothing
       where
         p' = scale (1 / leadingCoefficient q) p

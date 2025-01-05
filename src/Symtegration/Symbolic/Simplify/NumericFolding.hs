@@ -85,7 +85,10 @@ binary e@((x :/: Number n) :*: Number m) | n /= 0, m == n = x | otherwise = e
 -- Subtractions are turned into addition.
 binary (x :-: y) = simplify $ x :+: Negate' y
 -- Fold division.
+binary e@(_ :/: (_ :/: _)) = e
 binary (x :/: (y :/: z)) = simplify $ (x :*: z) :/: y
+binary e@((_ :/: 0) :/: _) = e
+binary e@((_ :/: _) :/: 0) = e
 binary ((x :/: y) :/: z) = simplify $ x :/: (y :*: z)
 binary (Number n :/: Number m) = reduceRatio n m
 -- Fold exponentiation.
