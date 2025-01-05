@@ -44,10 +44,6 @@ Concrete numbers can also be computed from these integrals.  For example:
 Just (1110 % 2401)
 ```
 
-See the [module documentation] for details.
-
-[module documentation]: https://chungyc.github.io/symtegration/symtegration-0.3.0/Symtegration.html
-
 ### Symbolic integration in GHCi
 
 With Symtegration, symbolic integration can be done within [GHCi].
