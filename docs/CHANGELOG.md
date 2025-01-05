@@ -8,6 +8,15 @@ and this project adheres to the
 
 ## Unreleased
 
+*   Implementation of Rioboo's algorithm.
+
+    *   Supports integration of more rational functions.
+
+    *   Integration of rational functions with rational number coefficients now
+        only limited by finding solutions for polynomials.  As of yet, only
+        rational functions which require solutions for polymials up to degree 2
+        can be integrated.
+
 *   Output `pi` as `\pi` in LaTeX.
 
 ## 0.2.0 - 2025-01-02
