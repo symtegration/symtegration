@@ -68,11 +68,6 @@ import Symtegration.Symbolic.Simplify
 -- so that
 --
 -- \[\int \frac{36}{x^5-2x^4-2x^3+4x^2+x-2} \, dx = \frac{12x+6}{x^2-1} + 4 \log \left( x - 2 \right) - 4 \log \left( x + 1 \right)\]
---
--- >>> let p = "x" ** 4 - 3 * "x" ** 2 + 6
--- >>> let q = "x" ** 6 - 5 * "x" ** 4 + 5 * "x" ** 2 + 4
--- >>> toHaskell . simplify <$> integrate "x" (p / q)
--- Just "(1 / 2) * (2 * (atan x) + 2 * (atan (((-107) * x + (-107) * (x ** 5) + 321 * (x ** 3)) / (-214))) + 2 * (atan (x ** 3)))"
 integrate :: Text -> Expression -> Maybe Expression
 integrate v e
   | (x :/: y) <- e',
