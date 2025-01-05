@@ -94,14 +94,8 @@ integrate v e
         logTerms = rationalIntegralLogTerms h'
         logs :: Maybe Expression
         logs
-          | (Just terms) <- logTerms = sum <$> toMaybeList (map toLog terms)
+          | (Just terms) <- logTerms = sum <$> toMaybeList (map (complexLogTermToRealExpression v) terms)
           | otherwise = Nothing
-          where
-            toLog (q', s) = do
-              roots <- solve q' :: Maybe [Expression]
-              let ss = map (\x -> (x, mapCoefficients (toExpr x) s)) roots
-              return $ sum $ map (\(x, p) -> x * Log' (toExpression v toSymbolicCoefficient p)) ss
-            toExpr x p = getSum $ foldTerms (\e'' c -> Sum $ fromRational c * (x ** Number (fromIntegral e''))) p
 
         fromRationalFunction (RationalFunction u w) = u' / w'
           where
@@ -462,6 +456,83 @@ complexLogTermToRealTerm (q, s) = ((qp, qq), (sp, sq))
       where
         i = power 1
         c' = scale c 1
+
+-- | For the ingredients of a complex logarithm, return an equivalent real function in terms of an indefinite integral.
+--
+-- Specifically, for polynomials \(\left(R(t), S(t,x)\right)\) such that
+--
+-- \[
+-- \frac{df}{dx} = \frac{d}{dx} \sum_{\alpha \in \{ t \mid R(t) = 0 \}} \left( \alpha \log \left( S(\alpha,x) \right) \right)
+-- \]
+--
+-- a symbolic representation for \(f\) will be returned.  See 'complexLogTermToRealTerm' for specifics as to how \(f\) is derived.
+complexLogTermToRealExpression ::
+  -- | Symbol for the variable.
+  Text ->
+  -- | Polynomials \(R(t)\) and \(S(t,x)\).
+  (IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial) ->
+  -- | Expression for the real function \(f\).
+  Maybe Expression
+complexLogTermToRealExpression v (r, s)
+  | (Just xys) <- toRationalPairList (solveBivariatePolynomials p q),
+    (Just zs) <- toRationalList (solve r) =
+      Just $ f xys + g zs
+  | otherwise = Nothing
+  where
+    ((p, q), (_, _)) = complexLogTermToRealTerm (r, s)
+
+    f xys = sum $ do
+      (x, _) <- xys
+      a' <- undefined
+      b' <- undefined
+      return $ fromRational x * log (a' * a' + b' * b') + complexLogTermToAtan v undefined undefined
+
+    g zs = sum $ do
+      z <- zs
+      let s' = mapCoefficients (toExpr $ fromRational z) s
+      return $ fromRational z * Log' (toExpression v toSymbolicCoefficient s')
+
+    toRationalList :: Maybe [Expression] -> Maybe [Rational]
+    toRationalList Nothing = Nothing
+    toRationalList (Just []) = Just []
+    toRationalList (Just (x : xs))
+      | (Just x'') <- convert x', (Just xs'') <- xs' = Just $ x'' : xs''
+      | otherwise = Nothing
+      where
+        x' = simplify x
+        xs' = toRationalList $ Just xs
+
+    toRationalPairList :: Maybe [(Expression, Expression)] -> Maybe [(Rational, Rational)]
+    toRationalPairList Nothing = Nothing
+    toRationalPairList (Just []) = Just []
+    toRationalPairList (Just ((x, y) : xs))
+      | (Just x'') <- convert x', (Just y'') <- convert y', (Just xs'') <- xs' = Just $ (x'', y'') : xs''
+      | otherwise = Nothing
+      where
+        x' = simplify x
+        y' = simplify y
+        xs' = toRationalPairList $ Just xs
+
+    convert (Number n) = Just $ fromIntegral n
+    convert (Number n :/: Number m) = Just $ fromIntegral n / fromIntegral m
+    convert _ = Nothing
+
+    -- Turns a polynomial into an Expression.
+    toExpr x u = getSum $ foldTerms (\e'' c -> Sum $ fromRational c * (x ** Number (fromIntegral e''))) u
+
+-- | Returns the roots for two variables in two polynomials.
+--
+-- Only supports rational roots.  If not all roots are rational, then it will return 'Nothing'.
+-- Returning all real roots would be preferable, but this is not supported at this time.
+--
+-- If the function cannot derive the roots otherwise, either, 'Nothing' will be returned as well.
+--
+-- For now, returns no real roots.
+solveBivariatePolynomials ::
+  IndexedPolynomialWith IndexedPolynomial ->
+  IndexedPolynomialWith IndexedPolynomial ->
+  Maybe [(Expression, Expression)]
+solveBivariatePolynomials _ _ = Just []
 
 -- | If there are any nothings, then turn the list into nothing.
 -- Otherwise, turn it into the list of just the elements.
