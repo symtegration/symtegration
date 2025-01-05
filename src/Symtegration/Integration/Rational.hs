@@ -365,7 +365,7 @@ complexLogTermToAtan v a b
 -- \[
 -- \frac{df}{dx} = \frac{d}{dx} \left(
 -- \sum_{(a,b) \in \{(u,v) \in (\mathbb{R}, \mathbb{R}) \mid P(u,v)=Q(u,v)=0, b > 0\}}
---   \left( a \log \left( A(a,b,x)^2 + B(a,b,x)^2 \right) + b \log (g_{ab}(x)) \right)
+--   \left( a \log \left( A(a,b,x)^2 + B(a,b,x)^2 \right) + b g_{ab}(x) \right)
 -- + \sum_{a \in \{t \in \mathbb{R} \mid R(t)=0 \}} \left( a \log (S(a,x)) \right)
 -- \right)
 -- \]
