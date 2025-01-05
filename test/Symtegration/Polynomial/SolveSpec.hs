@@ -22,8 +22,7 @@ spec = parallel $ do
     describe "linear polynomials" $ do
       prop "found roots are roots" $ \(NonZero a) b ->
         let p = scale a (power 1) + scale b (power 0)
-         in counterexample (show p) $
-              solve p `shouldSatisfy` areRoots p
+         in correctlySolves p
 
       prop "finds root" $ \(NonZero a) x ->
         let p = scale a 1 * (power 1 - scale x 1)
@@ -33,8 +32,7 @@ spec = parallel $ do
     describe "quadratic polynomials" $ do
       prop "found roots are roots" $ \(NonZero a) b c ->
         let p = scale a (power 2) + scale b (power 1) + scale c (power 0)
-         in counterexample (show p) $
-              solve p `shouldSatisfy` areRoots p
+         in correctlySolves p
 
       prop "finds roots" $ \(NonZero a) x y ->
         let p = scale a 1 * (power 1 - scale x 1) * (power 1 - scale y 1)
@@ -51,8 +49,17 @@ spec = parallel $ do
     describe "quartic polynomials" $ do
       prop "found roots are roots" $ \(NonZero a) b c d e ->
         let p = scale a (power 4) + scale b (power 3) + scale c (power 2) + scale d (power 1) + scale e 1
-         in counterexample (show p) $
-              solve p `shouldSatisfy` areRoots p
+         in correctlySolves p
+
+-- | Passes if either all the roots found are indeed roots of the polynomial
+-- or solutions could not be derived.
+correctlySolves :: IndexedPolynomial -> Property
+correctlySolves p =
+  counterexample (show p) $
+    label (case roots of Nothing -> "not solved"; Just _ -> "solved") $
+      roots `shouldSatisfy` areRoots p
+  where
+    roots = solve p
 
 -- | Whether x is a root of p.
 isRoot :: IndexedPolynomial -> Expression -> Bool
