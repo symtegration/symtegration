@@ -125,14 +125,13 @@ test-suite spec
       LambdaCase
       OverloadedStrings
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
-  build-tool-depends:
-      hspec-discover:hspec-discover ==2.11.*
   build-depends:
       QuickCheck ==2.14.*
     , ad ==4.5.*
     , base >=4.18 && <4.21
     , containers >=0.6 && <0.8
     , hspec ==2.11.*
+    , hspec-discover ==2.11.*
     , symtegration
     , text >=2.0 && <2.2
     , text-show ==3.10.*

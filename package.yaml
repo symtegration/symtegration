@@ -50,9 +50,8 @@ tests:
     - symtegration
     - containers >= 0.6 && < 0.8
     - hspec >= 2.11 && < 2.12
-    - QuickCheck >= 2.14 && < 2.15
-    build-tool-depends:
     - hspec-discover >= 2.11 && < 2.12
+    - QuickCheck >= 2.14 && < 2.15
 
     when:
       condition: false
