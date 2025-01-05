@@ -8,10 +8,10 @@ name:           symtegration
 version:        0.3.0
 synopsis:       Library for symbolic integration of mathematical expressions.
 description:    Symtegration is a library providing symbolic integration of mathematical expressions.
-                See the [README](https://github.com/chungyc/symtegration#readme) on GitHub.
+                See the [README](https://github.com/symtegration/symtegration#readme) on GitHub.
 category:       Mathematics, Symbolic Computation
-homepage:       https://github.com/chungyc/symtegration#readme
-bug-reports:    https://github.com/chungyc/symtegration/issues
+homepage:       https://github.com/symtegration/symtegration#readme
+bug-reports:    https://github.com/symtegration/symtegration/issues
 author:         Yoo Chung
 maintainer:     dev@chungyc.org
 copyright:      Copyright 2025 Yoo Chung
@@ -28,7 +28,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/chungyc/symtegration
+  location: https://github.com/symtegration/symtegration
 
 library
   exposed-modules:
