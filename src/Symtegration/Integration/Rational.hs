@@ -468,7 +468,7 @@ complexLogTermToRealExpression v (r, s)
 
     f :: [(Rational, Rational)] -> Maybe [Expression]
     f xys = toMaybeList $ do
-      (x, y) <- filter ((>0) . snd) xys
+      (x, y) <- filter ((> 0) . snd) xys
       let flatten'' = mapCoefficients (toExpr (fromRational y) fromRational) -- v-polynomials into Expressions.
       let flatten' = mapCoefficients (toExpr (fromRational x) id . flatten'') -- u-polynomials into Expressions.
       let flatten = toExpr (Symbol v) id . flatten' -- x-polynomials into Expressions.
@@ -503,7 +503,7 @@ complexLogTermToRealExpression v (r, s)
 
     -- Convert polynomial with Expression coefficients into a polynomial with rational number coefficients.
     convertCoefficients :: IndexedPolynomialWith Expression -> Maybe IndexedPolynomial
-    convertCoefficients x = sum . map (\(e,c) -> scale c (power e)) <$> toMaybeList (foldTerms (\e c -> [(e,) <$> convert (simplify c)]) x)
+    convertCoefficients x = sum . map (\(e, c) -> scale c (power e)) <$> toMaybeList (foldTerms (\e c -> [(e,) <$> convert (simplify c)]) x)
 
     -- Turns a polynomial into an Expression.
     -- Function h is used to turn the coefficient into an Expression.
@@ -530,7 +530,7 @@ solveBivariatePolynomials p q = do
     toRationalFunctionCoefficients = mapCoefficients (`toRationalFunction` 1)
 
     -- For each v, returns list of (u,v) such that P(u,v)=Q(u,v)=0.
-    solveForU :: Rational -> Maybe [(Rational,Rational)]
+    solveForU :: Rational -> Maybe [(Rational, Rational)]
     solveForU v
       | 0 <- p' = do
           -- Any u will make p'=0 true, so we only need to solve p'.
