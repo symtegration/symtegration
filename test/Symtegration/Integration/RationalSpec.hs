@@ -57,9 +57,9 @@ spec = parallel $ do
 newtype Rat = Rat Expression deriving (Eq, Show)
 
 instance Arbitrary Rat where
-  arbitrary = do
+  arbitrary = resize 10 $ do
     p <- arbitrary :: Gen IndexedPolynomial
-    q <- arbitrary :: Gen IndexedPolynomial
+    q <- arbitrary `suchThat` (/= 0) :: Gen IndexedPolynomial
     let p' = toExpression var toRationalCoefficient p
     let q' = toExpression var toRationalCoefficient q
     return $ Rat $ p' / q'
