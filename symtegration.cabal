@@ -10,7 +10,7 @@ synopsis:       Library for symbolic integration of mathematical expressions.
 description:    Symtegration is a library providing symbolic integration of mathematical expressions.
                 See the [README](https://github.com/symtegration/symtegration#readme) on GitHub.
 category:       Mathematics, Symbolic Computation
-homepage:       https://github.com/symtegration/symtegration#readme
+homepage:       https://symtegration.dev/
 bug-reports:    https://github.com/symtegration/symtegration/issues
 author:         Yoo Chung
 maintainer:     dev@chungyc.org

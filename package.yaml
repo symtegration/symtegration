@@ -1,5 +1,6 @@
 name:                symtegration
 version:             0.3.0
+homepage:            https://symtegration.dev/
 github:              "symtegration/symtegration"
 author:              "Yoo Chung"
 maintainer:          "dev@chungyc.org"
