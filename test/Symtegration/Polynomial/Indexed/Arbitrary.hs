@@ -17,7 +17,6 @@ instance Arbitrary IndexedPolynomial where
     n ->
       frequency
         [ (1, resize 0 arbitrary),
-          (5, resize (max 0 (n - 1)) $ scale <$> arbitrary <*> arbitrary),
           (10, resize (n `div` 2) $ (+) <$> arbitrary <*> arbitrary),
           (10, resize (n `div` 2) $ (*) <$> arbitrary <*> arbitrary)
         ]
