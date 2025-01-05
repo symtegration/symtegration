@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+## 0.3.0 - 2025-01-05
+
 *   Implementation of Rioboo's algorithm.
 
     *   Supports integration of more rational functions.

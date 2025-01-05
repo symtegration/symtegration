@@ -46,7 +46,7 @@ Just (1110 % 2401)
 
 See the [module documentation] for details.
 
-[module documentation]: https://chungyc.github.io/symtegration/symtegration-0.2.0/Symtegration.html
+[module documentation]: https://chungyc.github.io/symtegration/symtegration-0.3.0/Symtegration.html
 
 ### Symbolic integration in GHCi
 
