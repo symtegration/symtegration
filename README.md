@@ -74,7 +74,7 @@ Just (1 % 3)
 
 [GHCi]: https://downloads.haskell.org/ghc/latest/docs/users_guide/ghci.html
 
-### Symblic integration in IHaskell
+### Symbolic integration in IHaskell
 
 Symtegration can also be used in [IHaskell] to do symbolic integration.
 Its use can be seen in an [example IHaskell notebook],
