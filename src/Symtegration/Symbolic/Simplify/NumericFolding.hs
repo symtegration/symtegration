@@ -82,6 +82,8 @@ binary (Number n :*: (x :*: Number m)) = Number (n * m) :*: x
 binary (Number n :*: (Number m :*: x)) = Number (n * m) :*: x
 binary e@(Number n :*: (x :/: Number m)) | m /= 0, m == n = x | otherwise = e
 binary e@((x :/: Number n) :*: Number m) | n /= 0, m == n = x | otherwise = e
+binary (x@(Number _) :*: (y@(Number _ :/: Number _) :*: z)) = simplify (x :*: y) :*: z
+binary (x@(Number _ :/: Number _) :*: (y@(Number _ :/: Number _) :*: z)) = simplify (x :*: y) :*: z
 -- Subtractions are turned into addition.
 binary (x :-: y) = simplify $ x :+: Negate' y
 -- Fold division.
