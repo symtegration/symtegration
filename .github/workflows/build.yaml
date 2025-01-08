@@ -91,3 +91,8 @@ jobs:
 
       - name: Test
         run: stack build --coverage --test
+
+      - name: Coverage report
+        uses: 8c6794b6/hpc-codecov-action@0baa5bacbd3ed4103ca4e25495e6e9cf0469912b # v4.1.0
+        with:
+          target: stack:spec
