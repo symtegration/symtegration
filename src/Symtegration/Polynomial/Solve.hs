@@ -64,4 +64,9 @@ solveQuartic a 0 b 0 0
   | a < 0, b < 0 = Just [0]
   | b == 0 = Just [0]
   | otherwise = Just [0, Sqrt' (fromRational (-(b / a))), -Sqrt' (fromRational (-(b / a)))]
+solveQuartic a 0 0 0 b
+  | a > 0, b > 0 = Just []
+  | a < 0, b < 0 = Just []
+  | b == 0 = Just [0]
+  | otherwise = Nothing
 solveQuartic _ _ _ _ _ = Nothing
