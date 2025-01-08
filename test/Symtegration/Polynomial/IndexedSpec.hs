@@ -78,6 +78,22 @@ spec = parallel $ describe "IndexedPolynomial" $ do
     prop "negates coefficients" $ \p ->
       getCoefficients (negate p) `shouldBe` map negate (getCoefficients p)
 
+  describe "signum" $ do
+    it "is zero for zero" $ do
+      signum (0 :: IndexedPolynomial) `shouldBe` 0
+
+    prop "is either one or negative one" $ \(NonZero p) ->
+      signum (p :: IndexedPolynomial) `shouldSatisfy` (\x -> x == 1 || x == -1)
+
+    prop "is consistent with abs" $ \p ->
+      abs p * signum (p :: IndexedPolynomial) `shouldBe` p
+
+  describe "show" $ do
+    prop "is total for IndexedPolynomial" $ \p -> total (show (p :: IndexedPolynomial))
+
+    prop "is total for IndexedPolynomialWith IndexedPolynomial" $ \p ->
+      total (show (p :: IndexedPolynomialWith IndexedPolynomial))
+
 -- | Returns the coefficients of the given polynomial, in ascending order of the power.
 getCoefficients :: IndexedPolynomial -> [Rational]
 getCoefficients p = [coefficient p k | k <- [0 .. degree p]]

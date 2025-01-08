@@ -81,6 +81,7 @@ instance (Eq a, Num a) => Num (P Int a) where
       multiplyTerm e c = IntMap.mapKeysMonotonic (+ e) $ IntMap.map (* c) q
 
   abs = id
+  signum 0 = 0
   signum _ = 1
   fromInteger 0 = P IntMap.empty
   fromInteger n = P $ IntMap.singleton 0 $ fromInteger n
