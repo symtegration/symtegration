@@ -10,14 +10,29 @@ import Data.Text (Text)
 import Symtegration.Integration.Powers
 import Symtegration.Integration.Properties
 import Symtegration.Symbolic
+import Symtegration.Symbolic.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 spec :: Spec
-spec = parallel $ modifyMaxSuccess (* 10) $ do
-  prop "consistent with derivative of integral" $ \(Pow e) x ->
-    antiderivativeProperty integrate (Map.singleton var x) e x
+spec = parallel $ do
+  modifyMaxSuccess (* 10) $ do
+    prop "consistent with derivative of integral" $ \(Pow e) x ->
+      antiderivativeProperty integrate (Map.singleton var x) e x
+
+  prop "integrates constant symbol" $
+    forAll (arbitrarySymbol `suchThat` (/= Symbol var)) $ \c ->
+      integrate var c `shouldSatisfy` flip elem (map Just [Symbol var * c, c * Symbol var])
+
+  describe "ignores constants" $ do
+    prop "with integer power" $ \n ->
+      forAll (arbitrarySymbol `suchThat` (/= Symbol var)) $ \c ->
+        integrate var (c :*: Number n) `shouldBe` Nothing
+
+    prop "with fraction" $ \n m ->
+      forAll (arbitrarySymbol `suchThat` (/= Symbol var)) $ \c ->
+        integrate var (c :*: (Number n :/: Number m)) `shouldBe` Nothing
 
 newtype Pow = Pow Expression deriving (Eq, Show)
 
