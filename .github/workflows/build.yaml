@@ -106,7 +106,7 @@ jobs:
           enable-stack: true
 
       - name: Build
-        run: stack build --coverage --test --no-run-tests
+        run: stack build --test --no-run-tests
 
       - name: Test
         run: stack build --coverage --test
