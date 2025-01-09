@@ -13,7 +13,7 @@ import Test.QuickCheck hiding (scale)
 
 instance Arbitrary IndexedPolynomial where
   arbitrary = sized $ \case
-    0 -> frequency [(10, pure (power 1)), (1, scale <$> arbitrary <*> pure 1)]
+    0 -> frequency [(10, pure (power 1)), (1, scale <$> resize 4 arbitrary <*> pure 1)]
     n ->
       frequency
         [ (1, resize 0 arbitrary),
@@ -30,7 +30,7 @@ instance
   Arbitrary (IndexedPolynomialWith (p e c))
   where
   arbitrary = sized $ \case
-    0 -> frequency [(10, pure (power 1)), (1, scale <$> arbitrary <*> pure 1)]
+    0 -> frequency [(10, pure (power 1)), (1, scale <$> resize 4 arbitrary <*> pure 1)]
     n ->
       frequency
         [ (1, resize 0 arbitrary),
