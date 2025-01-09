@@ -60,6 +60,7 @@ jobs:
 
       - name: Test
         run: cabal run spec
+        timeout-minutes: 10
 
       - name: Test examples
         run: cabal run examples
@@ -101,6 +102,7 @@ jobs:
 
       - name: Test
         run: stack build --coverage --test
+        timeout-minutes: 10
 
       - name: Generate coverage report
         uses: 8c6794b6/hpc-codecov-action@0baa5bacbd3ed4103ca4e25495e6e9cf0469912b # v4.1.0
