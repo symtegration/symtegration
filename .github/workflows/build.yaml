@@ -69,19 +69,11 @@ jobs:
         uses: 8c6794b6/hpc-codecov-action@0baa5bacbd3ed4103ca4e25495e6e9cf0469912b # v4.1.0
         with:
           target: cabal:spec
-          out: codecov-spec.json
-
-      - name: Generate coverage report for examples
-        uses: 8c6794b6/hpc-codecov-action@0baa5bacbd3ed4103ca4e25495e6e9cf0469912b # v4.1.0
-        with:
-          target: cabal:examples
-          out: codecov-examples.json
 
       - name: Upload coverage report
         uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v5.1.2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: codecov-spec.json,codecov-examples.json
 
   stack:
     name: stack
