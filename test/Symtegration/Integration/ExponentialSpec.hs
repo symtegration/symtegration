@@ -16,9 +16,10 @@ import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 spec :: Spec
-spec = parallel $ modifyMaxSuccess (* 10) $ do
-  prop "consistent with derivative of integral" $ \(F e) x ->
-    antiderivativeProperty integrate (Map.singleton var x) e x
+spec = parallel $ do
+  modifyMaxSuccess (* 10) $
+    prop "consistent with derivative of integral" $ \(F e) x ->
+      antiderivativeProperty integrate (Map.singleton var x) e x
 
   describe "ignores constants" $ do
     prop "with exponential" $

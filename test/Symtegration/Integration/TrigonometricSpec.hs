@@ -10,14 +10,20 @@ import Data.Text (Text)
 import Symtegration.Integration.Properties
 import Symtegration.Integration.Trigonometric
 import Symtegration.Symbolic
+import Symtegration.Symbolic.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 spec :: Spec
-spec = parallel $ modifyMaxSuccess (* 10) $ do
-  prop "consistent with derivative of integral" $ \(Trig e) x ->
-    antiderivativeProperty integrate (Map.singleton var x) e x
+spec = parallel $ do
+  modifyMaxSuccess (* 10) $
+    prop "consistent with derivative of integral" $ \(Trig e) x ->
+      antiderivativeProperty integrate (Map.singleton var x) e x
+
+  prop "ignores constant symbols" $ \(Trig e) ->
+    forAll (arbitrarySymbol `suchThat` (/= Symbol var)) $ \c ->
+      integrate var (substitute e (\x -> if x == var then Just c else Nothing)) `shouldBe` Nothing
 
 newtype Trig = Trig Expression deriving (Eq, Show)
 

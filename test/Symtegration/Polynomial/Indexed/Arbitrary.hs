@@ -16,7 +16,7 @@ instance Arbitrary IndexedPolynomial where
     0 ->
       frequency
         [ (50, pure (power 1)),
-          (10, scale <$> resize 4 arbitrary `suchThat` (/= 0) <*> pure 1),
+          (10, scale <$> resize 3 arbitrary `suchThat` (/= 0) <*> pure 1),
           (1, pure 0)
         ]
     n ->
