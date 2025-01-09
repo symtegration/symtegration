@@ -17,18 +17,18 @@ on:
 jobs:
   cabal:
     strategy:
-      # Test only lowest and highest bounds.
       matrix:
         os:
           - "ubuntu-latest"
 
+        # Policy for compatible GHC versions is to:
+        # * Test three most recent minor versions.
+        # * Test lowest and highest minor versions of the previous major version.
+        # * Test highest minor version of major versions before the second last.
         ghc:
           - "9.6.6"
+          - "9.8.4"
           - "9.10.1"
-
-        include:
-          - ghc: "9.6.6"
-            flags : "--prefer-oldest"
 
       fail-fast: false
 
@@ -55,7 +55,7 @@ jobs:
 
       - name: Build
         run: |
-          cabal configure --disable-optimization --enable-tests --enable-coverage --write-ghc-environment-files=always ${{ matrix.flags }}
+          cabal configure --disable-optimization --enable-tests --enable-coverage --write-ghc-environment-files=always
           cabal build
 
       - name: Test
