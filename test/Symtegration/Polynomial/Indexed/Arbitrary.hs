@@ -13,12 +13,17 @@ import Test.QuickCheck hiding (scale)
 
 instance Arbitrary IndexedPolynomial where
   arbitrary = sized $ \case
-    0 -> frequency [(10, pure (power 1)), (1, scale <$> resize 4 arbitrary <*> pure 1)]
+    0 ->
+      frequency
+        [ (50, pure (power 1)),
+          (10, scale <$> resize 4 arbitrary `suchThat` (/= 0) <*> pure 1),
+          (1, pure 0)
+        ]
     n ->
       frequency
         [ (1, resize 0 arbitrary),
           (10, resize (n `div` 2) $ (+) <$> arbitrary <*> arbitrary),
-          (10, resize (n `div` 2) $ (*) <$> arbitrary <*> arbitrary)
+          (10, resize (n `div` 2) $ (*) <$> arbitrary `suchThat` (/= 0) <*> arbitrary `suchThat` (/= 0))
         ]
 
   shrink p
