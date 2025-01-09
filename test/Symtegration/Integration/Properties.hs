@@ -45,8 +45,8 @@ antiderivativeProperty integrate m e x =
     replace var s
       | s == var = id
       | (Just z) <- Map.lookup s m = const z
-      | otherwise = error "unknown symbol"
+      | otherwise = const 0
     replaceForDiff var s
       | s == var = id
       | (Just z) <- Map.lookup s m = const $ auto z
-      | otherwise = error "unknown symbol"
+      | otherwise = const $ auto 0
