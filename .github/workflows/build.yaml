@@ -55,7 +55,7 @@ jobs:
 
       - name: Build
         run: |
-          cabal configure --disable-optimization --enable-tests --write-ghc-environment-files=always ${{ matrix.flags }}
+          cabal configure --disable-optimization --enable-tests --enable-coverage --write-ghc-environment-files=always ${{ matrix.flags }}
           cabal build
 
       - name: Test
@@ -63,6 +63,16 @@ jobs:
 
       - name: Test examples
         run: cabal run examples
+
+      - name: Generate coverage report
+        uses: 8c6794b6/hpc-codecov-action@0baa5bacbd3ed4103ca4e25495e6e9cf0469912b # v4.1.0
+        with:
+          target: cabal:spec
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v5.1.2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   stack:
     name: stack
