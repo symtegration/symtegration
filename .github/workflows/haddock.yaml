@@ -8,6 +8,7 @@ on:
     paths:
       - 'package.yaml'
       - '**.hs'
+      - '.github/workflows/haddock.yaml'
 
 jobs:
   haddock:

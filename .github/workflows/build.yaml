@@ -11,8 +11,8 @@ on:
       - 'stack.yaml'
       - 'package.yaml'
       - 'symtegration.cabal'
-      - '.github/workflows/**'
       - '**.hs'
+      - '.github/workflows/build.yaml'
 
 jobs:
   cabal:
