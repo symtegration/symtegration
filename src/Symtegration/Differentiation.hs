@@ -9,7 +9,7 @@
 -- This module does not actually implement differentiation,
 -- but is rather a thin wrapper over "Numeric.AD" providing
 -- derivatives for 'Expression' with some simplification applied.
-module Symtegration.Differentiation where
+module Symtegration.Differentiation (differentiate) where
 
 import Data.Text (Text)
 import Numeric.AD.Rank1.Forward
