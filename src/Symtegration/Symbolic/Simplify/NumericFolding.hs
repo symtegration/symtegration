@@ -87,7 +87,7 @@ binary (x@(Number _ :/: Number _) :*: (y@(Number _ :/: Number _) :*: z)) = simpl
 -- Subtractions are turned into addition.
 binary (x :-: y) = simplify $ x :+: Negate' y
 -- Fold division.
-binary e@(_ :/: (_ :/: _)) = e
+binary e@(_ :/: (_ :/: 0)) = e
 binary (x :/: (y :/: z)) = simplify $ (x :*: z) :/: y
 binary e@((_ :/: 0) :/: _) = e
 binary e@((_ :/: _) :/: 0) = e
