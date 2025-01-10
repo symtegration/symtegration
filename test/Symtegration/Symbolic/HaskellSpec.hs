@@ -77,31 +77,23 @@ spec = parallel $ do
         let text1 = toHaskell e1
             text2 = toHaskell e2
             t = toHaskell $ e1 :+: e2
-         in t `shouldBe` case (e1, e2) of
-              (BinaryApply _ _ _, BinaryApply _ _ _) -> text1 <> " + " <> text2
-              (BinaryApply _ _ _, UnaryApply _ _) -> text1 <> " + " <> text2
-              (BinaryApply _ _ _, _) -> text1 <> " + " <> par text2
-              (UnaryApply _ _, BinaryApply _ _ _) -> text1 <> " + " <> text2
-              (_, BinaryApply _ _ _) -> text1 <> " + " <> text2
-              (UnaryApply _ _, UnaryApply _ _) -> text1 <> " + " <> text2
-              (UnaryApply _ _, _) -> text1 <> " + " <> par text2
-              (_, UnaryApply _ _) -> par text1 <> " + " <> text2
-              _ -> par text1 <> " + " <> par text2
+         in t `shouldBe` text1 <> " + " <> text2
 
       prop "multiplication with compound arguments" $ \(Compound e1) (Compound e2) ->
         let text1 = toHaskell e1
             text2 = toHaskell e2
+            multiply x y = x <> " * " <> y
             t = toHaskell $ e1 :*: e2
          in t `shouldBe` case (e1, e2) of
-              (_ :+: _, _ :+: _) -> par text1 <> " * " <> par text2
-              (_ :+: _, _ :-: _) -> par text1 <> " * " <> par text2
-              (_ :-: _, _ :+: _) -> par text1 <> " * " <> par text2
-              (_ :-: _, _ :-: _) -> par text1 <> " * " <> par text2
-              (_ :+: _, _) -> par text1 <> " * " <> text2
-              (_ :-: _, _) -> par text1 <> " * " <> text2
-              (_, _ :+: _) -> text1 <> " * " <> par text2
-              (_, _ :-: _) -> text1 <> " * " <> par text2
-              _ -> text1 <> " * " <> text2
+              (_ :+: _, _ :+: _) -> par text1 `multiply` par text2
+              (_ :+: _, _ :-: _) -> par text1 `multiply` par text2
+              (_ :-: _, _ :+: _) -> par text1 `multiply` par text2
+              (_ :-: _, _ :-: _) -> par text1 `multiply` par text2
+              (_ :+: _, _) -> par text1 `multiply` text2
+              (_ :-: _, _) -> par text1 `multiply` text2
+              (_, _ :+: _) -> text1 `multiply` par text2
+              (_, _ :-: _) -> text1 `multiply` par text2
+              _ -> text1 `multiply` text2
 
       prop "subtraction with compound arguments" $ \(Compound e1) (Compound e2) ->
         let text1 = toHaskell e1
@@ -111,7 +103,7 @@ spec = parallel $ do
          in t `shouldBe` case (e1, e2) of
               (_, _ :+: _) -> text1 `minus` par text2
               (_, _ :-: _) -> text1 `minus` par text2
-              _ -> text1 <> " - " <> text2
+              _ -> text1 `minus` text2
 
       prop "operators with compound arguments" $ \(Compound e1) (Compound e2) ->
         forAll (elements [Divide, Power]) $ \op ->
