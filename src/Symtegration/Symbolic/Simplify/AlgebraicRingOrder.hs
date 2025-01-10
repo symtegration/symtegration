@@ -24,7 +24,7 @@ import Symtegration.Symbolic
 -- >>> toHaskell $ order "x" $ "x" + 1
 -- "1 + x"
 -- >>> toHaskell $ order "x" $ 2 + 3 * "x"**2 + "x"
--- "2 + x + 3 * (x ** 2)"
+-- "2 + x + 3 * x ** 2"
 order ::
   -- | Symbol representing the variable.
   Text ->

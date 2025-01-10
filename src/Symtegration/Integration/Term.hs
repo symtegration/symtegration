@@ -25,7 +25,7 @@ import Symtegration.Symbolic.Simplify
 -- Nothing
 -- >>> let g = integrate [T.integrate] "x" f
 -- >>> toHaskell . simplify <$> g
--- Just "a * (negate (cos x))"
+-- Just "a * negate (cos x)"
 --
 -- Assumes the expression has had algebraic ring ordering applied.
 integrate ::

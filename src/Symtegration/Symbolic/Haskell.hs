@@ -44,9 +44,7 @@ toHaskell (LogBase' x y) = funcText <> " " <> asArg x <> " " <> asArg y
   where
     funcText = getBinaryFunctionText LogBase
 toHaskell (x :+: y) = asAddArg x <> " + " <> asAddArg y
-toHaskell (x@(_ :*: _) :*: y@(_ :*: _)) = toHaskell x <> " * " <> toHaskell y
-toHaskell (x@(_ :*: _) :*: y) = toHaskell x <> " * " <> asArg y
-toHaskell (x :*: y@(_ :*: _)) = asArg x <> " * " <> toHaskell y
+toHaskell (x :*: y) = asMultiplyArg x <> " * " <> asMultiplyArg y
 toHaskell (x@(_ :+: _) :-: y) = toHaskell x <> " - " <> asArg y
 toHaskell (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
   where
@@ -60,14 +58,29 @@ asArg x@(Number n)
   | n >= 0 = toHaskell x
   | otherwise = "(" <> toHaskell x <> ")"
 asArg x@(Symbol _) = toHaskell x
-asArg x = "(" <> toHaskell x <> ")"
+asArg x = par $ toHaskell x
 
+-- | Converts an 'Expression' to an argument appropriate for addition.
 asAddArg :: Expression -> Text
 asAddArg x@(Number _) = asArg x
 asAddArg x@(Symbol _) = asArg x
--- No other operation has lower precedence than addition,
+-- No operation has lower precedence than addition,
 -- and addition is commutative, so no parentheses are needed.
 asAddArg x = toHaskell x
+
+-- | Converts an 'Expression' to an argument appropriate for multiplication.
+asMultiplyArg :: Expression -> Text
+asMultiplyArg x@(Number _) = asArg x
+asMultiplyArg x@(Symbol _) = asArg x
+asMultiplyArg x@(_ :+: _) = par $ toHaskell x
+asMultiplyArg x@(_ :-: _) = par $ toHaskell x
+-- No other operation has lower precedence than multiplication,
+-- and multiplication is commutative, so no parentheses are needed.
+asMultiplyArg x = toHaskell x
+
+-- | Surrounds text by parentheses.
+par :: Text -> Text
+par s = "(" <> s <> ")"
 
 -- | Returns the corresponding Haskell function name.
 getUnaryFunctionText :: UnaryFunction -> Text

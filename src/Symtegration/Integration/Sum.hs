@@ -25,7 +25,7 @@ import Symtegration.Symbolic
 -- Nothing
 -- >>> let g = integrate [P.integrate, T.integrate] "x" f
 -- >>> toHaskell . simplify <$> g
--- Just "(-1) * (cos x) + (1 / 2) * (x ** 2)"
+-- Just "(-1) * cos x + 1 / 2 * x ** 2"
 integrate ::
   -- | Functions for directly integrating each term.
   [Text -> Expression -> Maybe Expression] ->
