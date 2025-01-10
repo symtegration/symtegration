@@ -70,6 +70,12 @@ When releasing, these files should be updated:
 Versioning is based on [semantic versioning] and the [Haskell package versioning policy].
 When there are differences between the two policies, the latter takes precedence.
 
+Lower version bounds for dependencies should be verified by setting the versions
+to the lowest minor versions in the Cabal configuration and checking that
+builds and tests are still successful.  These changes to the Cabal configuration
+are only for confirming that the lower bounds are still valid, and should not
+be submitted to the repository.
+
 [`CHANGELOG.md`]: CHANGELOG.md
 [`package.yaml`]: ../package.yaml
 [`symtegration.cabal`]: ../symtegration.cabal
