@@ -55,7 +55,7 @@ jobs:
 
       - name: Build
         run: |
-          cabal configure --disable-optimization --enable-tests --enable-coverage --write-ghc-environment-files=always
+          cabal configure --enable-optimization --enable-tests --enable-coverage --write-ghc-environment-files=always
           cabal build
 
       - name: Test
