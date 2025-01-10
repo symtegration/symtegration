@@ -88,7 +88,7 @@ import TextShow.Generic (FromGeneric (..))
 -- A somewhat more concise representation can be obtained using 'Symtegration.toHaskell':
 --
 -- >>> toHaskell $ 2 * "y" + sin "x"
--- "2 * y + (sin x)"
+-- "2 * y + sin x"
 data Expression
   = -- | Represents a concrete number.
     Number Integer

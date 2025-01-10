@@ -79,8 +79,13 @@ spec = parallel $ do
             t = toHaskell $ e1 :+: e2
          in t `shouldBe` case (e1, e2) of
               (BinaryApply _ _ _, BinaryApply _ _ _) -> text1 <> " + " <> text2
+              (BinaryApply _ _ _, UnaryApply _ _) -> text1 <> " + " <> text2
               (BinaryApply _ _ _, _) -> text1 <> " + " <> par text2
-              (_, BinaryApply _ _ _) -> par text1 <> " + " <> text2
+              (UnaryApply _ _, BinaryApply _ _ _) -> text1 <> " + " <> text2
+              (_, BinaryApply _ _ _) -> text1 <> " + " <> text2
+              (UnaryApply _ _, UnaryApply _ _) -> text1 <> " + " <> text2
+              (UnaryApply _ _, _) -> text1 <> " + " <> par text2
+              (_, UnaryApply _ _) -> par text1 <> " + " <> text2
               _ -> par text1 <> " + " <> par text2
 
       prop "multiplication with compound arguments" $ \(Compound e1) (Compound e2) ->

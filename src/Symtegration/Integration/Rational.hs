@@ -53,7 +53,7 @@ import Symtegration.Symbolic.Simplify
 -- >>> let p = "x" ** 7 - 24 * "x" ** 4 - 4 * "x" ** 2 + 8 * "x" - 8
 -- >>> let q = "x" ** 8 + 6 * "x" ** 6 + 12 * "x" ** 4 + 8 * "x" ** 2
 -- >>> toHaskell . simplify <$> integrate "x" (p / q)
--- Just "3 / (2 + x ** 2) + (4 + 8 * (x ** 2)) / (4 * x + 4 * (x ** 3) + x ** 5) + (log x)"
+-- Just "3 / (2 + x ** 2) + (4 + 8 * (x ** 2)) / (4 * x + 4 * (x ** 3) + x ** 5) + log x"
 --
 -- so that
 --

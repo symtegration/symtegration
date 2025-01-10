@@ -43,9 +43,7 @@ toHaskell (UnaryApply fun x) = funcText <> " " <> asArg x
 toHaskell (LogBase' x y) = funcText <> " " <> asArg x <> " " <> asArg y
   where
     funcText = getBinaryFunctionText LogBase
-toHaskell (x@(BinaryApply _ _ _) :+: y@(BinaryApply _ _ _)) = toHaskell x <> " + " <> toHaskell y
-toHaskell (x@(BinaryApply _ _ _) :+: y) = toHaskell x <> " + " <> asArg y
-toHaskell (x :+: y@(BinaryApply _ _ _)) = asArg x <> " + " <> toHaskell y
+toHaskell (x :+: y) = asAddArg x <> " + " <> asAddArg y
 toHaskell (x@(_ :*: _) :*: y@(_ :*: _)) = toHaskell x <> " * " <> toHaskell y
 toHaskell (x@(_ :*: _) :*: y) = toHaskell x <> " * " <> asArg y
 toHaskell (x :*: y@(_ :*: _)) = asArg x <> " * " <> toHaskell y
@@ -63,6 +61,13 @@ asArg x@(Number n)
   | otherwise = "(" <> toHaskell x <> ")"
 asArg x@(Symbol _) = toHaskell x
 asArg x = "(" <> toHaskell x <> ")"
+
+asAddArg :: Expression -> Text
+asAddArg x@(Number _) = asArg x
+asAddArg x@(Symbol _) = asArg x
+-- No other operation has lower precedence than addition,
+-- and addition is commutative, so no parentheses are needed.
+asAddArg x = toHaskell x
 
 -- | Returns the corresponding Haskell function name.
 getUnaryFunctionText :: UnaryFunction -> Text
