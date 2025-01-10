@@ -14,7 +14,7 @@
 --
 -- >>> import Symtegration
 -- >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
--- Just "x + (x ** 4)"
+-- Just "x + x ** 4"
 --
 -- For another example, with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):
 --
@@ -70,7 +70,7 @@ import Symtegration.Symbolic.Simplify (simplify, simplifyForVariable)
 -- where all the coefficients are numbers:
 --
 -- >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
--- Just "x + (x ** 4)"
+-- Just "x + x ** 4"
 --
 -- It can also return indefinite integrals when the coefficients
 -- are symbolic, as with \(\int (xz+y) \, dz = \frac{xz^2}{2} + yz\):

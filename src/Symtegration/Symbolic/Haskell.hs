@@ -43,14 +43,9 @@ toHaskell (UnaryApply fun x) = funcText <> " " <> asArg x
 toHaskell (LogBase' x y) = funcText <> " " <> asArg x <> " " <> asArg y
   where
     funcText = getBinaryFunctionText LogBase
-toHaskell (x@(_ :*: _) :+: y@(_ :*: _)) = toHaskell x <> " + " <> toHaskell y
-toHaskell (x@(_ :*: _) :+: y@(_ :+: _)) = toHaskell x <> " + " <> toHaskell y
-toHaskell (x@(_ :*: _) :+: y) = toHaskell x <> " + " <> asArg y
-toHaskell (x@(_ :+: _) :+: y@(_ :*: _)) = toHaskell x <> " + " <> toHaskell y
-toHaskell (x :+: y@(_ :*: _)) = asArg x <> " + " <> toHaskell y
-toHaskell (x@(_ :+: _) :+: y@(_ :+: _)) = toHaskell x <> " + " <> toHaskell y
-toHaskell (x@(_ :+: _) :+: y) = toHaskell x <> " + " <> asArg y
-toHaskell (x :+: y@(_ :+: _)) = asArg x <> " + " <> toHaskell y
+toHaskell (x@(BinaryApply _ _ _) :+: y@(BinaryApply _ _ _)) = toHaskell x <> " + " <> toHaskell y
+toHaskell (x@(BinaryApply _ _ _) :+: y) = toHaskell x <> " + " <> asArg y
+toHaskell (x :+: y@(BinaryApply _ _ _)) = asArg x <> " + " <> toHaskell y
 toHaskell (x@(_ :*: _) :*: y@(_ :*: _)) = toHaskell x <> " * " <> toHaskell y
 toHaskell (x@(_ :*: _) :*: y) = toHaskell x <> " * " <> asArg y
 toHaskell (x :*: y@(_ :*: _)) = asArg x <> " * " <> toHaskell y

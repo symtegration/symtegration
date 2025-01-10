@@ -53,7 +53,7 @@ import Symtegration.Symbolic.Simplify
 -- >>> let p = "x" ** 7 - 24 * "x" ** 4 - 4 * "x" ** 2 + 8 * "x" - 8
 -- >>> let q = "x" ** 8 + 6 * "x" ** 6 + 12 * "x" ** 4 + 8 * "x" ** 2
 -- >>> toHaskell . simplify <$> integrate "x" (p / q)
--- Just "(3 / (2 + (x ** 2))) + ((4 + 8 * (x ** 2)) / (4 * x + 4 * (x ** 3) + (x ** 5))) + (log x)"
+-- Just "3 / (2 + x ** 2) + (4 + 8 * (x ** 2)) / (4 * x + 4 * (x ** 3) + x ** 5) + (log x)"
 --
 -- so that
 --
@@ -63,7 +63,7 @@ import Symtegration.Symbolic.Simplify
 --
 -- >>> let f = 36 / ("x" ** 5 - 2 * "x" ** 4 - 2 * "x" ** 3 + 4 * "x" ** 2 + "x" - 2)
 -- >>> toHaskell . simplify <$> integrate "x" f
--- Just "(-4) * (log (8 + 8 * x)) + 4 * (log (16 + (-8) * x)) + ((6 + 12 * x) / ((-1) + (x ** 2)))"
+-- Just "(-4) * (log (8 + 8 * x)) + 4 * (log (16 + (-8) * x)) + (6 + 12 * x) / ((-1) + x ** 2)"
 --
 -- so that
 --

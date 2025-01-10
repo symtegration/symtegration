@@ -6,7 +6,7 @@
 module Symtegration.Symbolic.HaskellSpec (spec) where
 
 import Data.String (fromString)
-import Data.Text (toLower)
+import Data.Text (Text, toLower)
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Arbitrary
 import Symtegration.Symbolic.Haskell
@@ -31,7 +31,7 @@ spec = parallel $ do
 
       prop "with negative number" $ \func (Negative n) ->
         toHaskell (UnaryApply func $ Number n)
-          `shouldBe` getUnaryFunctionText func <> " (" <> showt n <> ")"
+          `shouldBe` getUnaryFunctionText func <> " " <> par (showt n)
 
       prop "with symbol" $ \func s ->
         toHaskell (UnaryApply func $ Symbol $ fromString s)
@@ -39,7 +39,7 @@ spec = parallel $ do
 
       prop "with compound argument" $ \func (Compound e) ->
         toHaskell (UnaryApply func e)
-          `shouldBe` getUnaryFunctionText func <> " (" <> toHaskell e <> ")"
+          `shouldBe` getUnaryFunctionText func <> " " <> par (toHaskell e)
 
     describe "converts for binary function" $ do
       prop "logBase with non-negative numbers" $ \(NonNegative m) (NonNegative n) ->
@@ -48,7 +48,7 @@ spec = parallel $ do
 
       prop "logBase with negative numbers" $ \(Negative m) (Negative n) ->
         toHaskell (BinaryApply LogBase (Number m) (Number n))
-          `shouldBe` "logBase (" <> showt m <> ") (" <> showt n <> ")"
+          `shouldBe` "logBase " <> par (showt m) <> " " <> par (showt n)
 
       prop "logBase with symbols" $ \s r ->
         toHaskell (BinaryApply LogBase (Symbol $ fromString s) (Symbol $ fromString r))
@@ -56,7 +56,7 @@ spec = parallel $ do
 
       prop "logBase with compound arguments" $ \(Compound e1) (Compound e2) ->
         toHaskell (BinaryApply LogBase e1 e2)
-          `shouldBe` "logBase (" <> toHaskell e1 <> ") (" <> toHaskell e2 <> ")"
+          `shouldBe` "logBase " <> par (toHaskell e1) <> " " <> par (toHaskell e2)
 
       prop "operators with non-negative numbers" $ \op (NonNegative m) (NonNegative n) ->
         op /= LogBase ==>
@@ -66,7 +66,7 @@ spec = parallel $ do
       prop "operators with negative numbers" $ \op (Negative m) (Negative n) ->
         op /= LogBase ==>
           toHaskell (BinaryApply op (Number m) (Number n))
-            `shouldBe` "(" <> showt m <> ") " <> getBinaryFunctionText op <> " (" <> showt n <> ")"
+            `shouldBe` par (showt m) <> " " <> getBinaryFunctionText op <> " " <> par (showt n)
 
       prop "operators with symbols" $ \op s r ->
         op /= LogBase ==>
@@ -76,23 +76,16 @@ spec = parallel $ do
       prop "addition with compound arguments" $ \(Compound e1) (Compound e2) ->
         let text1 = toHaskell e1
             text2 = toHaskell e2
-            par s = "(" <> s <> ")"
             t = toHaskell $ e1 :+: e2
          in t `shouldBe` case (e1, e2) of
-              (_ :*: _, _ :*: _) -> text1 <> " + " <> text2
-              (_ :*: _, _ :+: _) -> text1 <> " + " <> text2
-              (_ :*: _, _) -> text1 <> " + " <> par text2
-              (_ :+: _, _ :*: _) -> text1 <> " + " <> text2
-              (_, _ :*: _) -> par text1 <> " + " <> text2
-              (_ :+: _, _ :+: _) -> text1 <> " + " <> text2
-              (_ :+: _, _) -> text1 <> " + " <> par text2
-              (_, _ :+: _) -> par text1 <> " + " <> text2
+              (BinaryApply _ _ _, BinaryApply _ _ _) -> text1 <> " + " <> text2
+              (BinaryApply _ _ _, _) -> text1 <> " + " <> par text2
+              (_, BinaryApply _ _ _) -> par text1 <> " + " <> text2
               _ -> par text1 <> " + " <> par text2
 
       prop "multiplication with compound arguments" $ \(Compound e1) (Compound e2) ->
         let text1 = toHaskell e1
             text2 = toHaskell e2
-            par s = "(" <> s <> ")"
             t = toHaskell $ e1 :*: e2
          in t `shouldBe` case (e1, e2) of
               (_ :*: _, _ :*: _) -> text1 <> " * " <> text2
@@ -103,7 +96,6 @@ spec = parallel $ do
       prop "subtraction with compound arguments" $ \(Compound e1) (Compound e2) ->
         let text1 = toHaskell e1
             text2 = toHaskell e2
-            par s = "(" <> s <> ")"
             t = toHaskell $ e1 :-: e2
          in t `shouldBe` case (e1, e2) of
               (_ :+: _, _) -> text1 <> " - " <> par text2
@@ -114,7 +106,6 @@ spec = parallel $ do
           let text1 = toHaskell e1
               text2 = toHaskell e2
               optext = getBinaryFunctionText op
-              par s = "(" <> s <> ")"
               t = toHaskell (BinaryApply op e1 e2)
            in t `shouldBe` par text1 <> " " <> optext <> " " <> par text2
 
@@ -134,3 +125,7 @@ spec = parallel $ do
     it "for Divide" $ getBinaryFunctionText Divide `shouldBe` "/"
     it "for Power" $ getBinaryFunctionText Power `shouldBe` "**"
     it "for LogBase" $ getBinaryFunctionText LogBase `shouldBe` "logBase"
+
+-- | Surrounds the given text with parentheses.
+par :: Text -> Text
+par s = "(" <> s <> ")"
