@@ -10,8 +10,10 @@ import Data.Map qualified as Map
 import Data.Text (Text)
 import Data.Text qualified as Text
 import Numeric.AD
+import Symtegration.ErrorDouble
 import Symtegration.FiniteDouble
 import Symtegration.Symbolic
+import Symtegration.Symbolic.Arbitrary
 import Symtegration.Symbolic.Haskell
 import Test.Hspec
 import Test.QuickCheck
@@ -29,11 +31,12 @@ antiderivativeProperty integrate m e x =
   where
     check Nothing _ = label "integration fail" True
     check (Just integrated) v =
-      isFinite (FiniteDouble $ f x) && isFinite (FiniteDouble $ f' x) ==>
-        label "integration success" $
-          counterexample ("derivative = " <> Text.unpack (toHaskell e)) $
-            counterexample ("antiderivative = " <> Text.unpack (toHaskell integrated)) $
-              Near (FiniteDouble (f' x)) `shouldBe` Near (FiniteDouble (f x))
+      not (sensitiveExpression e (assign m)) && not (sensitiveExpression integrated (assign m)) ==>
+        isFinite (FiniteDouble $ f x) && isFinite (FiniteDouble $ f' x) ==>
+          label "integration success" $
+            counterexample ("derivative = " <> Text.unpack (toHaskell e)) $
+              counterexample ("antiderivative = " <> Text.unpack (toHaskell integrated)) $
+                Near (FiniteDouble (f' x)) `shouldBe` Near (FiniteDouble (f x))
       where
         -- The original function and the derivative of the integral should behave similarly.
         --

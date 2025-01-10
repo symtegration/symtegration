@@ -88,8 +88,7 @@ instance Arbitrary Complete where
     vals <- infiniteList
     let symbols = gatherSymbols expr
     let assignment = Map.fromList $ zip (S.toList symbols) vals
-    let err = relativeError <$> evaluate expr (assign (Map.map includeError assignment))
-    if err < Just 1e-5
+    if not (sensitiveExpression expr (assign assignment))
       -- Only use expressions where slight divergences do not result in huge errors.
       then return $ Complete expr (Map.map FiniteDouble assignment)
       -- If we do not have such an expression, try again.

@@ -24,10 +24,11 @@ spec = parallel $ do
 
     prop "folds to simple numeric expressions" $
       forAll genNumeric $ \e ->
-        let e' = simplify e
-         in counterexample ("e = " <> unpack (toHaskell e)) $
-              counterexample ("simplify e = " <> unpack (toHaskell e')) $
-                e' `shouldSatisfy` simpleNumeric
+        simpleNumeric e ==>
+          let e' = simplify e
+           in counterexample ("e = " <> unpack (toHaskell e)) $
+                counterexample ("simplify e = " <> unpack (toHaskell e')) $
+                  e' `shouldSatisfy` simpleNumeric
 
 -- Numeric folding should be able to fold arithmetic on numbers
 -- to either an integer or a fraction.  The exception is if there

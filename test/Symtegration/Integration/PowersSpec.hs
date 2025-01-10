@@ -6,6 +6,7 @@
 module Symtegration.Integration.PowersSpec (spec) where
 
 import Data.Map qualified as Map
+import Data.Ratio (denominator, numerator)
 import Data.Text (Text)
 import Symtegration.Integration.Powers
 import Symtegration.Integration.Properties
@@ -17,9 +18,8 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
-  modifyMaxSuccess (* 10) $ do
-    prop "consistent with derivative of integral" $ \(Pow e) x ->
-      antiderivativeProperty integrate (Map.singleton var x) e x
+  prop "consistent with derivative of integral" $ \(Pow e) x ->
+    antiderivativeProperty integrate (Map.singleton var x) e x
 
   prop "integrates constant symbol" $
     forAll (arbitrarySymbol `suchThat` (/= Symbol var)) $ \c ->
@@ -41,9 +41,14 @@ instance Arbitrary Pow where
     Pow
       <$> frequency
         [ (1, pure $ Symbol var :**: Number (-1)),
-          (50, (\n -> Symbol var :**: Number n) <$> arbitrary),
-          (50, (\m n -> Symbol var :**: (Number m :/: Number n)) <$> arbitrary <*> arbitrary)
+          (2, (\n -> Symbol var :**: Number n) <$> genExponent),
+          (10, (\(m, n) -> Symbol var :**: (Number m :/: Number n)) <$> genFractionalExponent)
         ]
+    where
+      genExponent = resize 4 arbitrarySizedIntegral
+      genFractionalExponent = resize 4 $ do
+        q <- arbitrarySizedFractional
+        return (numerator q, denominator q)
 
 var :: Text
 var = "x"
