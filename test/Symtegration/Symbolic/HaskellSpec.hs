@@ -97,27 +97,11 @@ spec = parallel $ do
               (_ :+: _, _ :-: _) -> par text1 <> " * " <> par text2
               (_ :-: _, _ :+: _) -> par text1 <> " * " <> par text2
               (_ :-: _, _ :-: _) -> par text1 <> " * " <> par text2
-              (_ :+: _, BinaryApply _ _ _) -> par text1 <> " * " <> text2
-              (_ :-: _, BinaryApply _ _ _) -> par text1 <> " * " <> text2
-              (BinaryApply _ _ _, _ :+: _) -> text1 <> " * " <> par text2
-              (BinaryApply _ _ _, _ :-: _) -> text1 <> " * " <> par text2
-              (BinaryApply _ _ _, BinaryApply _ _ _) -> text1 <> " * " <> text2
-              (_ :+: _, UnaryApply _ _) -> par text1 <> " * " <> text2
-              (_ :-: _, UnaryApply _ _) -> par text1 <> " * " <> text2
-              (BinaryApply _ _ _, UnaryApply _ _) -> text1 <> " * " <> text2
-              (_ :+: _, _) -> par text1 <> " * " <> par text2
-              (_ :-: _, _) -> par text1 <> " * " <> par text2
-              (BinaryApply _ _ _, _) -> text1 <> " * " <> par text2
-              (UnaryApply _ _, _ :+: _) -> text1 <> " * " <> par text2
-              (UnaryApply _ _, _ :-: _) -> text1 <> " * " <> par text2
-              (UnaryApply _ _, BinaryApply _ _ _) -> text1 <> " * " <> text2
-              (_, _ :+: _) -> par text1 <> " * " <> par text2
-              (_, _ :-: _) -> par text1 <> " * " <> par text2
-              (_, BinaryApply _ _ _) -> par text1 <> " * " <> text2
-              (UnaryApply _ _, UnaryApply _ _) -> text1 <> " * " <> text2
-              (UnaryApply _ _, _) -> text1 <> " * " <> par text2
-              (_, UnaryApply _ _) -> par text1 <> " * " <> text2
-              _ -> par text1 <> " * " <> par text2
+              (_ :+: _, _) -> par text1 <> " * " <> text2
+              (_ :-: _, _) -> par text1 <> " * " <> text2
+              (_, _ :+: _) -> text1 <> " * " <> par text2
+              (_, _ :-: _) -> text1 <> " * " <> par text2
+              _ -> text1 <> " * " <> text2
 
       prop "subtraction with compound arguments" $ \(Compound e1) (Compound e2) ->
         let text1 = toHaskell e1
