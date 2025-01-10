@@ -122,10 +122,12 @@ spec = parallel $ do
       prop "subtraction with compound arguments" $ \(Compound e1) (Compound e2) ->
         let text1 = toHaskell e1
             text2 = toHaskell e2
+            minus x y = x <> " - " <> y
             t = toHaskell $ e1 :-: e2
          in t `shouldBe` case (e1, e2) of
-              (_ :+: _, _) -> text1 <> " - " <> par text2
-              _ -> par text1 <> " - " <> par text2
+              (_, _ :+: _) -> text1 `minus` par text2
+              (_, _ :-: _) -> text1 `minus` par text2
+              _ -> text1 <> " - " <> text2
 
       prop "operators with compound arguments" $ \(Compound e1) (Compound e2) ->
         forAll (elements [Divide, Power]) $ \op ->

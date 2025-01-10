@@ -21,7 +21,7 @@ import Symtegration.Symbolic
 -- >>> toHaskell <$> integrate "x" (exp "x")
 -- Just "exp x"
 -- >>> toHaskell <$> integrate "x" (log "x")
--- Just "(x * log x) - x"
+-- Just "x * log x - x"
 integrate :: Text -> Expression -> Maybe Expression
 integrate _ (Number _) = Nothing
 integrate _ (Symbol _) = Nothing

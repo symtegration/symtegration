@@ -44,8 +44,10 @@ toHaskell (LogBase' x y) = funcText <> " " <> asArg x <> " " <> asArg y
   where
     funcText = getBinaryFunctionText LogBase
 toHaskell (x :+: y) = asAddArg x <> " + " <> asAddArg y
+toHaskell (x :-: y@(_ :+: _)) = asAddArg x <> " - " <> asArg y
+toHaskell (x :-: y@(_ :-: _)) = asAddArg x <> " - " <> asArg y
+toHaskell (x :-: y) = asAddArg x <> " - " <> asAddArg y
 toHaskell (x :*: y) = asMultiplyArg x <> " * " <> asMultiplyArg y
-toHaskell (x@(_ :+: _) :-: y) = toHaskell x <> " - " <> asArg y
 toHaskell (BinaryApply op x y) = asArg x <> " " <> opText <> " " <> asArg y
   where
     opText = getBinaryFunctionText op
