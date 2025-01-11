@@ -54,6 +54,7 @@ library
       Symtegration.Symbolic.LaTeX
       Symtegration.Symbolic.Simplify
       Symtegration.Symbolic.Simplify.AlgebraicRingOrder
+      Symtegration.Symbolic.Simplify.Factor
       Symtegration.Symbolic.Simplify.NumericFolding
       Symtegration.Symbolic.Simplify.SymbolicFolding
   other-modules:
@@ -116,6 +117,7 @@ test-suite spec
       Symtegration.Symbolic.HaskellSpec
       Symtegration.Symbolic.LaTeXSpec
       Symtegration.Symbolic.Simplify.AlgebraicRingOrderSpec
+      Symtegration.Symbolic.Simplify.FactorSpec
       Symtegration.Symbolic.Simplify.NumericFoldingSpec
       Symtegration.Symbolic.Simplify.Properties
       Symtegration.Symbolic.Simplify.SymbolicFoldingSpec
