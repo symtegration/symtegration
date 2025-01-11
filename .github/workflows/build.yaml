@@ -23,12 +23,13 @@ jobs:
 
         # Policy for compatible GHC versions is to:
         # * Test three most recent minor versions.
-        # * Test lowest and highest minor versions of the previous major version.
+        # * Test lowest and highest minor versions of the current and previous major versions.
         # * Test highest minor version of major versions before the second last.
         ghc:
           - "9.6.6"
           - "9.8.4"
           - "9.10.1"
+          - "9.12.1"
 
       fail-fast: false
 
