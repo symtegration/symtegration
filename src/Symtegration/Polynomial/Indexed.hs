@@ -72,6 +72,14 @@ instance (Polynomial p e c, TextShow (p e c)) => TextShow (IndexedPolynomialWith
     | IntMap.null m = "0"
     | otherwise = showb $ IntMap.toList m
 
+instance Show (P Int Expression) where
+  show = unpack . showt
+
+instance TextShow (P Int Expression) where
+  showb (P m)
+    | IntMap.null m = "0"
+    | otherwise = showb $ IntMap.toList m
+
 instance (Eq a, Num a) => Num (P Int a) where
   (P p) + (P q) = P $ filterNonzero $ IntMap.unionWith (+) p q
 
