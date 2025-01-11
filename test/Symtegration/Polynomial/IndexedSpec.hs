@@ -91,6 +91,9 @@ spec = parallel $ describe "IndexedPolynomial" $ do
   describe "show" $ do
     prop "is total for IndexedPolynomial" $ \p -> total (show (p :: IndexedPolynomial))
 
+    prop "is total for IndexedSymbolicPolynomial" $ \p ->
+      total (show (p :: IndexedSymbolicPolynomial))
+
     prop "is total for IndexedPolynomialWith IndexedPolynomial" $ \p ->
       total (show (p :: IndexedPolynomialWith IndexedPolynomial))
 
