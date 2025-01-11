@@ -1,2 +1,7 @@
+coverage:
+  status:
+    patch:
+      informational: true
+
 ignore:
   - "test"
