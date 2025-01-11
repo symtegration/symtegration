@@ -52,7 +52,7 @@ tests:
     dependencies:
     - symtegration
     - hspec >= 2.11 && < 2.12
-    - QuickCheck >= 2.14 && < 2.15
+    - QuickCheck >= 2.14 && < 2.16
     build-tool-depends:
     - hspec-discover >= 2.11 && < 2.12
 
