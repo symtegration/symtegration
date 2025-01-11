@@ -5,6 +5,9 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.Symbolic.Simplify.FactorSpec (spec) where
 
+import Data.Text (unpack)
+import Symtegration.Symbolic
+import Symtegration.Symbolic.Haskell
 import Symtegration.Symbolic.Simplify.Factor
 import Symtegration.Symbolic.Simplify.Properties
 import Test.Hspec
@@ -26,3 +29,25 @@ spec = parallel $ do
             simplify ((x * z) + (z * y)) === z * (x + y),
             simplify ((x * z) + (y * z)) === z * (x + y)
           ]
+
+    prop "factors common factors in multiplication" $ \n m x y ->
+      x /= y ==>
+        let n' = fromIntegral n
+            m' = fromIntegral m
+            f "x" = Just x
+            f "y" = Just y
+            f _ = Nothing
+            eval e = fractionalEvaluate e f :: Maybe Rational
+            shouldEvaluateTo e z =
+              counterexample (unpack $ toHaskell e) $
+                eval e `shouldBe` Just z
+         in conjoin
+              [ let e = Number n + Number m
+                 in e `shouldEvaluateTo` (n' + m'),
+                let e = Number n + Number m * "y"
+                 in e `shouldEvaluateTo` (n' + m' * y),
+                let e = Number n * "x" + Number m
+                 in e `shouldEvaluateTo` (n' * x + m'),
+                let e = Number n * "x" + Number m * "y"
+                 in e `shouldEvaluateTo` (n' * x + m' * y)
+              ]
