@@ -2,7 +2,7 @@
 -- Module: Symtegration.Symbolic.Simplify.Factor
 -- Description: Factors out or cancels out common factors.
 -- Copyright: Copyright 2025 Yoo Chung
--- License: Apache-2.9
+-- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
 -- This factors out common factors in multiplication or cancels out common factors
