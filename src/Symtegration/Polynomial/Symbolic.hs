@@ -94,6 +94,7 @@ forVariable v = (fromSymbol, toCoefficient)
     toCoefficient (x :+: y) = (+) <$> toCoefficient x <*> toCoefficient y
     toCoefficient (x :*: y) = (*) <$> toCoefficient x <*> toCoefficient y
     toCoefficient (x :-: y) = (-) <$> toCoefficient x <*> toCoefficient y
+    toCoefficient (_ :/: 0) = Nothing
     toCoefficient (x :/: y) = (/) <$> toCoefficient x <*> toCoefficient y
     toCoefficient (x :**: (Number n)) = (^^ n) <$> toCoefficient x
     toCoefficient _ = Nothing
