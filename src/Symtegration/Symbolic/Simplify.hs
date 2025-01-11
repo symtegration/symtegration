@@ -13,6 +13,7 @@ module Symtegration.Symbolic.Simplify (simplify, simplifyForVariable) where
 import Data.Text (Text)
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Simplify.AlgebraicRingOrder qualified as AlgebraicRingOrder
+import Symtegration.Symbolic.Simplify.Factor qualified as Factor
 import Symtegration.Symbolic.Simplify.NumericFolding qualified as NumericFolding
 import Symtegration.Symbolic.Simplify.SymbolicFolding qualified as SymbolicFolding
 
@@ -55,4 +56,4 @@ simplifyForVariable v e
   | otherwise = simplifyForVariable v e' -- Another round.
   where
     e' = f e
-    f = NumericFolding.simplify . SymbolicFolding.simplify . AlgebraicRingOrder.order v
+    f = Factor.simplify . NumericFolding.simplify . SymbolicFolding.simplify . AlgebraicRingOrder.order v
