@@ -51,3 +51,17 @@ spec = parallel $ do
                 let e = Number n * "x" + Number m * "y"
                  in e `shouldEvaluateTo` (n' * x + m' * y)
               ]
+
+    prop "cancels out common factors in division" $ \n m x y ->
+      x /= y && y /= 0 && m /= 0 ==>
+        let n' = fromIntegral n :: Rational
+            m' = fromIntegral m :: Rational
+            f "x" = Just x
+            f "y" = Just y
+            f _ = Nothing
+            e = (Number n * "x") / (Number m * "y")
+            e' = simplify e
+         in counterexample ("e = " <> unpack (toHaskell e)) $
+              counterexample ("simplify e = " <> unpack (toHaskell e')) $
+                fractionalEvaluate e f
+                  `shouldBe` Just ((n' * x) / (m' * y))
