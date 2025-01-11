@@ -18,24 +18,25 @@ import Test.QuickCheck
 spec :: Spec
 spec = parallel $ do
   describe "fromExpression" $ do
-    prop "is inverse of toExpression" $ \p (SymbolText s) ->
-      let e = toExpression s toRationalCoefficient (p :: IndexedPolynomial)
-          p' = fromExpression (forVariable s) e
-       in counterexample ("p = " <> show p) $
-            counterexample ("p'" <> show p') $
-              -- With exact rational coefficients, the polynomial representation of
-              -- a particular polynomial is unique.
-              p' `shouldBe` Just p
+    describe "with rational number coefficients" $ do
+      prop "is inverse of toExpression" $ \p (SymbolText s) ->
+        let e = toExpression s toRationalCoefficient (p :: IndexedPolynomial)
+            p' = fromExpression (forVariable s) e
+         in counterexample ("p = " <> show p) $
+              counterexample ("p'" <> show p') $
+                -- With exact rational coefficients, the polynomial representation of
+                -- a particular polynomial is unique.
+                p' `shouldBe` Just p
 
-    prop "from number" $ \(SymbolText s) n ->
-      fromExpression (forVariable s) (Number n)
-        `shouldBe` Just (fromInteger n :: IndexedPolynomial)
+      prop "from number" $ \(SymbolText s) n ->
+        fromExpression (forVariable s) (Number n)
+          `shouldBe` Just (fromInteger n :: IndexedPolynomial)
 
-    prop "from symbol" $ \(SymbolText s) ->
-      fromExpression (forVariable s) (Symbol s)
-        `shouldBe` Just (power 1 :: IndexedPolynomial)
+      prop "from symbol" $ \(SymbolText s) ->
+        fromExpression (forVariable s) (Symbol s)
+          `shouldBe` Just (power 1 :: IndexedPolynomial)
 
-    prop "from symbol with exponent" $ \(SymbolText s) (Positive n) ->
-      n > 1 ==>
-        fromExpression (forVariable s) (Symbol s :**: Number n)
-          `shouldBe` Just (power (fromIntegral n) :: IndexedPolynomial)
+      prop "from symbol with exponent" $ \(SymbolText s) (Positive n) ->
+        n > 1 ==>
+          fromExpression (forVariable s) (Symbol s :**: Number n)
+            `shouldBe` Just (power (fromIntegral n) :: IndexedPolynomial)
