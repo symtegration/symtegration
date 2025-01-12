@@ -59,6 +59,7 @@ import Symtegration.Symbolic (Expression, evaluate, fractionalEvaluate, toFuncti
 import Symtegration.Symbolic.Haskell (toHaskell)
 import Symtegration.Symbolic.LaTeX (toLaTeX)
 import Symtegration.Symbolic.Simplify (simplify, simplifyForVariable)
+import Symtegration.Symbolic.Simplify.Tidy (tidy)
 
 -- |
 -- Returns the indefinite integral of a mathematical expression given
@@ -84,4 +85,4 @@ integrate ::
   Expression ->
   -- | The indefinite integral, if derived.
   Maybe Expression
-integrate var expr = simplifyForVariable var <$> Integration.integrate var expr
+integrate var expr = tidy . simplifyForVariable var <$> Integration.integrate var expr

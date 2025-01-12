@@ -15,6 +15,7 @@ import Data.Text (Text)
 import Numeric.AD.Rank1.Forward
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Simplify
+import Symtegration.Symbolic.Simplify.Tidy
 
 -- $setup
 -- >>> import Symtegration.Symbolic.Haskell
@@ -34,7 +35,7 @@ differentiate ::
   Expression ->
   -- | The derivative.
   Expression
-differentiate v e = simplifyForVariable v $ diff f $ Symbol v
+differentiate v e = tidy $ simplifyForVariable v $ diff f $ Symbol v
   where
     f = toFunction e assign
     assign x
