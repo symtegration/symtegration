@@ -54,6 +54,7 @@ unary Atanh x = "\\tanh^{-1} " <> asNamedFunctionArg x
 
 -- | Converts binary functions into LaTeX.
 binary :: BinaryFunction -> Expression -> Expression -> Text
+binary Add x (Negate' y) = binary Subtract x y
 binary Add x y = asAddArg x <> " + " <> asAddArg y
 binary Multiply x@(_ :*: Number _) y@(Number _ :*: _) = toLaTeX x <> " \\times " <> toLaTeX y
 binary Multiply x@(Number _) y@(Number _ :*: _) = toLaTeX x <> " \\times " <> toLaTeX y

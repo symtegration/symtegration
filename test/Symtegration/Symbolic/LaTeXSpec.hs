@@ -32,9 +32,13 @@ spec = parallel $ describe "toLaTeX" $ do
 
     it "(x - y) + (u - v)" $ toLaTeX (("x" - "y") + ("u" - "v")) `shouldBe` "x - y + u - v"
 
-    it "(-1) + (-4)" $ toLaTeX ((-1) + (-4)) `shouldBe` "\\left(-1\\right) + \\left(-4\\right)"
+    it "(-1) + (-4)" $ toLaTeX ((-1) + (-4)) `shouldBe` "\\left(-1\\right) - 4"
 
     it "sin x + cos y" $ toLaTeX (sin "x" + cos "y") `shouldBe` "\\sin x + \\cos y"
+
+    it "10 + (-4)" $ toLaTeX (10 + (-4)) `shouldBe` "10 - 4"
+
+    it "x + (-y)" $ toLaTeX ("x" + (-"y")) `shouldBe` "x - y"
 
   describe "subtraction" $ do
     it "x - y" $ toLaTeX ("x" - "y") `shouldBe` "x - y"
