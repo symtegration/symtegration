@@ -80,6 +80,23 @@ spec = parallel $ describe "toLaTeX" $ do
 
     it "logBase x y * z" $ toLaTeX (logBase "x" "y" * "z") `shouldBe` "\\left(\\log_{x}y\\right) z"
 
+  describe "negation" $ do
+    it "-19" $ toLaTeX (negate 19) `shouldBe` "-19"
+
+    it "-x" $ toLaTeX (negate "x") `shouldBe` "-x"
+
+    it "-(-x)" $ toLaTeX (negate (negate "x")) `shouldBe` "-\\left(-x\\right)"
+
+    it "-(x + y)" $ toLaTeX (negate ("x" + "y")) `shouldBe` "-\\left(x + y\\right)"
+
+    it "-(x - y)" $ toLaTeX (negate ("x" - "y")) `shouldBe` "-\\left(x - y\\right)"
+
+    it "-(sin x)" $ toLaTeX (negate (sin "x")) `shouldBe` "-\\sin x"
+
+    it "-(x * sin x)" $ toLaTeX (negate ("x" * sin "x")) `shouldBe` "-x \\sin x"
+
+    it "x * negate (sin x)" $ toLaTeX ("x" * negate (sin "x")) `shouldBe` "x \\left(-\\sin x\\right)"
+
   describe "unary function arguments" $ do
     it "cos (log x)" $ toLaTeX (cos (log "x")) `shouldBe` "\\cos \\left(\\log x\\right)"
 

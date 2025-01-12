@@ -33,7 +33,10 @@ toLaTeX (BinaryApply func x y) = binary func x y
 
 -- | Converts unary functions into LaTeX.
 unary :: UnaryFunction -> Expression -> Text
-unary Negate x = "-" <> asArg x
+unary Negate x@(_ :+: _) = "-" <> asArg x
+unary Negate x@(_ :-: _) = "-" <> asArg x
+unary Negate x@(Negate' _) = "-" <> asArg x
+unary Negate x = "-" <> toLaTeX x
 unary Abs x = "\\left\\lvert " <> toLaTeX x <> " \\right\\rvert"
 unary Signum x = "\\mathrm{signum}" <> par (toLaTeX x)
 unary Exp x = "e^" <> brace (toLaTeX x)
