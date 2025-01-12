@@ -30,9 +30,22 @@ spec = parallel $ describe "toLaTeX" $ do
 
     it "x + u * v" $ toLaTeX ("x" + "u" * "v") `shouldBe` "x + u v"
 
+    it "(x - y) + (u - v)" $ toLaTeX (("x" - "y") + ("u" - "v")) `shouldBe` "x - y + u - v"
+
     it "(-1) + (-4)" $ toLaTeX ((-1) + (-4)) `shouldBe` "\\left(-1\\right) + \\left(-4\\right)"
 
     it "sin x + cos y" $ toLaTeX (sin "x" + cos "y") `shouldBe` "\\sin x + \\cos y"
+
+  describe "subtraction" $ do
+    it "x - y" $ toLaTeX ("x" - "y") `shouldBe` "x - y"
+
+    it "(x + y) - z" $ toLaTeX (("x" + "y") - "z") `shouldBe` "x + y - z"
+
+    it "x - (y + z)" $ toLaTeX ("x" - ("y" + "z")) `shouldBe` "x - \\left(y + z\\right)"
+
+    it "x - (y - z)" $ toLaTeX ("x" - ("y" - "z")) `shouldBe` "x - \\left(y - z\\right)"
+
+    it "x - (y * z)" $ toLaTeX ("x" - ("y" * "z")) `shouldBe` "x - y z"
 
   describe "multiplication" $ do
     it "2 * 5" $ toLaTeX (2 * 5) `shouldBe` "2 \\times 5"
@@ -58,6 +71,8 @@ spec = parallel $ describe "toLaTeX" $ do
     it "x * y" $ toLaTeX ("x" * "y") `shouldBe` "x y"
 
     it "x * y ** z" $ toLaTeX ("x" * "y" ** "z") `shouldBe` "x y^{z}"
+
+    it "log x * y" $ toLaTeX (log "x" * "y") `shouldBe` "\\left(\\log x\\right) y"
 
     it "logBase x y * z" $ toLaTeX (logBase "x" "y" * "z") `shouldBe` "\\left(\\log_{x}y\\right) z"
 

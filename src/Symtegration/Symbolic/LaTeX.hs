@@ -29,25 +29,6 @@ toLaTeX (Number n) = showt n
 toLaTeX (Symbol "pi") = "\\pi"
 toLaTeX (Symbol s) = s
 toLaTeX (UnaryApply func x) = unary func x
-toLaTeX (x@(_ :*: _) :+: y@(_ :*: _)) = toLaTeX x <> " + " <> toLaTeX y
-toLaTeX (x@(_ :*: _) :+: y@(_ :+: _)) = toLaTeX x <> " + " <> toLaTeX y
-toLaTeX (x@(_ :+: _) :+: y@(_ :*: _)) = toLaTeX x <> " + " <> toLaTeX y
-toLaTeX (x :+: y@(_ :*: _)) = asArg x <> " + " <> toLaTeX y
-toLaTeX (x@(_ :*: _) :+: y) = toLaTeX x <> " + " <> asArg y
-toLaTeX (x@(_ :+: _) :+: y@(_ :+: _)) = toLaTeX x <> " + " <> toLaTeX y
-toLaTeX (x@(_ :+: _) :+: y) = toLaTeX x <> " + " <> asArg y
-toLaTeX (x :+: y@(_ :+: _)) = asArg x <> " + " <> toLaTeX y
-toLaTeX (x@(_ :*: Number _) :*: y@(Number _ :*: _)) = toLaTeX x <> " \\times " <> toLaTeX y
-toLaTeX (x@(Number _) :*: y@(Number _ :*: _)) = toLaTeX x <> " \\times " <> toLaTeX y
-toLaTeX (x@(_ :*: Number _) :*: y@(Number _)) = toLaTeX x <> " \\times " <> toLaTeX y
-toLaTeX (x@(Abs' _) :*: y@(Symbol _)) = toLaTeX x <> " " <> toLaTeX y
-toLaTeX (x@(Signum' _) :*: y@(Symbol _)) = toLaTeX x <> " " <> toLaTeX y
-toLaTeX (x@(Exp' _) :*: y@(Symbol _)) = toLaTeX x <> " " <> toLaTeX y
-toLaTeX (x@(UnaryApply _ _) :*: y@(Symbol _)) = par (toLaTeX x) <> " " <> toLaTeX y
-toLaTeX (x@(LogBase' _ _) :*: y@(Symbol _)) = par (toLaTeX x) <> " " <> toLaTeX y
-toLaTeX (x@(_ :*: _) :*: y@(_ :*: _)) = toLaTeX x <> " " <> toLaTeX y
-toLaTeX (x :*: y@(_ :*: _)) = asArg x <> " " <> toLaTeX y
-toLaTeX (x@(_ :*: _) :*: y) = toLaTeX x <> " " <> asArg y
 toLaTeX (BinaryApply func x y) = binary func x y
 
 -- | Converts unary functions into LaTeX.
@@ -73,10 +54,22 @@ unary Atanh x = "\\tanh^{-1} " <> asNamedFunctionArg x
 
 -- | Converts binary functions into LaTeX.
 binary :: BinaryFunction -> Expression -> Expression -> Text
-binary Add x y = asArg x <> " + " <> asArg y
-binary Multiply x y@(Number _) = asArg x <> " \\times " <> asArg y
-binary Multiply x y = asArg x <> " " <> asArg y
-binary Subtract x y = asArg x <> " - " <> asArg y
+binary Add x y = asAddArg x <> " + " <> asAddArg y
+binary Multiply x@(_ :*: Number _) y@(Number _ :*: _) = toLaTeX x <> " \\times " <> toLaTeX y
+binary Multiply x@(Number _) y@(Number _ :*: _) = toLaTeX x <> " \\times " <> toLaTeX y
+binary Multiply x@(_ :*: Number _) y@(Number _) = toLaTeX x <> " \\times " <> toLaTeX y
+binary Multiply x y@(Number _) = asMultiplyArg x <> " \\times " <> asArg y
+binary Multiply x@(Abs' _) y = toLaTeX x <> " " <> asMultiplyArg y
+binary Multiply x@(Signum' _) y = toLaTeX x <> " " <> asMultiplyArg y
+binary Multiply x@(Exp' _) y = toLaTeX x <> " " <> asMultiplyArg y
+binary Multiply x@(Sqrt' _) y = toLaTeX x <> " " <> asMultiplyArg y
+binary Multiply x@(UnaryApply _ _) y@(Symbol _) = par (toLaTeX x) <> " " <> asMultiplyArg y
+binary Multiply x@(LogBase' _ _) y = par (toLaTeX x) <> " " <> asMultiplyArg y
+binary Multiply x y = asMultiplyArg x <> " " <> asMultiplyArg y
+binary Subtract x y@(Negate' _) = asAddArg x <> " - " <> asArg y
+binary Subtract x y@(_ :+: _) = asAddArg x <> " - " <> asArg y
+binary Subtract x y@(_ :-: _) = asAddArg x <> " - " <> asArg y
+binary Subtract x y = asAddArg x <> " - " <> asAddArg y
 binary Divide x y = "\\frac" <> brace (toLaTeX x) <> brace (toLaTeX y)
 binary Power x y = asArg x <> "^" <> brace (toLaTeX y)
 binary LogBase x y = "\\log_" <> brace (toLaTeX x) <> asNamedFunctionArg y
@@ -90,6 +83,21 @@ asArg e@(_ :/: _) = toLaTeX e
 asArg e@(Number _ :**: _) = par $ toLaTeX e
 asArg e@(_ :**: _) = toLaTeX e
 asArg e = par $ toLaTeX e
+
+asAddArg :: Expression -> Text
+asAddArg e@(Number _) = asArg e
+asAddArg e@(Symbol _) = asArg e
+asAddArg e@(Negate' _) = asArg e
+asAddArg e = toLaTeX e
+
+asMultiplyArg :: Expression -> Text
+asMultiplyArg e@(Number _) = asArg e
+asMultiplyArg e@(Symbol _) = asArg e
+asMultiplyArg e@(Negate' _) = asArg e
+asMultiplyArg e@(UnaryApply _ _) = toLaTeX e
+asMultiplyArg e@(_ :+: _) = asArg e
+asMultiplyArg e@(_ :-: _) = asArg e
+asMultiplyArg e@(BinaryApply _ _ _) = toLaTeX e
 
 -- For arguments to named functions such as "sin" which do not always delimit their arguments.
 -- E.g., it is preferred that "1 + sin x" be "1 + sin x" and not "1 + (sin x)",
