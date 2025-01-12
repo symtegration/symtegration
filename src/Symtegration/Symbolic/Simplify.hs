@@ -15,6 +15,7 @@ import Symtegration.Symbolic
 import Symtegration.Symbolic.Simplify.AlgebraicRingOrder qualified as AlgebraicRingOrder
 import Symtegration.Symbolic.Simplify.NumericFolding qualified as NumericFolding
 import Symtegration.Symbolic.Simplify.SymbolicFolding qualified as SymbolicFolding
+import Symtegration.Symbolic.Simplify.Tidy
 
 -- $setup
 -- >>> import Symtegration.Symbolic.Haskell
@@ -51,7 +52,7 @@ simplifyForVariable ::
   -- | Simplified expression.
   Expression
 simplifyForVariable v e
-  | e == e' = e
+  | e == e' = tidy e
   | otherwise = simplifyForVariable v e' -- Another round.
   where
     e' = f e

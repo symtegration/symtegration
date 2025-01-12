@@ -63,7 +63,7 @@ import Symtegration.Symbolic.Simplify
 --
 -- >>> let f = 36 / ("x" ** 5 - 2 * "x" ** 4 - 2 * "x" ** 3 + 4 * "x" ** 2 + "x" - 2)
 -- >>> toHaskell . simplify <$> integrate "x" f
--- Just "(-4) * log (8 + 8 * x) + 4 * log (16 + (-8) * x) + (6 + 12 * x) / ((-1) + x ** 2)"
+-- Just "negate (4 * log (8 + 8 * x)) + 4 * log (16 - 8 * x) + (6 + 12 * x) / ((-1) + x ** 2)"
 --
 -- so that
 --
@@ -298,7 +298,7 @@ rationalIntegralLogTerms (RationalFunction a d) = do
 -- For example,
 --
 -- >>> toHaskell $ simplify $ complexLogTermToAtan "x" (power 3 - 3 * power 1) (power 2 - 2)
--- "2 * atan x + 2 * atan (((-1) * x + (-1) * x ** 5 + 3 * x ** 3) / (-2)) + 2 * atan (x ** 3)"
+-- "2 * atan x + 2 * atan ((negate x + negate (x ** 5) + 3 * x ** 3) / (-2)) + 2 * atan (x ** 3)"
 --
 -- so it is the case that
 --
