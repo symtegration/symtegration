@@ -66,6 +66,7 @@ solveCubic a b c d = map restore <$> depressedRoots
     three = 3 :: Int
 
 -- | Solve depressed cubic equations of the form \(x^3 + px + q = 0\).
+-- Only returns real roots.
 --
 -- #### References
 --
@@ -78,10 +79,12 @@ solveDepressedCubic 0 q
 solveDepressedCubic p q
   | s < 0 = Nothing
   | p < 0, s > 0 = Nothing
-  | p > 0 = Nothing
+  | p > 0 = Just [(-2) * sqrt (p' / 3) * sinh (asinh (3 / 2 * q' / p' * sqrt (3 / p')) / 3)]
   | otherwise = Nothing
   where
     s = 4 * p ^ (3 :: Int) + 27 * q ^ (2 :: Int)
+    p' = fromRational p
+    q' = fromRational q
 
 -- | Returns the real roots for a polynomial of degree 2.
 --
