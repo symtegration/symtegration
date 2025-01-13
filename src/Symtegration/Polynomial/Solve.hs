@@ -60,14 +60,21 @@ solveCubic a b c d = map restore <$> depressedRoots
   where
     restore x = x - fromRational b / (3 * fromRational a)
     depressedRoots = solveDepressedCubic p q
-    p = (3 * a * c - b ^ (2 :: Int)) / (3 * a ^ (2 :: Int))
-    q = (2 * b ^ (3 :: Int) - 9 * a * b * c + 27 * a ^ (2 :: Int) * d) / (27 * a ^ (3 :: Int))
+    p = (3 * a * c - b ^ two) / (3 * a ^ two)
+    q = (2 * b ^ three - 9 * a * b * c + 27 * a ^ two * d) / (27 * a ^ three)
+    two = 2 :: Int
+    three = 3 :: Int
 
--- | Solve depressed cubic equations of the form \(x^2 + px + q = 0\).
+-- | Solve depressed cubic equations of the form \(x^3 + px + q = 0\).
 --
--- https://en.wikipedia.org/wiki/Cubic_equation#Trigonometric_and_hyperbolic_solutions
+-- #### References
+--
+-- * https://en.wikipedia.org/wiki/Cubic_equation#Trigonometric_and_hyperbolic_solutions
+-- * https://mathworld.wolfram.com/CubicFormula.html
 solveDepressedCubic :: Rational -> Rational -> Maybe [Expression]
-solveDepressedCubic 0 _ = Nothing
+solveDepressedCubic 0 q
+  | q < 0 = Just [fromRational (-q) ** (1 / 3)]
+  | otherwise = Just [negate $ fromRational q ** (1 / 3)]
 solveDepressedCubic p q
   | s < 0 = Nothing
   | p < 0, s > 0 = Nothing
