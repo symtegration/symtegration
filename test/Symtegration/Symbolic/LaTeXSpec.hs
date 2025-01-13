@@ -64,6 +64,10 @@ spec = parallel $ describe "toLaTeX" $ do
 
     it "2 * 3 * 4 * 6" $ toLaTeX (2 * 3 * 4 * 6) `shouldBe` "2 \\times 3 \\times 4 \\times 6"
 
+    it "(2 * 3) * (4 * 6)" $ toLaTeX ((2 * 3) * (4 * 6)) `shouldBe` "2 \\times 3 \\times 4 \\times 6"
+
+    it "2 * (4 * 6)" $ toLaTeX (2 * (4 * 6)) `shouldBe` "2 \\times 4 \\times 6"
+
     it "sin x * 3" $ toLaTeX (sin "x" * 3) `shouldBe` "\\sin x \\times 3"
 
     it "abs x * y" $ toLaTeX (abs "x" * "y") `shouldBe` "\\left\\lvert x \\right\\rvert y"
