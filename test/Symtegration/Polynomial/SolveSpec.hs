@@ -46,6 +46,11 @@ spec = parallel $ do
             sq = b * b - 4 * a * c
          in sq < 0 ==> solve p `shouldBe` Just []
 
+    describe "cubic polynomials" $ do
+      prop "found roots are roots" $ \(NonZero a) b c d ->
+        let p = scale a (power 3) + scale b (power 2) + scale c (power 1) + scale d 1
+         in correctlySolves p
+
     describe "quartic polynomials" $ do
       prop "found roots are roots" $ \(NonZero a) b c d e ->
         let p = scale a (power 4) + scale b (power 3) + scale c (power 2) + scale d (power 1) + scale e 1

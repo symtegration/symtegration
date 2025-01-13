@@ -30,6 +30,7 @@ solve :: IndexedPolynomial -> Maybe [Expression]
 solve p
   | degree p == 1 = solveLinear (coefficient p 1) (coefficient p 0)
   | degree p == 2 = solveQuadratic (coefficient p 2) (coefficient p 1) (coefficient p 0)
+  | degree p == 3 = solveCubic (coefficient p 3) (coefficient p 2) (coefficient p 1) (coefficient p 0)
   | degree p == 4 = solveQuartic (coefficient p 4) (coefficient p 3) (coefficient p 2) (coefficient p 1) (coefficient p 0)
   | otherwise = Nothing
 
@@ -52,6 +53,28 @@ solveQuadratic a b c
     sq' = fromRational sq
     a' = fromRational a
     b' = fromRational b
+
+-- | Returns the real roots for a polynomial of degree 2.
+solveCubic :: Rational -> Rational -> Rational -> Rational -> Maybe [Expression]
+solveCubic a b c d = map restore <$> depressedRoots
+  where
+    restore x = x - fromRational b / (3 * fromRational a)
+    depressedRoots = solveDepressedCubic p q
+    p = (3 * a * c - b ^ (2 :: Int)) / (3 * a ^ (2 :: Int))
+    q = (2 * b ^ (3 :: Int) - 9 * a * b * c + 27 * a ^ (2 :: Int) * d) / (27 * a ^ (3 :: Int))
+
+-- | Solve depressed cubic equations of the form \(x^2 + px + q = 0\).
+--
+-- https://en.wikipedia.org/wiki/Cubic_equation#Trigonometric_and_hyperbolic_solutions
+solveDepressedCubic :: Rational -> Rational -> Maybe [Expression]
+solveDepressedCubic 0 _ = Nothing
+solveDepressedCubic p q
+  | s < 0 = Nothing
+  | p < 0, s > 0 = Nothing
+  | p > 0 = Nothing
+  | otherwise = Nothing
+  where
+    s = 4 * p ^ (3 :: Int) + 27 * q ^ (2 :: Int)
 
 -- | Returns the real roots for a polynomial of degree 2.
 --
