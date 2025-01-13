@@ -86,17 +86,14 @@ solveDepressedCubic p q
       Just [(-2) * signum q' * sqrt (-(p' / 3)) * cosh (acosh ((-3) / 2 * abs q' / p' * sqrt (-(3 / p'))) / 3)]
   | p > 0 =
       Just [(-2) * sqrt (p' / 3) * sinh (asinh (3 / 2 * q' / p' * sqrt (3 / p')) / 3)]
+  | s == 0 = Just [3 * q' / p', -(3 / 2 * q' / p')]
   | otherwise = Nothing
   where
     s = 4 * p ^ (3 :: Int) + 27 * q ^ (2 :: Int)
     p' = fromRational p
     q' = fromRational q
 
--- | Returns the real roots for a polynomial of degree 2.
---
--- For now, only solves the very special case of ax^4+bx^2=0,
--- which is useful for finding solutions (u,v) for the resultant of P and Q,
--- where R(u+iv) = P(u,v) + iQ(u,v) and R is quadratic.
+-- | Returns the real roots for a polynomial of degree 4.
 solveQuartic :: Rational -> Rational -> Rational -> Rational -> Rational -> Maybe [Expression]
 solveQuartic a b 0 0 0
   | b /= 0 = Just [0, fromRational $ -(b / a)]
