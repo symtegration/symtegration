@@ -41,6 +41,9 @@ import Symtegration.Symbolic
 --
 -- >>> toHaskell $ tidy $ (-"x") * (-"y")
 -- "x * y"
+--
+-- >>> toHaskell $ tidy $ "x" + ((-"y") + "z")
+-- "x - y + z"
 tidy :: Expression -> Expression
 tidy (UnaryApply func x) = unary $ UnaryApply func $ tidy x
 tidy (BinaryApply func x y) = binary $ BinaryApply func (tidy x) (tidy y)
@@ -61,4 +64,5 @@ binary e@(Number n :/: x)
 binary (Negate' x :*: Negate' y) = x :*: y
 binary (Negate' x :*: y) = Negate' $ x :*: y
 binary (x :*: Negate' y) = Negate' $ x :*: y
+binary (x :+: (Negate' y :+: z)) = (x :-: y) :+: z
 binary e = e

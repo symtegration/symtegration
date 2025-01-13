@@ -57,3 +57,9 @@ spec = parallel $ do
       forAll arbitrarySymbol $ \x ->
         forAll arbitrarySymbol $ \y ->
           tidy ((-x) * (-y)) `shouldBe` x * y
+
+    prop "x + ((-y) + z)" $
+      forAll arbitrarySymbol $ \x ->
+        forAll arbitrarySymbol $ \y ->
+          forAll arbitrarySymbol $ \z ->
+            tidy (x + ((-y) + z)) `shouldBe` x - y + z
