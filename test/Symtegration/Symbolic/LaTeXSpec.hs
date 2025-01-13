@@ -42,6 +42,8 @@ spec = parallel $ describe "toLaTeX" $ do
 
     it "x + (-y)" $ toLaTeX ("x" + (-"y")) `shouldBe` "x - y"
 
+    it "x + 3 * x ** 2 + 2" $ toLaTeX ("x" + 3 * "x" ** 2 + 2) `shouldBe` "x + 3 x^{2} + 2"
+
   describe "subtraction" $ do
     it "x - y" $ toLaTeX ("x" - "y") `shouldBe` "x - y"
 
@@ -54,6 +56,8 @@ spec = parallel $ describe "toLaTeX" $ do
     it "x - (y * z)" $ toLaTeX ("x" - ("y" * "z")) `shouldBe` "x - y z"
 
     it "(-x) - y" $ toLaTeX ((-"x") - "y") `shouldBe` "-x - y"
+
+    it "x - 3 * x ** 2 + 2" $ toLaTeX ("x" - 3 * "x" ** 2 + 2) `shouldBe` "x - 3 x^{2} + 2"
 
   describe "multiplication" $ do
     it "2 * 5" $ toLaTeX (2 * 5) `shouldBe` "2 \\times 5"

@@ -93,7 +93,10 @@ asAddInitialArg e@(Number _) = toLaTeX e
 asAddInitialArg e@(Symbol _) = toLaTeX e
 asAddInitialArg e@(Negate' _) = toLaTeX e
 asAddInitialArg (x :+: y) = asAddInitialArg x <> " + " <> asAddTrailingArg y
-asAddInitialArg (x :-: y) = asAddInitialArg x <> " - " <> asArg y
+asAddInitialArg (x :-: y@(Negate' _)) = asAddInitialArg x <> " - " <> asArg y
+asAddInitialArg (x :-: y@(_ :+: _)) = asAddInitialArg x <> " - " <> asArg y
+asAddInitialArg (x :-: y@(_ :-: _)) = asAddInitialArg x <> " - " <> asArg y
+asAddInitialArg (x :-: y) = asAddInitialArg x <> " - " <> toLaTeX y
 asAddInitialArg e = asAddTrailingArg e
 
 asAddTrailingArg :: Expression -> Text
