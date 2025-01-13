@@ -86,8 +86,7 @@ solveDepressedCubic p q
       Just [(-2) * signum q' * sqrt (-(p' / 3)) * cosh (acosh ((-3) / 2 * abs q' / p' * sqrt (-(3 / p'))) / 3)]
   | p > 0 =
       Just [(-2) * sqrt (p' / 3) * sinh (asinh (3 / 2 * q' / p' * sqrt (3 / p')) / 3)]
-  | otherwise =
-      Nothing -- Not reachable.
+  | otherwise = Nothing
   where
     s = 4 * p ^ (3 :: Int) + 27 * q ^ (2 :: Int)
     p' = fromRational p
@@ -102,14 +101,17 @@ solveQuartic :: Rational -> Rational -> Rational -> Rational -> Rational -> Mayb
 solveQuartic a b 0 0 0
   | b /= 0 = Just [0, fromRational $ -(b / a)]
   | otherwise = Just [0]
-solveQuartic a 0 b 0 0
-  | a > 0, b > 0 = Just [0]
-  | a < 0, b < 0 = Just [0]
-  | b == 0 = Just [0]
-  | otherwise = Just [0, Sqrt' (fromRational (-(b / a))), -Sqrt' (fromRational (-(b / a)))]
+solveQuartic a b c 0 0
+  | (Just xs) <- solveQuadratic a b c = Just $ 0 : xs
+  | otherwise = Just [0]
+solveQuartic a b c d 0
+  | (Just xs) <- solveCubic a b c d = Just $ 0 : xs
+  | otherwise = Just [0]
 solveQuartic a 0 0 0 b
   | a > 0, b > 0 = Just []
   | a < 0, b < 0 = Just []
   | b == 0 = Just [0]
-  | otherwise = Nothing
+  | otherwise = Just [x, -x]
+  where
+    x = fromRational ((-b) / a) ** (1 / 4)
 solveQuartic _ _ _ _ _ = Nothing

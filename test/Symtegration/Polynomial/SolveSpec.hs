@@ -13,6 +13,7 @@ import Symtegration.Polynomial.Solve
 import Symtegration.Polynomial.Symbolic
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Haskell
+import Symtegration.Symbolic.Simplify
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (scale)
@@ -64,7 +65,7 @@ spec = parallel $ do
 correctlySolves :: IndexedPolynomial -> Property
 correctlySolves p =
   counterexample (show p) $
-    counterexample (show $ map toHaskell <$> roots) $
+    counterexample (show $ map (toHaskell . simplify) <$> roots) $
       label (case roots of Nothing -> "not solved"; Just _ -> "solved") $
         roots `shouldSatisfy` areRoots p
   where
