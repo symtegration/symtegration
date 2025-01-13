@@ -99,6 +99,9 @@ solveDepressedCubic p q
 -- which is useful for finding solutions (u,v) for the resultant of P and Q,
 -- where R(u+iv) = P(u,v) + iQ(u,v) and R is quadratic.
 solveQuartic :: Rational -> Rational -> Rational -> Rational -> Rational -> Maybe [Expression]
+solveQuartic a b 0 0 0
+  | b /= 0 = Just [0, fromRational $ -(b / a)]
+  | otherwise = Just [0]
 solveQuartic a 0 b 0 0
   | a > 0, b > 0 = Just [0]
   | a < 0, b < 0 = Just [0]

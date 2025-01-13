@@ -54,9 +54,10 @@ spec = parallel $ do
            in correctlySolves p
 
     describe "quartic polynomials" $ do
-      prop "found roots are roots" $ \(NonZero a) b c d e ->
-        let p = scale a (power 4) + scale b (power 3) + scale c (power 2) + scale d (power 1) + scale e 1
-         in correctlySolves p
+      modifyMaxSuccess (* 10) $
+        prop "found roots are roots" $ \(NonZero a) b c d e ->
+          let p = scale a (power 4) + scale b (power 3) + scale c (power 2) + scale d (power 1) + scale e 1
+           in correctlySolves p
 
 -- | Passes if either all the roots found are indeed roots of the polynomial
 -- or solutions could not be derived.
