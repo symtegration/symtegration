@@ -111,4 +111,23 @@ solveQuartic a 0 0 0 b
   | otherwise = Just [x, -x]
   where
     x = fromRational ((-b) / a) ** (1 / 4)
+solveQuartic a 0 b 0 c
+  | sq == 0, st < 0 = Just []
+  | sq == 0 = Just [sqrt st', -sqrt st']
+  | a > 0, sq > 0, b == 0 = Just [sqrt st' / (2 * a')]
+  | a < 0, sq > 0, b == 0 = Just [-(sqrt st' / (2 * a'))]
+  | a > 0, sq > 0, b > 0, sq > b * b = Just [sqrt x1, -sqrt x1]
+  | a < 0, sq > 0, b < 0, sq > b * b = Just [sqrt x2, -sqrt x2]
+  | a > 0, sq > 0, b < 0, sq < b * b = Just [sqrt x1, -sqrt x1, sqrt x2, -sqrt x2]
+  | a < 0, sq > 0, b > 0, sq < b * b = Just [sqrt x1, -sqrt x1, sqrt x2, -sqrt x2]
+  | otherwise = Nothing
+  where
+    sq = b * b - 4 * a * c
+    st = (-b) / (2 * a)
+    sq' = fromRational sq
+    st' = fromRational st
+    a' = fromRational a
+    b' = fromRational b
+    x1 = ((-b') + sqrt sq') / (2 * a')
+    x2 = ((-b') - sqrt sq') / (2 * a')
 solveQuartic _ _ _ _ _ = Nothing
