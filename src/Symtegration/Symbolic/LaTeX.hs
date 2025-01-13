@@ -58,7 +58,7 @@ unary Atanh x = "\\tanh^{-1} " <> asNamedFunctionArg x
 -- | Converts binary functions into LaTeX.
 binary :: BinaryFunction -> Expression -> Expression -> Text
 binary Add x (Negate' y) = binary Subtract x y
-binary Add x y = asAddArg x <> " + " <> asAddArg y
+binary Add x y = asAddInitialArg x <> " + " <> asAddTrailingArg y
 binary Multiply x@(_ :*: Number _) y@(Number _ :*: _) = toLaTeX x <> " \\times " <> toLaTeX y
 binary Multiply x@(Number _) y@(Number _ :*: _) = toLaTeX x <> " \\times " <> toLaTeX y
 binary Multiply x@(_ :*: Number _) y@(Number _) = toLaTeX x <> " \\times " <> toLaTeX y
@@ -70,10 +70,10 @@ binary Multiply x@(Sqrt' _) y = toLaTeX x <> " " <> asMultiplyArg y
 binary Multiply x@(UnaryApply _ _) y@(Symbol _) = par (toLaTeX x) <> " " <> asMultiplyArg y
 binary Multiply x@(LogBase' _ _) y = par (toLaTeX x) <> " " <> asMultiplyArg y
 binary Multiply x y = asMultiplyArg x <> " " <> asMultiplyArg y
-binary Subtract x y@(Negate' _) = asAddArg x <> " - " <> asArg y
-binary Subtract x y@(_ :+: _) = asAddArg x <> " - " <> asArg y
-binary Subtract x y@(_ :-: _) = asAddArg x <> " - " <> asArg y
-binary Subtract x y = asAddArg x <> " - " <> asAddArg y
+binary Subtract x y@(Negate' _) = asAddInitialArg x <> " - " <> asArg y
+binary Subtract x y@(_ :+: _) = asAddInitialArg x <> " - " <> asArg y
+binary Subtract x y@(_ :-: _) = asAddInitialArg x <> " - " <> asArg y
+binary Subtract x y = asAddInitialArg x <> " - " <> asAddTrailingArg y
 binary Divide x y = "\\frac" <> brace (toLaTeX x) <> brace (toLaTeX y)
 binary Power x y = asArg x <> "^" <> brace (toLaTeX y)
 binary LogBase x y = "\\log_" <> brace (toLaTeX x) <> asNamedFunctionArg y
@@ -88,11 +88,19 @@ asArg e@(Number _ :**: _) = par $ toLaTeX e
 asArg e@(_ :**: _) = toLaTeX e
 asArg e = par $ toLaTeX e
 
-asAddArg :: Expression -> Text
-asAddArg e@(Number _) = asArg e
-asAddArg e@(Symbol _) = asArg e
-asAddArg e@(Negate' _) = asArg e
-asAddArg e = toLaTeX e
+asAddInitialArg :: Expression -> Text
+asAddInitialArg e@(Number _) = toLaTeX e
+asAddInitialArg e@(Symbol _) = toLaTeX e
+asAddInitialArg e@(Negate' _) = toLaTeX e
+asAddInitialArg (x :+: y) = asAddInitialArg x <> " + " <> asAddTrailingArg y
+asAddInitialArg (x :-: y) = asAddInitialArg x <> " - " <> asArg y
+asAddInitialArg e = asAddTrailingArg e
+
+asAddTrailingArg :: Expression -> Text
+asAddTrailingArg e@(Number _) = asArg e
+asAddTrailingArg e@(Symbol _) = asArg e
+asAddTrailingArg e@(Negate' _) = asArg e
+asAddTrailingArg e = toLaTeX e
 
 asMultiplyArg :: Expression -> Text
 asMultiplyArg e@(Number _) = asArg e

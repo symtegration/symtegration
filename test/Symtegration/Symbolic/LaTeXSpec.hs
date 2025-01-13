@@ -17,8 +17,6 @@ spec = parallel $ describe "toLaTeX" $ do
   -- check only for totality property and test with specific examples instead.
   prop "is total" $ \e -> total (toLaTeX e)
 
-  it "-a" $ toLaTeX (-"a") `shouldBe` "-a"
-
   describe "addition" $ do
     it "-(1 + a)" $ toLaTeX (-(1 + "a")) `shouldBe` "-\\left(1 + a\\right)"
 
@@ -32,7 +30,11 @@ spec = parallel $ describe "toLaTeX" $ do
 
     it "(x - y) + (u - v)" $ toLaTeX (("x" - "y") + ("u" - "v")) `shouldBe` "x - y + u - v"
 
-    it "(-1) + (-4)" $ toLaTeX ((-1) + (-4)) `shouldBe` "\\left(-1\\right) - 4"
+    it "(-1) + (-4)" $ toLaTeX ((-1) + (-4)) `shouldBe` "-1 - 4"
+
+    it "(-x) + y" $ toLaTeX ((-"x") + "y") `shouldBe` "-x + y"
+
+    it "(-x) + (-y)" $ toLaTeX ((-"x") + (-"y")) `shouldBe` "-x - y"
 
     it "sin x + cos y" $ toLaTeX (sin "x" + cos "y") `shouldBe` "\\sin x + \\cos y"
 
@@ -50,6 +52,8 @@ spec = parallel $ describe "toLaTeX" $ do
     it "x - (y - z)" $ toLaTeX ("x" - ("y" - "z")) `shouldBe` "x - \\left(y - z\\right)"
 
     it "x - (y * z)" $ toLaTeX ("x" - ("y" * "z")) `shouldBe` "x - y z"
+
+    it "(-x) - y" $ toLaTeX ((-"x") - "y") `shouldBe` "-x - y"
 
   describe "multiplication" $ do
     it "2 * 5" $ toLaTeX (2 * 5) `shouldBe` "2 \\times 5"
@@ -81,6 +85,8 @@ spec = parallel $ describe "toLaTeX" $ do
     it "logBase x y * z" $ toLaTeX (logBase "x" "y" * "z") `shouldBe` "\\left(\\log_{x}y\\right) z"
 
   describe "negation" $ do
+    it "-a" $ toLaTeX (-"a") `shouldBe` "-a"
+
     it "-19" $ toLaTeX (negate 19) `shouldBe` "-19"
 
     it "-x" $ toLaTeX (negate "x") `shouldBe` "-x"
