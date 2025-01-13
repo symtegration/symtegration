@@ -12,6 +12,7 @@
 -- by an approximate floating-point number.
 module Symtegration.Symbolic.Simplify.NumericFolding (simplify) where
 
+import Symtegration.Numeric (root)
 import Symtegration.Symbolic
 
 -- $setup
@@ -127,32 +128,6 @@ reduceRatio n m
   | otherwise = Number (n `div` d) :/: Number (m `div` d)
   where
     d = gcd n m
-
--- | Compute the integer root to the given power.
--- I.e., find \(m\) such that \(m^k = n\)
-root ::
-  -- | Number \(n\) whose root we want.
-  Integer ->
-  -- | The power \(k\) of the root.
-  Integer ->
-  -- | The root \(m\).
-  Maybe Integer
-root 0 _ = Just 0
-root 1 _ = Just 1
-root n k
-  | k < 0 = Nothing
-  | GT <- compare n 0 = search n 1 n
-  | LT <- compare n 0, odd k = (* (-1)) <$> search (-n) 1 (-n)
-  | otherwise = Nothing
-  where
-    search m low hi
-      | low >= hi, c /= EQ = Nothing
-      | EQ <- c = Just mid
-      | GT <- c = search m low (mid - 1)
-      | LT <- c = search m (mid + 1) hi
-      where
-        mid = (low + hi) `div` 2
-        c = compare (mid ^ k) m
 
 -- | Simplify an exponential of Euler's number.  I.e., simplify \(e^X\).
 -- Only the exponent is given as an argument, while the return value is
