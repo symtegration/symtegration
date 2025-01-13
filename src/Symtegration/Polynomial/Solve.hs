@@ -78,9 +78,9 @@ solveDepressedCubic 0 q
   | otherwise = Just [negate $ fromRational q ** (1 / 3)]
 solveDepressedCubic p q
   | s < 0 = Nothing
-  | p < 0, s > 0 = Nothing
+  | p < 0, s > 0 = Just [(-2) * signum q' * sqrt (-(p' / 3)) * cosh (acosh ((-3) / 2 * abs q' / p' * sqrt (-(3 / p'))) / 3)]
   | p > 0 = Just [(-2) * sqrt (p' / 3) * sinh (asinh (3 / 2 * q' / p' * sqrt (3 / p')) / 3)]
-  | otherwise = Nothing
+  | otherwise = Nothing -- Not reachable.
   where
     s = 4 * p ^ (3 :: Int) + 27 * q ^ (2 :: Int)
     p' = fromRational p
