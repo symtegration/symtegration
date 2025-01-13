@@ -48,9 +48,10 @@ spec = parallel $ do
          in sq < 0 ==> solve p `shouldBe` Just []
 
     describe "cubic polynomials" $ do
-      prop "found roots are roots" $ \(NonZero a) b c d ->
-        let p = scale a (power 3) + scale b (power 2) + scale c (power 1) + scale d 1
-         in correctlySolves p
+      modifyMaxSuccess (* 10) $
+        prop "found roots are roots" $ \(NonZero a) b c d ->
+          let p = scale a (power 3) + scale b (power 2) + scale c (power 1) + scale d 1
+           in correctlySolves p
 
     describe "quartic polynomials" $ do
       prop "found roots are roots" $ \(NonZero a) b c d e ->
