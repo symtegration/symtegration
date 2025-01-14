@@ -34,9 +34,13 @@ simplify (Number n :/: Number m)
   | otherwise = Number ((-n) `div` g) :/: Number ((-m) `div` g)
   where
     g = gcd n m
-simplify (x :/: y) = divideFactor g x :/: divideFactor g y
+simplify (x :/: y) = divideFactor g x' :/: divideFactor g y'
   where
-    g = gcd (commonFactor x) (commonFactor y)
+    g = gcd (commonFactor x') (commonFactor y')
+    x' = simplify x
+    y' = simplify y
+simplify (UnaryApply func x) = UnaryApply func $ simplify x
+simplify (BinaryApply func x y) = BinaryApply func (simplify x) (simplify y)
 simplify e = e
 
 -- | Finds a common factor which multiplies each term in an expression.
