@@ -54,6 +54,20 @@ spec = parallel $ do
           let p = scale a (power 3) + scale b (power 2) + scale c (power 1) + scale d 1
            in correctlySolves p
 
+      prop "with zero lower order terms" $ \(NonZero a) ->
+        let p = scale a (power 3)
+         in correctlySolves p
+
+      prop "with zero discriminant" $ \u ->
+        let p = -(3 * u * u)
+            q = 2 * u * u * u
+            r = power 3 + scale p (power 1) + scale q 1
+         in conjoin
+              [ counterexample ("p = " <> show p <> ", q = " <> show q) $
+                  4 * p * p * p + 27 * q * q === 0,
+                correctlySolves r
+              ]
+
       prop "finds roots" $ \(NonZero a) x y z ->
         let p = scale a 1 * (power 1 - scale x 1) * (power 1 - scale y 1) * (power 1 - scale z 1)
             roots = nub [x, y, z]
