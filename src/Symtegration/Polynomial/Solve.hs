@@ -70,8 +70,8 @@ solveCubic a b c d = map restore <$> depressedRoots
 --
 -- #### References
 --
--- * https://en.wikipedia.org/wiki/Cubic_equation#Trigonometric_and_hyperbolic_solutions
--- * https://mathworld.wolfram.com/CubicFormula.html
+-- * [Wikipedia](https://en.wikipedia.org/wiki/Cubic_equation#Trigonometric_and_hyperbolic_solutions)
+-- * [Wolfram MathWorld](https://mathworld.wolfram.com/CubicFormula.html)
 solveDepressedCubic :: Rational -> Rational -> Maybe [Expression]
 solveDepressedCubic 0 q
   | q < 0 = Just [fromRational (-q) ** (1 / 3)]
@@ -86,7 +86,6 @@ solveDepressedCubic p q
       Just [(-2) * signum q' * sqrt (-(p' / 3)) * cosh (acosh ((-3) / 2 * abs q' / p' * sqrt (-(3 / p'))) / 3)]
   | p > 0 =
       Just [(-2) * sqrt (p' / 3) * sinh (asinh (3 / 2 * q' / p' * sqrt (3 / p')) / 3)]
-  | s == 0 = Just [3 * q' / p', -(3 / 2 * q' / p')]
   | otherwise = Nothing
   where
     s = 4 * p ^ (3 :: Int) + 27 * q ^ (2 :: Int)

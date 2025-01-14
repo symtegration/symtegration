@@ -1,8 +1,2 @@
-coverage:
-  status:
-    patch:
-      default:
-        informational: true
-
 ignore:
   - "test"
