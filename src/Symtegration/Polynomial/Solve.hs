@@ -7,7 +7,7 @@
 --
 -- This module supports deriving exact solutions to polynomial equations.
 -- It cannot derive solutions for all polynomials; it will only return those which it can.
-module Symtegration.Polynomial.Solve where
+module Symtegration.Polynomial.Solve (solve) where
 
 import Data.List (nub)
 import Symtegration.Polynomial
