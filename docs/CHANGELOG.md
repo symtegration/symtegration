@@ -8,6 +8,23 @@ and this project adheres to the
 
 ## Unreleased
 
+## 0.4.0 - 2025-01-14
+
+*   Integrate more rational functions.
+
+    *   Find all real roots for integration involving solution of cubic equations.
+
+    *   For integration involving solution of quartic equations,
+        find real roots for more special cases.
+
+*   Cancel out common integer factors in fractions.
+
+*   Fewer parentheses in Haskell code output.
+
+*   Fewer parentheses in LaTeX output.
+
+*   Test with GHC 9.12.1.
+
 ## 0.3.0 - 2025-01-05
 
 *   Implementation of Rioboo's algorithm.
