@@ -88,15 +88,16 @@ spec = parallel $ do
             let p = scale a (power 4) + scale b (power 2) + scale c 1
              in correctlySolves p
 
-      prop "finds all real roots when any found" $ \(NonZero a) x y z w ->
-        let p = scale a $ product [power 1 - scale v 1 | v <- [x, y, z, w]]
-            roots = nub [x, y, z, w]
-         in counterexample (show p) $
-              case solve p of
-                Nothing -> label "not solved" True
-                xs@(Just _) ->
-                  label "solved" $
-                    toFiniteDoubleRoots xs `shouldBe` Just (toFiniteDoubles roots)
+      modifyMaxSuccess (* 10) $
+        prop "finds all real roots when any found" $ \(NonZero a) x y z w ->
+          let p = scale a $ product [power 1 - scale v 1 | v <- [x, y, z, w]]
+              roots = nub [x, y, z, w]
+           in counterexample (show p) $
+                case solve p of
+                  Nothing -> label "not solved" True
+                  xs@(Just _) ->
+                    label "solved" $
+                      toFiniteDoubleRoots xs `shouldBe` Just (toFiniteDoubles roots)
 
 -- | Passes if either all the roots found are indeed roots of the polynomial
 -- or solutions could not be derived.
