@@ -56,6 +56,7 @@ commonFactor _ = 1
 -- Specialized for dividing factors found by 'commonFactor.
 divideFactor :: Integer -> Expression -> Expression
 divideFactor 0 e = e
+divideFactor 1 e = e
 divideFactor g (Number n) = Number $ n `div` g
 divideFactor g (x :+: y) = divideFactor g x :+: divideFactor g y
 divideFactor g (Number n :*: x) = Number (n `div` g) :*: x
