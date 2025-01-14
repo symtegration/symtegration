@@ -68,11 +68,12 @@ spec = parallel $ do
                 correctlySolves r
               ]
 
-      prop "finds roots" $ \(NonZero a) x y z ->
-        let p = scale a 1 * (power 1 - scale x 1) * (power 1 - scale y 1) * (power 1 - scale z 1)
-            roots = nub [x, y, z]
-         in counterexample (show p) $
-              toFiniteDoubleRoots (solve p) `shouldBe` Just (toFiniteDoubles roots)
+      modifyMaxSuccess (* 100) $
+        prop "finds roots" $ \(NonZero a) x y z ->
+          let p = scale a 1 * (power 1 - scale x 1) * (power 1 - scale y 1) * (power 1 - scale z 1)
+              roots = nub [x, y, z]
+           in counterexample (show p) $
+                toFiniteDoubleRoots (solve p) `shouldBe` Just (toFiniteDoubles roots)
 
     describe "quartic polynomials" $ do
       modifyMaxSuccess (* 10) $
@@ -102,7 +103,7 @@ spec = parallel $ do
             let p = scale a (power 4) + scale b (power 2) + scale c 1
              in correctlySolves p
 
-      modifyMaxSuccess (* 10) $
+      modifyMaxSuccess (* 100) $
         prop "finds all real roots when any found" $ \(NonZero a) x y z w ->
           let p = scale a $ product [power 1 - scale v 1 | v <- [x, y, z, w]]
               roots = nub [x, y, z, w]
