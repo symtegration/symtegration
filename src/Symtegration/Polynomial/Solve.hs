@@ -114,6 +114,7 @@ solveQuartic a 0 0 0 b
   where
     x = fromRational ((-b) / a) ** (1 / 4)
 solveQuartic a 0 b 0 c
+  | sq < 0 = Just []
   | sq == 0, st < 0 = Just []
   | sq == 0 = Just [sqrt st', -sqrt st']
   | a > 0, sq > 0, b > 0, sq > b * b = Just [sqrt x1, -sqrt x1]
