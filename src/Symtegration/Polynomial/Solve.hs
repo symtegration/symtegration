@@ -114,8 +114,6 @@ solveQuartic a 0 0 0 b
 solveQuartic a 0 b 0 c
   | sq == 0, st < 0 = Just []
   | sq == 0 = Just [sqrt st', -sqrt st']
-  | a > 0, sq > 0, b == 0 = Just [sqrt st' / (2 * a')]
-  | a < 0, sq > 0, b == 0 = Just [-(sqrt st' / (2 * a'))]
   | a > 0, sq > 0, b > 0, sq > b * b = Just [sqrt x1, -sqrt x1]
   | a < 0, sq > 0, b < 0, sq > b * b = Just [sqrt x2, -sqrt x2]
   | a > 0, sq > 0, b < 0, sq < b * b = Just [sqrt x1, -sqrt x1, sqrt x2, -sqrt x2]
