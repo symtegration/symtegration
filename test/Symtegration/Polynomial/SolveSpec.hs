@@ -5,7 +5,7 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.SolveSpec (spec) where
 
-import Data.List (sort)
+import Data.List (nub, sort)
 import Symtegration.FiniteDouble
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Indexed
@@ -54,6 +54,12 @@ spec = parallel $ do
           let p = scale a (power 3) + scale b (power 2) + scale c (power 1) + scale d 1
            in correctlySolves p
 
+      prop "finds roots" $ \(NonZero a) x y z ->
+        let p = scale a 1 * (power 1 - scale x 1) * (power 1 - scale y 1) * (power 1 - scale z 1)
+            roots = nub [x, y, z]
+         in counterexample (show p) $
+              toFiniteDoubleRoots (solve p) `shouldBe` Just (toFiniteDoubles roots)
+
     describe "quartic polynomials" $ do
       modifyMaxSuccess (* 10) $
         prop "found roots are roots" $ \(NonZero a) b c d e ->
@@ -81,6 +87,16 @@ spec = parallel $ do
           prop "ax^4 + bx^2 + c = 0" $ \(NonZero a) b c ->
             let p = scale a (power 4) + scale b (power 2) + scale c 1
              in correctlySolves p
+
+      prop "finds all real roots when any found" $ \(NonZero a) x y z w ->
+        let p = scale a $ product [power 1 - scale v 1 | v <- [x, y, z, w]]
+            roots = nub [x, y, z, w]
+         in counterexample (show p) $
+              case solve p of
+                Nothing -> label "not solved" True
+                xs@(Just _) ->
+                  label "solved" $
+                    toFiniteDoubleRoots xs `shouldBe` Just (toFiniteDoubles roots)
 
 -- | Passes if either all the roots found are indeed roots of the polynomial
 -- or solutions could not be derived.
