@@ -36,7 +36,7 @@ spec = parallel $ do
         let p = scale a (power 2) + scale b (power 1) + scale c (power 0)
          in correctlySolves p
 
-      prop "finds roots" $ \(NonZero a) x y ->
+      prop "finds all roots" $ \(NonZero a) x y ->
         let p = scale a 1 * (power 1 - scale x 1) * (power 1 - scale y 1)
          in counterexample (show p) $
               if x == y

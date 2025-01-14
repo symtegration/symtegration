@@ -9,6 +9,7 @@
 -- It cannot derive solutions for all polynomials; it will only return those which it can.
 module Symtegration.Polynomial.Solve where
 
+import Data.List (nub)
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Indexed
 import Symtegration.Symbolic
@@ -86,6 +87,8 @@ solveDepressedCubic p q
       Just [(-2) * signum q' * sqrt (-(p' / 3)) * cosh (acosh ((-3) / 2 * abs q' / p' * sqrt (-(3 / p'))) / 3)]
   | p > 0 =
       Just [(-2) * sqrt (p' / 3) * sinh (asinh (3 / 2 * q' / p' * sqrt (3 / p')) / 3)]
+  | s == 0, p == 0 = Just [0]
+  | s == 0 = Just [fromRational (3 * q / p), fromRational ((-3) / 2 * q / p)]
   | otherwise = Nothing
   where
     s = 4 * p ^ (3 :: Int) + 27 * q ^ (2 :: Int)
@@ -98,11 +101,11 @@ solveQuartic a b 0 0 0
   | b /= 0 = Just [0, fromRational $ -(b / a)]
   | otherwise = Just [0]
 solveQuartic a b c 0 0
-  | (Just xs) <- solveQuadratic a b c = Just $ 0 : xs
+  | (Just xs) <- solveQuadratic a b c = Just $ nub $ 0 : xs
   | otherwise = Just [0]
 solveQuartic a b c d 0
-  | (Just xs) <- solveCubic a b c d = Just $ 0 : xs
-  | otherwise = Just [0]
+  | (Just xs) <- solveCubic a b c d = Just $ nub $ 0 : xs
+  | otherwise = Nothing
 solveQuartic a 0 0 0 b
   | a > 0, b > 0 = Just []
   | a < 0, b < 0 = Just []
