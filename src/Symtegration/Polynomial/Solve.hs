@@ -85,10 +85,10 @@ solveDepressedCubic p q
   | p < 0,
     s > 0 =
       Just [(-2) * signum q' * sqrt (-(p' / 3)) * cosh (acosh ((-3) / 2 * abs q' / p' * sqrt (-(3 / p'))) / 3)]
-  | p > 0 =
-      Just [(-2) * sqrt (p' / 3) * sinh (asinh (3 / 2 * q' / p' * sqrt (3 / p')) / 3)]
   | s == 0, p == 0 = Just [0]
   | s == 0 = Just [fromRational (3 * q / p), fromRational ((-3) / 2 * q / p)]
+  | p > 0 =
+      Just [(-2) * sqrt (p' / 3) * sinh (asinh (3 / 2 * q' / p' * sqrt (3 / p')) / 3)]
   | otherwise = Nothing
   where
     s = 4 * p ^ (3 :: Int) + 27 * q ^ (2 :: Int)
