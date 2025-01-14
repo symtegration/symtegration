@@ -55,6 +55,7 @@ library
       Symtegration.Symbolic.LaTeX
       Symtegration.Symbolic.Simplify
       Symtegration.Symbolic.Simplify.AlgebraicRingOrder
+      Symtegration.Symbolic.Simplify.Fraction
       Symtegration.Symbolic.Simplify.NumericFolding
       Symtegration.Symbolic.Simplify.SymbolicFolding
       Symtegration.Symbolic.Simplify.Tidy
@@ -119,6 +120,7 @@ test-suite spec
       Symtegration.Symbolic.HaskellSpec
       Symtegration.Symbolic.LaTeXSpec
       Symtegration.Symbolic.Simplify.AlgebraicRingOrderSpec
+      Symtegration.Symbolic.Simplify.FractionSpec
       Symtegration.Symbolic.Simplify.NumericFoldingSpec
       Symtegration.Symbolic.Simplify.Properties
       Symtegration.Symbolic.Simplify.SymbolicFoldingSpec
