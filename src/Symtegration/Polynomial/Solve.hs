@@ -101,7 +101,7 @@ solveQuartic a b 0 0 0
   | otherwise = Just [0]
 solveQuartic a b c 0 0
   | (Just xs) <- solveQuadratic a b c = Just $ nub $ 0 : xs
-  | otherwise = Just [0]
+  | otherwise = Nothing
 solveQuartic a b c d 0
   | (Just xs) <- solveCubic a b c d = Just $ nub $ 0 : xs
   | otherwise = Nothing

@@ -103,7 +103,7 @@ spec = parallel $ do
             let p = scale a (power 4) + scale b (power 2) + scale c 1
              in correctlySolves p
 
-      modifyMaxSuccess (* 100) $
+      modifyMaxSuccess (* 1000) $
         prop "finds all real roots when any found" $ \(NonZero a) x y z w ->
           let p = scale a $ product [power 1 - scale v 1 | v <- [x, y, z, w]]
               roots = nub [x, y, z, w]
