@@ -30,9 +30,9 @@ can be integrated.  For example:
 ```haskell
 >>> import Symtegration
 >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
-Just "x + (x ** 4)"
+Just "x + x ** 4"
 >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
-Just "y * z + x * (1 / 2) * (z ** 2)"
+Just "y * z + 1 / 2 * x * z ** 2"
 ```
 
 Concrete numbers can also be computed from these integrals.  For example:
@@ -62,7 +62,7 @@ and compute approximate or exact values from these integrals.
 ```haskell
 >>> :load Symtegration
 >>> toHaskell <$> integrate "x" ("a" * "x" ** 4 + "x" + "b")
-Just "b * x + (1 / 2) * (x ** 2) + a * ((x ** 5) / 5)"
+Just "b * x + 1 / 2 * x ** 2 + a * (x ** 5) / 5"
 >>>
 >>> let (Just p) = integrate "x" ("x" ** 2)
 >>> evaluate p (\case "x" -> Just 1)
