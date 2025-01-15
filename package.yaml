@@ -1,5 +1,5 @@
 name:                symtegration
-version:             0.3.0
+version:             0.4.0
 homepage:            https://symtegration.dev/
 github:              "symtegration/symtegration"
 author:              "Yoo Chung"
@@ -19,7 +19,7 @@ description: |
   Symtegration is a library providing symbolic integration of mathematical expressions.
   See the [README](https://github.com/symtegration/symtegration#readme) on GitHub.
 
-tested-with: GHC == 9.10.1 || == 9.8.4 || == 9.6.6
+tested-with: GHC == 9.12.1 || == 9.10.1 || == 9.8.4 || == 9.6.6
 
 language: GHC2021
 
