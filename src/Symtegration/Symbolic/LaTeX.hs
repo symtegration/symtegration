@@ -24,6 +24,11 @@ import TextShow (showt)
 -- "e^{x}"
 -- >>> toLaTeX $ "x" + 4 * sin "y"
 -- "x + 4 \\sin y"
+--
+-- Since the text for symbols are included as is, we can also include LaTeX symbols:
+--
+-- >>> toLaTeX $ exp "\\delta_0"
+-- "e^{\\delta_0}"
 toLaTeX :: Expression -> Text
 toLaTeX (Number n) = showt n
 toLaTeX (Symbol "pi") = "\\pi"
