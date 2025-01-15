@@ -49,6 +49,7 @@ module Symtegration
     -- such as when using [Numeric.AD](https://hackage.haskell.org/package/ad)
     -- directly for differentiation.
     simplify,
+    tidy,
   )
 where
 
