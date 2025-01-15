@@ -28,7 +28,7 @@ import Symtegration.Symbolic
 --
 -- Assumes numeric folding and algebraic ring ordering has been applied.
 simplify :: Expression -> Expression
-simplify e@(Number _ :/: Number 0) = e
+simplify e@(_ :/: Number 0) = e
 simplify (Number n :/: Number m)
   | m > 0 = Number (n `div` g) :/: Number (m `div` g)
   | otherwise = Number ((-n) `div` g) :/: Number ((-m) `div` g)
@@ -36,7 +36,9 @@ simplify (Number n :/: Number m)
     g = gcd n m
 simplify (x :/: y) = divideFactor g x' :/: divideFactor g y'
   where
-    g = gcd (commonFactor x') (commonFactor y')
+    g
+      | (Number n) <- y, n < 0 = negate $ gcd (commonFactor x') n
+      | otherwise = gcd (commonFactor x') (commonFactor y')
     x' = simplify x
     y' = simplify y
 simplify ((1 :/: x) :*: y) = (1 :/: divideFactor g x') :*: divideFactor g y'

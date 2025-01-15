@@ -298,7 +298,7 @@ rationalIntegralLogTerms (RationalFunction a d) = do
 -- For example,
 --
 -- >>> toHaskell $ simplify $ complexLogTermToAtan "x" (power 3 - 3 * power 1) (power 2 - 2)
--- "2 * atan x + 2 * atan (((-1) * x + (-1) * x ** 5 + 3 * x ** 3) / (-2)) + 2 * atan (x ** 3)"
+-- "2 * atan x + 2 * atan ((x + (-3) * x ** 3 + x ** 5) / 2) + 2 * atan (x ** 3)"
 --
 -- so it is the case that
 --
