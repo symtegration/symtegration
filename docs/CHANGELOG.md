@@ -10,6 +10,8 @@ and this project adheres to the
 
 *   Attempt integration by substitution after factoring out constant factors.
 
+*   Cancel out common integer fractions in $\frac{1}{x} \times y$ as well.
+
 ## 0.4.0 - 2025-01-14
 
 *   Integrate more rational functions.

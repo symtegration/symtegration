@@ -39,6 +39,11 @@ simplify (x :/: y) = divideFactor g x' :/: divideFactor g y'
     g = gcd (commonFactor x') (commonFactor y')
     x' = simplify x
     y' = simplify y
+simplify ((1 :/: x) :*: y) = (1 :/: divideFactor g x') :*: divideFactor g y'
+  where
+    g = gcd (commonFactor x') (commonFactor y')
+    x' = simplify x
+    y' = simplify y
 simplify (UnaryApply func x) = UnaryApply func $ simplify x
 simplify (BinaryApply func x y) = BinaryApply func (simplify x) (simplify y)
 simplify e = e
