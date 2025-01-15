@@ -27,10 +27,8 @@ import Symtegration.Symbolic.Simplify.Tidy
 -- The simplification is done with an eye towards making it
 -- easier to find common factors.
 --
--- >>> toHaskell $ simplify $ 1 + "a" * "x" ** 3 + "x"
+-- >>> toHaskell $ simplify $ 4 - "x" + "a" * "x" ** 3 + 2 * "x" - 3
 -- "1 + x + a * x ** 3"
--- >>> toHaskell $ simplify $ "a" ** 143 + "x" + "b" ** 2
--- "x + a ** 143 + b ** 2"
 simplify :: Expression -> Expression
 simplify = simplifyForVariable ""
 
