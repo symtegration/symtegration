@@ -33,7 +33,12 @@ base = [Powers.integrate, Exponential.integrate, Trigonometric.integrate, Ration
 
 -- | Includes integration of a term using other integration functions.
 withTerm :: [Text -> Expression -> Maybe Expression]
-withTerm = base ++ [Term.integrate base, Substitution.integrate base]
+withTerm =
+  base
+    ++ [ Term.integrate base,
+         Substitution.integrate base,
+         Term.integrate [Substitution.integrate base]
+       ]
 
 -- | Includes integration of a sum of terms.
 withTermSum :: [Text -> Expression -> Maybe Expression]

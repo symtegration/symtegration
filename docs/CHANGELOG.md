@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+*   Attempt integration by substitution after factoring out constant factors.
+
 ## 0.4.0 - 2025-01-14
 
 *   Integrate more rational functions.
