@@ -17,7 +17,7 @@ import Symtegration.Symbolic
 -- Assumes that other simplifications have been applied first.
 -- In fact, it may undo changes that made other simplifications easier.
 --
--- ==== What is tidied up
+-- ==== __What is tidied up__
 --
 -- This section shows examples of what this function tidies up.
 --

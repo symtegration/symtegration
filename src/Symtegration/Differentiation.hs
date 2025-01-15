@@ -15,7 +15,6 @@ import Data.Text (Text)
 import Numeric.AD.Rank1.Forward
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Simplify
-import Symtegration.Symbolic.Simplify.Tidy
 
 -- $setup
 -- >>> import Symtegration.Symbolic.Haskell

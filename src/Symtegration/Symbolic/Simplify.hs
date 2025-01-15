@@ -8,7 +8,7 @@
 -- Supports the simplification of the symbolic representation for a mathematical expression.
 -- This is aimed towards making it easier to find common factors for the purpose of integration.
 -- It requires the specification of which symbol represents the variable.
-module Symtegration.Symbolic.Simplify (simplify, simplifyForVariable) where
+module Symtegration.Symbolic.Simplify (simplify, tidy, simplifyForVariable) where
 
 import Data.Text (Text)
 import Symtegration.Symbolic
@@ -16,12 +16,16 @@ import Symtegration.Symbolic.Simplify.AlgebraicRingOrder qualified as AlgebraicR
 import Symtegration.Symbolic.Simplify.Fraction qualified as Fraction
 import Symtegration.Symbolic.Simplify.NumericFolding qualified as NumericFolding
 import Symtegration.Symbolic.Simplify.SymbolicFolding qualified as SymbolicFolding
+import Symtegration.Symbolic.Simplify.Tidy
 
 -- $setup
 -- >>> import Symtegration.Symbolic.Haskell
 
 -- | Simplifies symbolic representations of mathematical expressions.
+--
 -- All addition and multiplication will be associated to the left.
+-- The simplification is done with an eye towards making it
+-- easier to find common factors.
 --
 -- >>> toHaskell $ simplify $ 1 + "a" * "x" ** 3 + "x"
 -- "1 + x + a * x ** 3"
