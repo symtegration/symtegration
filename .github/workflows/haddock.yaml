@@ -43,7 +43,7 @@ jobs:
         run: |
           stack haddock --no-haddock-deps
           echo "docs=$(stack path --local-doc-root --no-haddock-deps)" >> $GITHUB_OUTPUT
-          echo "version=$(stack query locals personal version)" >> $GITHUB_OUTPUT
+          echo "version=$(stack query locals symtegration version)" >> $GITHUB_OUTPUT
 
       - name: Alias
         run: |
