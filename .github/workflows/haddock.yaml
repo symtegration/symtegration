@@ -49,7 +49,8 @@ jobs:
         run: |
           cd ${{ steps.build.outputs.docs }}
           mkdir symtegration
-          ln -s symtegration-${{ steps.build.outputs.version }} symtegration/latest
+          cd symtegration
+          ln -s ../symtegration-${{ steps.build.outputs.version }} latest
 
       - name: Upload
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa #v3.0.1
