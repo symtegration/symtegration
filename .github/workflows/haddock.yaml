@@ -48,7 +48,8 @@ jobs:
       - name: Alias
         run: |
           cd ${{ steps.build.outputs.docs }}
-          ln -s symtegration-${{ steps.build.outputs.version }} symtegration
+          mkdir symtegration
+          ln -s symtegration-${{ steps.build.outputs.version }} symtegration/latest
 
       - name: Upload
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa #v3.0.1
