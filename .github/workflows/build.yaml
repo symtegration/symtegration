@@ -20,6 +20,7 @@ jobs:
       matrix:
         os:
           - "ubuntu-latest"
+          - "ubuntu-24.04-arm"
 
         # Policy for compatible GHC versions is to:
         # * Test three most recent minor versions.
