@@ -19,7 +19,6 @@ jobs:
     strategy:
       matrix:
         os:
-          - "ubuntu-latest"
           - "ubuntu-24.04-arm"
 
         # Policy for compatible GHC versions is to:
@@ -31,11 +30,6 @@ jobs:
           - "9.8.4"
           - "9.10.1"
           - "9.12.1"
-
-        include:
-          # hpc-codecov-action does not work on ARM (yet).
-          - os: "ubuntu-24.04-arm"
-            disable-coverage: true
 
       fail-fast: false
 
@@ -62,7 +56,7 @@ jobs:
 
       - name: Build
         run: |
-          cabal configure --enable-optimization --enable-tests --enable-coverage --write-ghc-environment-files=always
+          cabal configure --enable-optimization --enable-tests --write-ghc-environment-files=always
           cabal build
 
       - name: Test
@@ -72,21 +66,9 @@ jobs:
       - name: Test examples
         run: cabal run examples
 
-      - name: Generate coverage report
-        if: ${{ ! matrix.disable-coverage }}
-        uses: 8c6794b6/hpc-codecov-action@0baa5bacbd3ed4103ca4e25495e6e9cf0469912b # v4.1.0
-        with:
-          target: cabal:spec
-
-      - name: Upload coverage report
-        if: ${{ ! matrix.disable-coverage }}
-        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v5.1.2
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-
   stack:
     name: stack
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
