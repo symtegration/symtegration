@@ -9,9 +9,20 @@ module Symtegration.Integration.Powers (integrate) where
 import Data.Text (Text)
 import Symtegration.Symbolic
 
+-- $setup
+-- >>> import Symtegration.Symbolic.Haskell
+-- >>> import Symtegration.Symbolic.Simplify
+
 -- | Integrates powers of a variable.
 -- In other words, expressions of the form \(x^c\),
 -- where \(c\) is a constant.
+--
+-- >>> toHaskell . simplify <$> integrate "x" "x"
+-- Just "1 / 2 * x ** 2"
+-- >>> toHaskell . simplify <$> integrate "x" ("x" ** (1/2))
+-- Just "(2 * x ** (3 / 2)) / 3"
+-- >>> toHaskell . simplify <$> integrate "x" ("x" ** (-1))
+-- Just "log x"
 integrate :: Text -> Expression -> Maybe Expression
 integrate v (1 :/: Symbol s) =
   integrate v $ Symbol s :**: Number (-1)
