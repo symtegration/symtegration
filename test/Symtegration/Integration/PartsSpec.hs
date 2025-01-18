@@ -32,7 +32,7 @@ genParts :: Gen Expression
 genParts = do
   n <- arbitrarySizedNatural
   m <- arbitrarySizedNatural
-  -- A product of two powers has some non-significant chance to be integrated by parts.
+  -- A product of two powers has some non-negligible chance to be integrated by parts.
   return $ x ** Number n * x ** Number m
   where
     x = Symbol var

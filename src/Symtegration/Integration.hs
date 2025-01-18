@@ -1,7 +1,7 @@
 -- |
 -- Module: Symtegration.Integration
 -- Description: Symbolically integrates mathematical expressions.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration (integrate) where
@@ -9,6 +9,7 @@ module Symtegration.Integration (integrate) where
 import Data.Foldable (asum)
 import Data.Text (Text)
 import Symtegration.Integration.Exponential qualified as Exponential
+import Symtegration.Integration.Parts qualified as Parts
 import Symtegration.Integration.Powers qualified as Powers
 import Symtegration.Integration.Rational qualified as Rational
 import Symtegration.Integration.Substitution qualified as Substitution
@@ -37,7 +38,8 @@ withTerm =
   base
     ++ [ Term.integrate base,
          Substitution.integrate base,
-         Term.integrate [Substitution.integrate base]
+         Parts.integrate [Term.integrate base],
+         Term.integrate [Substitution.integrate base, Parts.integrate [Term.integrate base]]
        ]
 
 -- | Includes integration of a sum of terms.
