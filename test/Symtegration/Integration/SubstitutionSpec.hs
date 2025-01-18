@@ -1,6 +1,6 @@
 -- |
 -- Description: Tests for Symtegration.Integration.Substitution
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration.SubstitutionSpec (spec) where
@@ -18,7 +18,7 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
-  describe "integrates and adds by term" $ do
+  describe "integrates by substitution" $ do
     prop "powers and trigonometric functions mixed" $
       forAll genExpression $ \e x ->
         antiderivativeProperty

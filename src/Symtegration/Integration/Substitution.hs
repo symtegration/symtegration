@@ -1,7 +1,7 @@
 -- |
 -- Module: Symtegration.Integration.Substitution
 -- Description: Integration by substitution.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration.Substitution (integrate) where
@@ -26,7 +26,7 @@ import Symtegration.Symbolic
 --
 -- >>> import Symtegration.Integration.Trigonometric qualified as Trigonometric
 -- >>> toHaskell <$> simplify <$> integrate [Trigonometric.integrate] "x" (sin ("a" * "x" + 1))
--- Just "1 / a * negate (cos (1 + a * x))"
+-- Just "(-1) * 1 / a * cos (1 + a * x)"
 integrate ::
   -- | Integration algorithms to try after substitution.
   [Text -> Expression -> Maybe Expression] ->

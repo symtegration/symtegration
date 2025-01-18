@@ -1,7 +1,7 @@
 -- |
 -- Module: Symtegration.Symbolic.Simplify.SymbolicFolding
 -- Description: Folding of symbolic terms.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
@@ -28,6 +28,7 @@ simplify (BinaryApply func x y) =
 -- The arguments should already have been simplified.
 unary :: Expression -> Expression
 unary (Negate' (Negate' x)) = simplify x
+unary (Negate' x) = (-1) * x
 unary e = e
 
 -- | Folds symbolic terms for binary expressions.

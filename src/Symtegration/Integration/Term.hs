@@ -1,7 +1,7 @@
 -- |
 -- Module: Symtegration.Integration.Term
 -- Description: Integrates a single term.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration.Term (integrate) where
@@ -25,7 +25,7 @@ import Symtegration.Symbolic.Simplify
 -- Nothing
 -- >>> let g = integrate [T.integrate] "x" f
 -- >>> toHaskell . simplify <$> g
--- Just "a * negate (cos x)"
+-- Just "(-1) * a * cos x"
 --
 -- Assumes the expression has had algebraic ring ordering applied.
 integrate ::
