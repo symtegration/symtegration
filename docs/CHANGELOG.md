@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+*   Implement integration by parts.
+
 *   Attempt integration by substitution after factoring out constant factors.
 
 *   Prefer positive integers in fraction denominators.
