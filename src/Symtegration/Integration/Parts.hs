@@ -18,7 +18,7 @@ import Symtegration.Symbolic.Simplify
 -- >>> import Symtegration.Symbolic.Haskell
 -- >>> import Symtegration.Symbolic.Simplify
 
--- | Integrates by substitution.
+-- | Integrates by parts.
 --
 -- Specifically, if for
 --
