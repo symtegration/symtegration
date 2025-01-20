@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+### 0.5.0 - 2025-01-20
+
 *   Implement integration by parts.
 
 *   Attempt integration by substitution after factoring out constant factors.
