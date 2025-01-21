@@ -12,9 +12,11 @@ It offers the following:
 
     *   Integration of exponential and logarithmic functions.
 
-    *   Partial support for integrating ratios of two polynomials.
+    *   Integration of ratios of two polynomials.
 
     *   Integration by substitution.
+
+    *   Integration by parts.
 
 *   Symbolic representation of mathematical expressions.
 
