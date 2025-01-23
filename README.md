@@ -89,7 +89,7 @@ which you try out by [running on mybinder.org].
 
 [IHaskell]: https://github.com/IHaskell/IHaskell
 [example IHaskell notebook]: https://github.com/chungyc/haskell-notebooks/blob/main/Symtegration.ipynb
-[running on mybinder.org]: https://mybinder.org/v2/gh/chungyc/ihaskell/custom?urlpath=git-pull%3Frepo%3Dhttps%253A%252F%252Fgithub.com%252Fchungyc%252Fhaskell-notebooks%26urlpath%3Dlab%252Ftree%252Fhaskell-notebooks%252FSymtegration.ipynb%26branch%3Dmain
+[running on mybinder.org]: https://mybinder.org/v2/gh/chungyc/haskell-notebooks/HEAD?labpath=Symtegration.ipynb
 
 ## Changes
 
