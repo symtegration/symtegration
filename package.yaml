@@ -17,7 +17,14 @@ category:            Mathematics, Symbolic Computation
 
 description: |
   Symtegration is a library providing symbolic integration of mathematical expressions.
-  See the [README](https://github.com/symtegration/symtegration#readme) on GitHub.
+  .
+  For example,
+  .
+  >>> import Symtegration
+  >>> toHaskell <$> integrate "x" (4 * "x" ** 3 + 1)
+  Just "x + x ** 4"
+  .
+  See the "Symtegration" module for the main interface.
 
 tested-with: GHC == 9.12.1 || == 9.10.1 || == 9.8.4 || == 9.6.6
 
