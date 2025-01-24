@@ -121,6 +121,8 @@ monic p
 -- >>> let q = mapCoefficients fromRational p :: IndexedSymbolicPolynomial
 -- >>> simplify $ coefficient q 1
 -- Number 2
+--
+-- Note that only non-zero coefficients are mapped.
 mapCoefficients ::
   (Polynomial p e c, Polynomial p e c', Num (p e c), Num (p e c')) =>
   (c -> c') ->
@@ -153,6 +155,8 @@ mapCoefficients f p = getSum $ foldTerms convertTerm p
 -- >>> let q = scale (1/2) (power 2) + scale 3 (power 1) :: IndexedPolynomial
 -- >>> mapCoefficientsM f q
 -- Left "not integer"
+--
+-- Note that only non-zero coefficients are mapped.
 mapCoefficientsM ::
   (Polynomial p e c, Polynomial p e c', Num (p e c), Num (p e c'), Monad m) =>
   (c -> m c') ->
