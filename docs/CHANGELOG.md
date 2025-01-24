@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+*   Add function to map polynomial coefficients monadically.
+
 ### 0.5.0 - 2025-01-20
 
 *   Implement integration by parts.

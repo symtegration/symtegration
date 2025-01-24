@@ -1,6 +1,6 @@
 -- |
 -- Description: Tests Symtegration.Polynomial.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.PolynomialSpec (spec) where
@@ -26,6 +26,22 @@ spec = parallel $ do
           (q, r) = p `divide` p'
        in counterexample (show p') $
             conjoin [r `shouldBe` 0, degree q `shouldBe` 0]
+
+  describe "mapCoefficients" $ do
+    prop "scales" $ \p x ->
+      p /= 0 && x /= 0 ==>
+        let q = mapCoefficients (* x) p :: IndexedPolynomial
+         in conjoin
+              [ monic p === monic q,
+                leadingCoefficient p * x === leadingCoefficient q
+              ]
+
+  describe "mapCoefficientsM" $ do
+    prop "with Maybe" $ \p (Fun _ f) ->
+      let q = mapCoefficientsM (f :: Rational -> Maybe Rational) (p :: IndexedPolynomial)
+          p' = filter (\(_, c) -> c /= 0) <$> mapM (\(e, c) -> (e,) <$> f c) (toList p)
+          toList = foldTerms (\e c -> [(e, c)])
+       in toList <$> q `shouldBe` p'
 
   describe "polynomial algorithms" $ do
     describe "division" $ do

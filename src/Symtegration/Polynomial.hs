@@ -1,7 +1,7 @@
 -- |
 -- Module: Symtegration.Polynomial
 -- Description: Polynomials for Symtegration.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
@@ -14,6 +14,7 @@ module Symtegration.Polynomial
     Polynomial (..),
     monic,
     mapCoefficients,
+    mapCoefficientsM,
 
     -- * Algorithms
     divide,
@@ -31,7 +32,7 @@ where
 import Data.Monoid (Sum (..))
 
 -- $setup
--- >>> import Data.Ratio ((%))
+-- >>> import Data.Ratio ((%), denominator, numerator)
 -- >>> import Symtegration.Symbolic
 -- >>> import Symtegration.Symbolic.Simplify
 -- >>> import Symtegration.Polynomial.Indexed
@@ -128,6 +129,41 @@ mapCoefficients ::
 mapCoefficients f p = getSum $ foldTerms convertTerm p
   where
     convertTerm e c = Sum $ scale (f c) (power e)
+
+-- | Maps the coefficients in a polynomial to form another polynomial, but in a monad.
+-- Specifically, it maps each coefficient in a monadic action,
+-- and collects the products of each result and power.
+--
+-- For example, with the 'Maybe' monad:
+--
+-- >>> let f q | denominator q == 1 = Just q | otherwise = Nothing
+-- >>> let p = scale 2 (power 2) + scale 3 (power 1) :: IndexedPolynomial
+-- >>> mapCoefficientsM f p
+-- Just 2x^2 + 3x
+-- >>> let q = scale (1/2) (power 2) + scale 3 (power 1) :: IndexedPolynomial
+-- >>> mapCoefficientsM f q
+-- Nothing
+--
+-- As an another example, with the 'Either' monad:
+--
+-- >>> let f q | denominator q == 1 = Right q | otherwise = Left "not integer"
+-- >>> let p = scale 2 (power 2) + scale 3 (power 1) :: IndexedPolynomial
+-- >>> mapCoefficientsM f p
+-- Right 2x^2 + 3x
+-- >>> let q = scale (1/2) (power 2) + scale 3 (power 1) :: IndexedPolynomial
+-- >>> mapCoefficientsM f q
+-- Left "not integer"
+mapCoefficientsM ::
+  (Polynomial p e c, Polynomial p e c', Num (p e c), Num (p e c'), Monad m) =>
+  (c -> m c') ->
+  p e c ->
+  m (p e c')
+mapCoefficientsM f p = sum <$> mapM f' terms
+  where
+    terms = foldTerms (\e c -> [(e, c)]) p
+    f' (e, c) = do
+      c' <- f c
+      return $ scale c' $ power e
 
 -- | Polynomial division.  It returns the quotient polynomial and the remainder polynomial.
 --

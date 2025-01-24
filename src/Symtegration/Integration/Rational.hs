@@ -245,9 +245,9 @@ rationalIntegralLogTerms (RationalFunction a d) = do
 
   -- Turn rational functions into polynomials if possible.
   -- When the preconditions are satisfied, these should all be polynomials.
-  sd' <- toPolyCoefficients sd
+  sd' <- mapCoefficientsM toPoly sd
   resultant' <- toPoly resultant
-  prs' <- toMaybeList $ map toPolyCoefficients prs :: Maybe [IndexedPolynomialWith IndexedPolynomial]
+  prs' <- toMaybeList $ map (mapCoefficientsM toPoly) prs :: Maybe [IndexedPolynomialWith IndexedPolynomial]
 
   -- Derive what make up the log terms in the integral.
   let qs = squarefree resultant' :: [IndexedPolynomial]
@@ -497,8 +497,7 @@ complexLogTermToRealExpression v (r, s)
     convert _ = Nothing
 
     -- Convert polynomial with Expression coefficients into a polynomial with rational number coefficients.
-    convertCoefficients :: IndexedPolynomialWith Expression -> Maybe IndexedPolynomial
-    convertCoefficients x = sum . map (\(e, c) -> scale c (power e)) <$> toMaybeList (foldTerms (\e c -> [(e,) <$> convert (simplify c)]) x)
+    convertCoefficients = mapCoefficientsM convert
 
     -- Turns a polynomial into an Expression.
     -- Function h is used to turn the coefficient into an Expression.
@@ -558,19 +557,6 @@ toPoly (RationalFunction p q)
   | otherwise = Nothing
   where
     p' = scale (1 / leadingCoefficient q) p
-
--- | Turn the rational function coefficients into polynomial coefficients if possible.
-toPolyCoefficients ::
-  IndexedPolynomialWith RationalFunction ->
-  Maybe (IndexedPolynomialWith IndexedPolynomial)
-toPolyCoefficients p = reconstruct terms
-  where
-    terms = foldTerms (\e c -> [(e, toPoly c)]) p
-    reconstruct [] = Just 0
-    reconstruct ((_, Nothing) : _) = Nothing
-    reconstruct ((e, Just c) : xs)
-      | (Just p') <- reconstruct xs = Just $ scale c (power e) + p'
-      | otherwise = Nothing
 
 -- | If there are any nothings, then turn the list into nothing.
 -- Otherwise, turn it into the list of just the elements.
