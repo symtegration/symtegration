@@ -5,7 +5,9 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.SolveSpec (spec) where
 
+import Data.Complex
 import Data.List (nub, sort)
+import Data.Monoid (Sum (..))
 import Symtegration.FiniteDouble
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Indexed
@@ -114,6 +116,65 @@ spec = parallel $ do
                     label "solved" $
                       toFiniteDoubleRoots xs `shouldBe` Just (toFiniteDoubles roots)
 
+  describe "complexSolve" $ do
+    describe "linear polynomials" $ do
+      prop "finds root" $ \(NonZero a) x ->
+        let p = scale a 1 * (power 1 - scale x 1)
+         in counterexample (show p) $
+              complexSolve p `shouldBe` Just [fromRational x]
+
+    describe "quadratic polynomials" $ do
+      prop "finds real solutions" $ \(NonZero a) b c ->
+        let p = scale a (power 2) + scale b (power 1) + scale c 1
+         in filter (/= Near (0 / 0)) <$> toFiniteDoubleRoots (complexSolve p)
+              `shouldBe` toFiniteDoubleRoots (solve p)
+
+    describe "cubic polynomials" $ do
+      modifyMaxSuccess (* 100) $
+        prop "finds roots" $ \(NonZero a) b c d ->
+          let p = scale a (power 3) + scale b (power 2) + scale c (power 1) + scale d 1
+           in consistentWithComplexRoots p (complexSolve p)
+
+      describe "special cases" $ do
+        prop "ax^3 = 0" $ \(NonZero a) ->
+          let p = scale a (power 3)
+           in consistentWithComplexRoots p (complexSolve p)
+
+        prop "ax^3 + bx^2 = 0" $ \(NonZero a) (NonZero b) ->
+          let p = scale a (power 3) + scale b (power 2)
+           in consistentWithComplexRoots p (complexSolve p)
+
+        prop "ax^3 + bx^2 + cx= 0" $ \(NonZero a) (NonZero b) (NonZero c) ->
+          let p = scale a (power 3) + scale b (power 2) + scale c (power 1)
+           in consistentWithComplexRoots p (complexSolve p)
+
+    describe "quartic polynomials" $ do
+      modifyMaxSuccess (* 100) $
+        prop "finds roots" $ \(NonZero a) b c d e ->
+          let p = scale a (power 4) + scale b (power 3) + scale c (power 2) + scale d (power 1) + scale e 1
+           in consistentWithComplexRoots p (complexSolve p)
+
+      describe "special cases" $ do
+        prop "ax^4 = 0" $ \(NonZero a) ->
+          let p = scale a (power 4)
+           in consistentWithComplexRoots p (complexSolve p)
+
+        prop "ax^4 + bx^3 = 0" $ \(NonZero a) (NonZero b) ->
+          let p = scale a (power 4) + scale b (power 3)
+           in consistentWithComplexRoots p (complexSolve p)
+
+        prop "ax^4 + bx^3 + cx^2 = 0" $ \(NonZero a) (NonZero b) (NonZero c) ->
+          let p = scale a (power 4) + scale b (power 3) + scale c (power 2)
+           in consistentWithComplexRoots p (complexSolve p)
+
+        prop "ax^4 + bx^3 + cx^2 + dx = 0" $ \(NonZero a) (NonZero b) (NonZero c) (NonZero d) ->
+          let p = scale a (power 4) + scale b (power 3) + scale c (power 2) + scale d (power 1)
+           in consistentWithComplexRoots p (complexSolve p)
+
+        prop "ax^4 + bx^2 + c = 0" $ \(NonZero a) b c ->
+          let p = scale a (power 4) + scale b (power 2) + scale c (power 0)
+           in consistentWithComplexRoots p (complexSolve p)
+
 -- | Passes if either all the roots found are indeed roots of the polynomial
 -- or solutions could not be derived.
 correctlySolves :: IndexedPolynomial -> Property
@@ -153,3 +214,30 @@ toFiniteDoubleRoots = fmap (sort . map eval)
 -- | Convert a list of rational numbers into floating-point values for comparisons.
 toFiniteDoubles :: [Rational] -> [Near]
 toFiniteDoubles = sort . map (Near . fromRational)
+
+-- | Evaluate an expression to a concrete complex number.
+complexEval :: Expression -> Complex Double
+complexEval expr
+  | (Just x) <- evaluate expr (const Nothing) = x
+  | otherwise = 0 / 0 -- not a number
+
+-- | Evaluate a polynomial with a complex number substituted in the variable.
+complexPolyEval :: IndexedPolynomial -> Complex Double -> Complex Double
+complexPolyEval p x = getSum $ foldTerms (\e c -> Sum $ fromRational c * x ** fromIntegral e) p
+
+-- | Check whether the given polynomial is consistent with the given solutions,
+-- which may include complex numbers.
+consistentWithComplexRoots :: IndexedPolynomial -> Maybe [Expression] -> Property
+consistentWithComplexRoots p roots =
+  label (rootsLabel roots) $
+    counterexample (show roots') $
+      map (complexPolyEval p) <$> roots' `shouldSatisfy` closeEnough
+  where
+    roots' = map complexEval <$> roots
+
+    rootsLabel Nothing = "did not solve"
+    rootsLabel (Just xs) = "root count = " <> show (length xs)
+
+    -- We do not check for sensitive functions, so use a generous error bound.
+    closeEnough (Just xs) = all ((< 1) . magnitude) xs
+    closeEnough Nothing = True
