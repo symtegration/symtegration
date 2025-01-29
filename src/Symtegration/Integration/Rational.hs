@@ -28,6 +28,7 @@ module Symtegration.Integration.Rational
   )
 where
 
+import Control.Applicative (Alternative (..))
 import Data.List (find, intersect)
 import Data.Monoid (Sum (..))
 import Data.Text (Text)
@@ -92,9 +93,16 @@ integrate v e
         -- Derive the log terms in the integral.
         h' = toRationalFunction r denom
         logTerms = rationalIntegralLogTerms h'
-        logs :: Maybe Expression
-        logs
+        logs = realLogs <|> complexLogs :: Maybe Expression
+
+        -- Try to integrate into real functions first.
+        realLogs
           | (Just terms) <- logTerms = sum <$> toMaybeList (map (complexLogTermToRealExpression v) terms)
+          | otherwise = Nothing
+
+        -- If it cannot be integrated into real functions, allow complex logarithms.
+        complexLogs
+          | (Just terms) <- logTerms = sum <$> toMaybeList (map (complexLogTermToComplexExpression v) terms)
           | otherwise = Nothing
 
         fromRationalFunction (RationalFunction u w) = u' / w'
@@ -502,6 +510,26 @@ complexLogTermToRealExpression v (r, s)
     -- Turns a polynomial into an Expression.
     -- Function h is used to turn the coefficient into an Expression.
     toExpr x h u = getSum $ foldTerms (\e'' c -> Sum $ h c * (x ** Number (fromIntegral e''))) u
+
+complexLogTermToComplexExpression ::
+  -- | Symbol for the variable.
+  Text ->
+  -- | Polynomials \(Q(t)\) and \(S(t,x)\).
+  (IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial) ->
+  -- | Expression for the logarithm.
+  Maybe Expression
+complexLogTermToComplexExpression v (q, s) = do
+  as <- complexSolve q
+  let terms = do
+        a <- as
+        let s' = mapCoefficients (collapse a) s
+        let s'' = toExpression v toSymbolicCoefficient s'
+        return $ a * log s''
+  return $ sum terms
+  where
+    -- Collapse a polynomial coefficient of a polynomial into an expression with the variable substituted.
+    -- E.g., turn (t+2)x+1 into (3+2)x+1 for t=3.
+    collapse a c' = getSum $ foldTerms (\e c -> Sum $ fromRational c * a ** fromIntegral e) c'
 
 -- | Returns the roots for two variables in two polynomials.
 --
