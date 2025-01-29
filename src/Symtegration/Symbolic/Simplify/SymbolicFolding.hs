@@ -18,16 +18,14 @@ import Symtegration.Symbolic
 simplify :: Expression -> Expression
 simplify e@(Number _) = e
 simplify e@(Symbol _) = e
-simplify (UnaryApply func x) =
-  unary $ UnaryApply func $ simplify x
-simplify (BinaryApply func x y) =
-  binary $ BinaryApply func (simplify x) (simplify y)
+simplify (UnaryApply func x) = unary $ UnaryApply func $ simplify x
+simplify (BinaryApply func x y) = binary $ BinaryApply func (simplify x) (simplify y)
 
 -- | Folds symbolic terms for unary expressions.
 --
 -- The arguments should already have been simplified.
 unary :: Expression -> Expression
-unary (Negate' (Negate' x)) = simplify x
+unary (Negate' (Negate' x)) = x
 unary (Negate' x) = (-1) * x
 unary e = e
 
@@ -45,28 +43,28 @@ binary e@(Negate' x :+: y)
 binary (Number 0 :+: x) = x
 binary (x :+: Number 0) = x
 binary e@((Number n :*: x) :+: ((Number m :*: y) :+: z))
-  | x == y = simplify $ (Number (m + n) :*: x) :+: z
+  | x == y = (Number (m + n) :*: x) :+: z
   | otherwise = e
 binary e@((Number n :*: x) :+: (y :+: z))
-  | x == y = simplify $ (Number (n + 1) :*: x) :+: z
+  | x == y = (Number (n + 1) :*: x) :+: z
   | otherwise = e
 binary e@(x :+: ((Number n :*: y) :+: z))
-  | x == y = simplify (Number (n + 1) :*: x) :+: z
+  | x == y = (Number (n + 1) :*: x) :+: z
   | otherwise = e
 binary e@((Number n :*: x) :+: (Number m :*: y))
-  | x == y = simplify $ Number (n + m) :*: x
+  | x == y = Number (n + m) :*: x
   | otherwise = e
 binary e@(x :+: (Number n :*: y))
-  | x == y = simplify $ Number (n + 1) :*: x
+  | x == y = Number (n + 1) :*: x
   | otherwise = e
 binary e@((Number n :*: x) :+: y)
-  | x == y = simplify $ Number (n + 1) :*: x
+  | x == y = Number (n + 1) :*: x
   | otherwise = e
 binary e@(x :+: (y :+: z))
-  | x == y = simplify $ Number 2 :*: x :+: z
+  | x == y = Number 2 :*: x :+: z
   | otherwise = e
 binary e@(x :+: y)
-  | x == y = simplify $ Number 2 :*: x
+  | x == y = Number 2 :*: x
   | otherwise = e
 -- Fold multiplication.
 binary (Number 0 :*: _) = Number 0
@@ -74,33 +72,39 @@ binary (_ :*: Number 0) = Number 0
 binary (x :*: Number 1) = x
 binary (Number 1 :*: x) = x
 binary e@(x :*: (y :**: Number n))
-  | x == y = simplify $ x :**: Number (n + 1)
+  | x == y = x :**: Number (n + 1)
   | otherwise = e
 binary e@((x :**: y) :*: (x' :**: y'))
-  | x == x' = simplify $ x :**: (y :+: y')
+  | x == x' = x :**: (y :+: y')
   | otherwise = e
 binary e@(x :*: ((y :**: Number n) :*: z))
-  | x == y = simplify $ (x :**: Number (n + 1)) :*: z
+  | x == y = (x :**: Number (n + 1)) :*: z
   | otherwise = e
 binary e@((x :**: Number n) :*: (y :*: z))
-  | x == y = simplify $ (x :**: Number (n + 1)) :*: z
+  | x == y = (x :**: Number (n + 1)) :*: z
   | otherwise = e
 binary e@(x :*: (y :*: z))
-  | x == y = simplify $ (x :**: Number 2) :*: z
+  | x == y = (x :**: Number 2) :*: z
   | otherwise = e
 binary e@(x :*: y)
-  | x == y = simplify $ x :**: Number 2
+  | x == y = x :**: Number 2
   | otherwise = e
 -- Fold division.
-binary (x :/: (y :/: z)) = simplify $ (x :*: z) :/: y
-binary ((x :/: y) :/: z) = simplify $ x :/: (y :*: z)
+binary (x :/: (y :/: z)) = (x :*: z) :/: y
+binary ((x :/: y) :/: z) = x :/: (y :*: z)
 binary (x :/: Number 1) = x
 binary (x :/: Number (-1)) = (-1) * x
 -- Fold powers.
 binary (_ :**: Number 0) = Number 1
+binary (1 :**: _) = Number 1
 binary (x :**: Number 1) = x
-binary ((x :**: y) :**: z) =
-  simplify $ x :**: (y :*: z)
+binary (Negate' x :**: Number n)
+  | even n = x :**: Number n
+  | otherwise = Negate' (x :**: Number n)
+binary ((Number (-1) :*: x) :**: Number n)
+  | even n = x :**: Number n
+  | otherwise = Number (-1) :*: (x :**: Number n)
+binary ((x :**: y) :**: z) = x :**: (y :*: z)
 -- Fold subtraction.
 binary e@(x :-: y)
   | x == y = Number 0

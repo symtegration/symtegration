@@ -140,11 +140,11 @@ solveQuartic _ _ _ _ _ = Nothing
 -- >>> map (toHaskell . simplify) <$> complexSolve (2 * power 1 - 6)
 -- Just ["3"]
 --
--- >>> map (toHaskell . simplify) <$> complexSolve (scale (1/2) (power 2) + 1)
--- Just ["(-2) ** (1 / 2)","(-1) * (-2) ** (1 / 2)"]
+-- >>> map (toHaskell . simplify) <$> complexSolve (power 2 + 1)
+-- Just ["(-1) ** (1 / 2)","(-1) * (-1) ** (1 / 2)"]
 --
--- >>> map (toHaskell . simplify) <$> complexSolve (power 3 - 1)
--- Just ["1","((-1) + (-3) ** (1 / 2)) / 2","((-1) + (-1) * (-3) ** (1 / 2)) / 2"]
+-- >>> map (toHaskell . simplify) <$> complexSolve (power 3 + 1)
+-- Just ["-1","(-1) * ((-1) + (-1) ** (1 / 2) * 3 ** (1 / 2)) / 2","(-1) * ((-1) + (-1) * (-1) ** (1 / 2) * 3 ** (1 / 2)) / 2"]
 --
 -- Returns 'Nothing' if the function does not know how to derive the roots.
 complexSolve :: IndexedPolynomial -> Maybe [Expression]

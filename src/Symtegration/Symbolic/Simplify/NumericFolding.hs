@@ -1,7 +1,7 @@
 -- |
 -- Module: Symtegration.Symbolic.Simplify.NumericFolding
 -- Description: Constant folding of numeric constants.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 --
@@ -104,9 +104,10 @@ binary (Number n :**: Number m)
 binary ((Number n :/: Number m) :**: Number k)
   | k >= 0 = Number (n ^ k) :/: Number (m ^ k)
   | otherwise = Number (m ^ (-k)) :/: Number (n ^ (-k))
-binary e@(Number n :**: (Number m :/: Number k))
+binary e@(Number n :**: c@(Number m :/: Number k))
   | (Just l) <- root n k, m >= 0 = Number (l ^ m)
   | (Just l) <- root n k, m < 0 = 1 :/: Number (l ^ (-m))
+  | n < 0, n /= -1, even k = (-1) ** c * simplify (Number (-n) ** c)
   | otherwise = e
 binary e@((Number n :/: Number m) :**: (Number k :/: Number l))
   | (Just n', Just m') <- (root n l, root m l) = (Number n' :/: Number m') :**: Number k
