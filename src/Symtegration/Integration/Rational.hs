@@ -28,7 +28,7 @@ module Symtegration.Integration.Rational
   )
 where
 
-import Control.Applicative (Alternative (..))
+import Data.Foldable (asum)
 import Data.List (find, intersect)
 import Data.Monoid (Sum (..))
 import Data.Text (Text)
@@ -96,7 +96,7 @@ integrate v e
         -- Derive the log terms in the integral.
         h' = toRationalFunction r denom
         logTerms = rationalIntegralLogTerms h'
-        logs = realLogs <|> complexLogs :: Maybe Expression
+        logs = asum [realLogs, complexLogs] :: Maybe Expression
 
         -- Try to integrate into real functions first.
         realLogs
