@@ -8,6 +8,10 @@ and this project adheres to the
 
 ## Unreleased
 
+### 0.6.1 - 2025-01-30
+
+*   Do not set `-Werror` by default in preparation for upload to Hackage.
+
 ### 0.6.0 - 2025-01-29
 
 *   For rational function integration, use complex logarithms if we are not
