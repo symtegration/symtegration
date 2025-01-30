@@ -69,6 +69,9 @@ import Symtegration.Symbolic.Simplify
 -- so that
 --
 -- \[\int \frac{36}{x^5-2x^4-2x^3+4x^2+x-2} \, dx = \frac{12x+6}{x^2-1} + 4 \log \left( x - 2 \right) - 4 \log \left( x + 1 \right)\]
+--
+-- This function will attempt to find a real function integral if it can,
+-- but if it cannot, it will try to find an integral which includes complex logarithms.
 integrate :: Text -> Expression -> Maybe Expression
 integrate v e
   | (x :/: y) <- e',

@@ -79,6 +79,29 @@ import Symtegration.Symbolic.Simplify.Tidy (tidy)
 --
 -- >>> toHaskell <$> integrate "z" ("x" * "z" + "y")
 -- Just "y * z + 1 / 2 * x * z ** 2"
+--
+-- === __Definite integrals__
+--
+-- If the indefinite integral \(F = \int f(x) \, dx\) is continuous,
+-- then the definite integral is
+--
+-- \[ \int_a^b f(x) \, dx = F(b) - F(a) \]
+--
+-- This is /not/ true in general if \(F\) is not continuous in the integral interval.
+-- Care must be taken when computing a definite integral from an indefinite integral
+-- which is not continuous.  For example, indefinite integrals which have complex
+-- logarithms such as
+--
+-- \[ F = \sum_{\alpha \mid 4 \alpha^2 + 1 = 0} \alpha \log (x^3 +2 \alpha x^2 - 3x - 4\alpha) \]
+--
+-- where \(\alpha = \pm \frac{i}{2}\) has discontinuities at \(x=-\sqrt{2}\) and \(x=\sqrt{2}\).
+-- Definite integrals for such cases can be handled by integrating over continuous intervals separately.
+-- For example,
+--
+-- \[ \left( F(2) - \lim_{x \rightarrow \sqrt{2}^+} F(x) \right) + \left( \lim_{x \rightarrow \sqrt{2}^-} F(x) - F(1) \right) \]
+--
+-- Symtegration will return real function integrals if it can,
+-- but may return complex function integrals instead if it is unable to.
 integrate ::
   -- | The symbol representing the variable being integrated over.
   Text ->
