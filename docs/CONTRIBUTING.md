@@ -50,6 +50,17 @@ Examples in the Haddock documentation are tested using [`doctest-parallel`].
 [QuickCheck]: https://hackage.haskell.org/package/QuickCheck
 [`doctest-parallel`]: https://github.com/martijnbastiaan/doctest-parallel
 
+All warnings are enabled for builds.
+If a certain warning is unavoidable, it should only be disabled on a per file basis.
+While the warnings are not errors by default, code with compiler warnings will not
+be merged, and the continuous build upgrades these to errors.
+To upgrade compiler warnings to errors locally, use the `--pedantic` flag.
+
+```bash
+$ stack build --pedantic
+$ stack test --pedantic
+```
+
 ### Dependencies
 
 This project aims to avoid using too many heavy dependencies.

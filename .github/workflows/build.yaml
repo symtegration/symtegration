@@ -56,7 +56,7 @@ jobs:
 
       - name: Build
         run: |
-          cabal configure --enable-optimization --enable-tests --write-ghc-environment-files=always
+          cabal configure --enable-optimization --enable-tests --write-ghc-environment-files=always --ghc-options="-Wall -Werror"
           cabal build
 
       - name: Test
@@ -89,10 +89,10 @@ jobs:
           enable-stack: true
 
       - name: Build
-        run: stack build --coverage --test --no-run-tests
+        run: stack build --pedantic --coverage --test --no-run-tests
 
       - name: Test
-        run: stack build --coverage --test
+        run: stack build --pedantic --coverage --test
         timeout-minutes: 10
 
       - name: Generate coverage report

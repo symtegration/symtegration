@@ -36,7 +36,6 @@ default-extensions:
 
 ghc-options:
 - -Wall
-- -Werror
 
 dependencies:
 - ad >= 4.5 && < 4.6
