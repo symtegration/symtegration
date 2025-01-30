@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           symtegration
-version:        0.5.0
+version:        0.6.0
 synopsis:       Library for symbolic integration of mathematical expressions.
 description:    Symtegration is a library providing symbolic integration of mathematical expressions.
                 .

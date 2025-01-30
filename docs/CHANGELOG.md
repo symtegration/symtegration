@@ -8,6 +8,8 @@ and this project adheres to the
 
 ## Unreleased
 
+### 0.6.0 - 2025-01-29
+
 *   For rational function integration, use complex logarithms if we are not
     able to derive real function integrals.
 
