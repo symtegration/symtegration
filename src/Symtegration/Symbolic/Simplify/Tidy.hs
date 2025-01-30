@@ -44,6 +44,9 @@ import Symtegration.Symbolic
 --
 -- >>> toHaskell $ tidy $ "x" + ((-"y") + "z")
 -- "x - y + z"
+--
+-- >>> toHaskell $ tidy $ "x" ** (1/2)
+-- "sqrt x"
 tidy :: Expression -> Expression
 tidy (UnaryApply func x) = unary $ UnaryApply func $ tidy x
 tidy (BinaryApply func x y) = binary $ BinaryApply func (tidy x) (tidy y)
@@ -65,4 +68,5 @@ binary (Negate' x :*: Negate' y) = x :*: y
 binary (Negate' x :*: y) = Negate' $ x :*: y
 binary (x :*: Negate' y) = Negate' $ x :*: y
 binary (x :+: (Negate' y :+: z)) = (x :-: y) :+: z
+binary (x :**: (Number 1 :/: Number 2)) = sqrt x
 binary e = e

@@ -63,3 +63,7 @@ spec = parallel $ do
         forAll arbitrarySymbol $ \y ->
           forAll arbitrarySymbol $ \z ->
             tidy (x + ((-y) + z)) `shouldBe` x - y + z
+
+    prop "(x + y) ** (1/2)" $
+      forAll arbitrarySymbol $ \x ->
+        tidy (x ** (1 / 2)) `shouldBe` sqrt x
