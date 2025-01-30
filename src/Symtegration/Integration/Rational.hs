@@ -514,6 +514,13 @@ complexLogTermToRealExpression v (r, s)
     -- Function h is used to turn the coefficient into an Expression.
     toExpr x h u = getSum $ foldTerms (\e'' c -> Sum $ h c * (x ** Number (fromIntegral e''))) u
 
+-- | From the ingredients of a complex logarithm, return the expression for the complex algorithm.
+-- Specifically, for polynomials \(\left(Q(t), S(t,x)\right)\),
+-- a symbolic representation for the following will be returned.
+--
+-- \[
+-- \sum_{\alpha \in \{ t \mid Q(t) = 0 \}} \left( \alpha \log \left( S(\alpha,x) \right) \right)
+-- \]
 complexLogTermToComplexExpression ::
   -- | Symbol for the variable.
   Text ->
