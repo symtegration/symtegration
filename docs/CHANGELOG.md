@@ -8,6 +8,9 @@ and this project adheres to the
 
 ## Unreleased
 
+*   For rational function integration, use complex logarithms if we are not
+    able to derive real function integrals.
+
 *   Add function to map polynomial coefficients monadically.
 
 ### 0.5.0 - 2025-01-20
