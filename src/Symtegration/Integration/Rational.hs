@@ -508,7 +508,8 @@ complexLogTermToRealExpression v (r, s)
     convert _ = Nothing
 
     -- Convert polynomial with Expression coefficients into a polynomial with rational number coefficients.
-    convertCoefficients = mapCoefficientsM convert
+    convertCoefficients :: IndexedPolynomialWith Expression -> Maybe IndexedPolynomial
+    convertCoefficients x = sum . map (\(e, c) -> scale c (power e)) <$> toMaybeList (foldTerms (\e c -> [(e,) <$> convert (simplify c)]) x)
 
     -- Turns a polynomial into an Expression.
     -- Function h is used to turn the coefficient into an Expression.
