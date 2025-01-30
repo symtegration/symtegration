@@ -95,7 +95,7 @@ which you can try out by [running on mybinder.org].
 
 See [`CHANGELOG.md`] for what has changed.
 
-[`CHANGELOG.md`]: docs/CHANGELOG.md
+[`CHANGELOG.md`]: CHANGELOG.md
 
 ## Code of conduct
 

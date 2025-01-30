@@ -87,7 +87,7 @@ builds and tests are still successful.  These changes to the Cabal configuration
 are only for confirming that the lower bounds are still valid, and should not
 be submitted to the repository.
 
-[`CHANGELOG.md`]: CHANGELOG.md
+[`CHANGELOG.md`]: ../CHANGELOG.md
 [`package.yaml`]: ../package.yaml
 [`symtegration.cabal`]: ../symtegration.cabal
 [semantic versioning]: https://semver.org/

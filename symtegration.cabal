@@ -28,9 +28,9 @@ build-type:     Simple
 tested-with:
     GHC == 9.12.1 || == 9.10.1 || == 9.8.4 || == 9.6.6
 extra-source-files:
+    CHANGELOG.md
     LICENSE
     README.md
-    docs/CHANGELOG.md
     docs/CODE_OF_CONDUCT.md
     docs/CONTRIBUTING.md
     docs/SECURITY.md
