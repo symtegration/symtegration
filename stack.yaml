@@ -2,7 +2,7 @@
 # https://docs.haskellstack.org/en/stable/yaml_configuration/
 
 # A 'specific' Stackage snapshot or a compiler version.
-snapshot: nightly-2025-01-15
+snapshot: nightly-2025-02-01
 
 # User packages to be built.
 packages:
