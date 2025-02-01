@@ -91,31 +91,33 @@ which you can try out by [running on mybinder.org].
 [example IHaskell notebook]: https://github.com/chungyc/haskell-notebooks/blob/main/Symtegration.ipynb
 [running on mybinder.org]: https://mybinder.org/v2/gh/chungyc/haskell-notebooks/HEAD?labpath=Symtegration.ipynb
 
-## Changes
+## Project information
+
+### Changes
 
 See [`CHANGELOG.md`] for what has changed.
 
 [`CHANGELOG.md`]: CHANGELOG.md
 
-## Code of conduct
+### Code of conduct
 
 Be nice; see [`CODE_OF_CONDUCT.md`] for details.
 
 [`CODE_OF_CONDUCT.md`]: docs/CODE_OF_CONDUCT.md
 
-## Security policy
+### Security policy
 
 See [`SECURITY.md`] for details.
 
 [`SECURITY.md`]: docs/SECURITY.md
 
-## Contributing
+### Contributing
 
 See [`CONTRIBUTING.md`] for details.
 
 [`CONTRIBUTING.md`]: docs/CONTRIBUTING.md
 
-## License
+### License
 
 Apache 2.0; see [`LICENSE`] for details.
 
