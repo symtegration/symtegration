@@ -1,6 +1,6 @@
 -- |
 -- Description: Provides general properties that can be used to testing various integration algorithms.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Integration.Properties (antiderivativeProperty) where
@@ -10,10 +10,8 @@ import Data.Map qualified as Map
 import Data.Text (Text)
 import Data.Text qualified as Text
 import Numeric.AD
-import Symtegration.ErrorDouble
-import Symtegration.FiniteDouble
+import Symtegration.Approximate
 import Symtegration.Symbolic
-import Symtegration.Symbolic.Arbitrary
 import Symtegration.Symbolic.Haskell
 import Test.Hspec
 import Test.QuickCheck
@@ -31,25 +29,23 @@ antiderivativeProperty integrate m e x =
   where
     check Nothing _ = label "integration fail" True
     check (Just integrated) v =
-      not (sensitiveExpression e (assign m)) && not (sensitiveExpression integrated (assign m)) ==>
-        isFinite (FiniteDouble $ f x) && isFinite (FiniteDouble $ f' x) ==>
-          label "integration success" $
-            counterexample ("derivative = " <> Text.unpack (toHaskell e)) $
-              counterexample ("antiderivative = " <> Text.unpack (toHaskell integrated)) $
-                Near (FiniteDouble (f' x)) `shouldBe` Near (FiniteDouble (f x))
+      label "integration success" $
+        counterexample ("derivative = " <> Text.unpack (toHaskell e)) $
+          counterexample ("antiderivative = " <> Text.unpack (toHaskell integrated)) $
+            let y = f (approximate x)
+                y' = f' (approximate x)
+             in isFinite y && isFinite y' ==> y `shouldBe` y'
       where
         -- The original function and the derivative of the integral should behave similarly.
-        --
-        -- These are (Double -> Double).  It seems Numeric.AD does not like FiniteDouble.
         f = toFunction e (replace v)
         f' = diff (toFunction integrated (replaceForDiff v))
 
     -- Map all but the variable symbol to concrete numbers.
     replace var s
       | s == var = id
-      | (Just z) <- Map.lookup s m = const z
-      | otherwise = const 0
+      | (Just z) <- Map.lookup s m = const (approximate z)
+      | otherwise = const $ approximate 0
     replaceForDiff var s
       | s == var = id
-      | (Just z) <- Map.lookup s m = const $ auto z
-      | otherwise = const $ auto 0
+      | (Just z) <- Map.lookup s m = const $ auto (approximate z)
+      | otherwise = const $ auto (approximate 0)

@@ -5,10 +5,10 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.SolveSpec (spec) where
 
-import Data.Complex
-import Data.List (nub, sort)
+import Data.Complex (realPart)
+import Data.List (nub, sort, sortOn)
 import Data.Monoid (Sum (..))
-import Symtegration.FiniteDouble
+import Symtegration.Approximate
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Solve
@@ -42,8 +42,8 @@ spec = parallel $ do
         let p = scale a 1 * (power 1 - scale x 1) * (power 1 - scale y 1)
          in counterexample (show p) $
               if x == y
-                then toFiniteDoubleRoots (solve p) `shouldBe` Just (toFiniteDoubles [x])
-                else toFiniteDoubleRoots (solve p) `shouldBe` Just (toFiniteDoubles [x, y])
+                then toDoubleRoots (solve p) `shouldBe` Just (toDoubles [x])
+                else toDoubleRoots (solve p) `shouldBe` Just (toDoubles [x, y])
 
       prop "does not find real roots" $ \(NonZero a) b c ->
         let p = scale a (power 2) + scale b (power 1) + scale c 1
@@ -75,7 +75,7 @@ spec = parallel $ do
           let p = scale a 1 * (power 1 - scale x 1) * (power 1 - scale y 1) * (power 1 - scale z 1)
               roots = nub [x, y, z]
            in counterexample (show p) $
-                toFiniteDoubleRoots (solve p) `shouldBe` Just (toFiniteDoubles roots)
+                toDoubleRoots (solve p) `shouldBe` Just (toDoubles roots)
 
     describe "quartic polynomials" $ do
       modifyMaxSuccess (* 10) $
@@ -114,7 +114,7 @@ spec = parallel $ do
                   Nothing -> label "not solved" True
                   xs@(Just _) ->
                     label "solved" $
-                      toFiniteDoubleRoots xs `shouldBe` Just (toFiniteDoubles roots)
+                      toDoubleRoots xs `shouldBe` Just (toDoubles roots)
 
   describe "complexSolve" $ do
     describe "linear polynomials" $ do
@@ -126,8 +126,8 @@ spec = parallel $ do
     describe "quadratic polynomials" $ do
       prop "finds real solutions" $ \(NonZero a) b c ->
         let p = scale a (power 2) + scale b (power 1) + scale c 1
-         in filter (/= Near (0 / 0)) <$> toFiniteDoubleRoots (complexSolve p)
-              `shouldBe` toFiniteDoubleRoots (solve p)
+         in filter isFinite <$> toDoubleRoots (complexSolve p)
+              `shouldBe` toDoubleRoots (solve p)
 
     describe "cubic polynomials" $ do
       modifyMaxSuccess (* 100) $
@@ -189,7 +189,7 @@ correctlySolves p =
 -- | Whether x is a root of p.
 isRoot :: IndexedPolynomial -> Expression -> Bool
 isRoot p x
-  | (Just x') <- evaluate x (const Nothing) = Near (f x') == Near 0
+  | (Just x') <- evaluate x (const Nothing) = f x' == approximate 0
   | otherwise = False
   where
     p' = toExpression "x" toRationalCoefficient p
@@ -202,27 +202,27 @@ areRoots _ Nothing = True
 areRoots p (Just xs) = all (isRoot p) xs
 
 -- | Evaluate an expression into a floating-point value for comparisons.
-eval :: Expression -> Near
+eval :: Expression -> Approximate
 eval e
-  | (Just x) <- evaluate e (const Nothing) = Near x
-  | otherwise = Near $ 0 / 0 -- not a number
+  | (Just x) <- evaluate e (const Nothing) = x
+  | otherwise = 0 / 0 -- not a number
 
 -- | Convert a potential list of polynomial root solutions into floating-point values for comparisons.
-toFiniteDoubleRoots :: Maybe [Expression] -> Maybe [Near]
-toFiniteDoubleRoots = fmap (sort . map eval)
+toDoubleRoots :: Maybe [Expression] -> Maybe [Approximate]
+toDoubleRoots = fmap (sortOn (realPart . center) . map eval)
 
 -- | Convert a list of rational numbers into floating-point values for comparisons.
-toFiniteDoubles :: [Rational] -> [Near]
-toFiniteDoubles = sort . map (Near . fromRational)
+toDoubles :: [Rational] -> [Approximate]
+toDoubles = map fromRational . sort
 
 -- | Evaluate an expression to a concrete complex number.
-complexEval :: Expression -> Complex Double
+complexEval :: Expression -> Approximate
 complexEval expr
   | (Just x) <- evaluate expr (const Nothing) = x
   | otherwise = 0 / 0 -- not a number
 
 -- | Evaluate a polynomial with a complex number substituted in the variable.
-complexPolyEval :: IndexedPolynomial -> Complex Double -> Complex Double
+complexPolyEval :: IndexedPolynomial -> Approximate -> Approximate
 complexPolyEval p x = getSum $ foldTerms (\e c -> Sum $ fromRational c * x ** fromIntegral e) p
 
 -- | Check whether the given polynomial is consistent with the given solutions,
@@ -231,13 +231,9 @@ consistentWithComplexRoots :: IndexedPolynomial -> Maybe [Expression] -> Propert
 consistentWithComplexRoots p roots =
   label (rootsLabel roots) $
     counterexample (show roots') $
-      map (complexPolyEval p) <$> roots' `shouldSatisfy` closeEnough
+      map (complexPolyEval p) <$> roots' `shouldSatisfy` maybe True (all (== 0))
   where
     roots' = map complexEval <$> roots
 
     rootsLabel Nothing = "did not solve"
     rootsLabel (Just xs) = "root count = " <> show (length xs)
-
-    -- We do not check for sensitive functions, so use a generous error bound.
-    closeEnough (Just xs) = all ((< 1) . magnitude) xs
-    closeEnough Nothing = True

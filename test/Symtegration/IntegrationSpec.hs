@@ -5,9 +5,7 @@
 -- Maintainer: dev@chungyc.org
 module Symtegration.IntegrationSpec (spec) where
 
-import Data.Map qualified as Map
 import Data.Text (Text)
-import Symtegration.FiniteDouble
 import Symtegration.Integration
 import Symtegration.Integration.Exponential qualified as Exponential
 import Symtegration.Integration.Powers qualified as Powers
@@ -49,4 +47,4 @@ antiderivativeProperty ::
   Double ->
   Property
 antiderivativeProperty f (Complete e m) =
-  Properties.antiderivativeProperty f (Map.map (\(FiniteDouble z) -> z) m) e
+  Properties.antiderivativeProperty f m e

@@ -1,6 +1,6 @@
 -- |
 -- Description: Tests for Symtegration.SymbolicSpec
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.SymbolicSpec (spec) where
@@ -11,15 +11,15 @@ import Data.Ratio (denominator, numerator)
 import Data.String (fromString)
 import Data.Text (Text)
 import Data.Text qualified as Text
-import Symtegration.FiniteDouble
+import Symtegration.Approximate
 import Symtegration.Symbolic
 import Symtegration.Symbolic.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
--- | Same as 'evaluate', except specialized to 'FiniteDouble'.
-evaluate' :: Expression -> (Text -> Maybe FiniteDouble) -> Maybe FiniteDouble
+-- | Same as 'evaluate', except specialized to 'Approximate'.
+evaluate' :: Expression -> (Text -> Maybe Approximate) -> Maybe Approximate
 evaluate' = evaluate
 
 spec :: Spec
@@ -146,14 +146,14 @@ spec = parallel $ do
       evaluate' (Symbol s) (\s' -> if s' == s then Just x else Nothing) `shouldBe` Just x
 
     prop "unary function" $ \(Complete e m) func ->
-      fmap Exact (evaluate' (UnaryApply func e) (assign m))
-        `shouldBe` fmap (Exact . getUnaryFunction func) (evaluate' e (assign m))
+      evaluate' (UnaryApply func e) (fmap approximate . assign m)
+        `shouldBe` fmap (getUnaryFunction func) (evaluate' e (fmap approximate . assign m))
 
     prop "binary function" $ \(Complete e1 m1) (Complete e2 m2) func ->
       let m = Map.union m1 m2
           f = getBinaryFunction func
-       in fmap Exact (evaluate' (BinaryApply func e1 e2) (assign m))
-            `shouldBe` fmap Exact (f <$> evaluate' e1 (assign m) <*> evaluate' e2 (assign m))
+       in evaluate' (BinaryApply func e1 e2) (fmap approximate . assign m)
+            `shouldBe` f <$> evaluate' e1 (fmap approximate . assign m) <*> evaluate' e2 (fmap approximate . assign m)
 
     prop "nothing" $ \(Complete e m) ->
       not (Map.null m) ==> evaluate' e (const Nothing) `shouldBe` Nothing
@@ -167,14 +167,14 @@ spec = parallel $ do
 
     prop "similar to evaluate" $ \(Complete e m) ->
       let v = fractionalEvaluate e (fmap toRational . assign m)
-          v' = evaluate e (assign m)
+          v' = evaluate e (fmap approximate . assign m)
        in maybe False isFinite v' && isJust v ==>
-            Near . FiniteDouble . fromRational <$> v `shouldBe` Near <$> v'
+            approximate . fromRational <$> v `shouldBe` v'
 
   describe "unary functions are correctly mapped for" $ do
     mapM_
       ( \(func, f) -> prop (show func) $ \x ->
-          Exact (getUnaryFunction func x) `shouldBe` Exact (f x)
+          getUnaryFunction func x `shouldBe` f x
       )
       ( [ (Negate, negate),
           (Abs, abs),
@@ -195,13 +195,13 @@ spec = parallel $ do
           (Acosh, acosh),
           (Atanh, atanh)
         ] ::
-          [(UnaryFunction, FiniteDouble -> FiniteDouble)]
+          [(UnaryFunction, Approximate -> Approximate)]
       )
 
   describe "binary functions are correctly mapped for" $ do
     mapM_
       ( \(func, f) -> prop (show func) $
-          \x y -> Exact (getBinaryFunction func x y) `shouldBe` Exact (f x y)
+          \x y -> getBinaryFunction func x y `shouldBe` f x y
       )
       ( [ (Add, (+)),
           (Multiply, (*)),
@@ -210,7 +210,7 @@ spec = parallel $ do
           (Power, (**)),
           (LogBase, logBase)
         ] ::
-          [(BinaryFunction, FiniteDouble -> FiniteDouble -> FiniteDouble)]
+          [(BinaryFunction, Approximate -> Approximate -> Approximate)]
       )
 
   describe "show" $ do

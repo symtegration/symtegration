@@ -2,7 +2,7 @@
 
 -- |
 -- Description: QuickCheck Arbitrary instances for generating Symtegration.Symbolic values.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
 module Symtegration.Symbolic.Arbitrary
@@ -30,8 +30,6 @@ import Data.Set qualified as S
 import Data.String (fromString)
 import Data.Text (Text)
 import Data.Text qualified as Text
-import Symtegration.ErrorDouble
-import Symtegration.FiniteDouble
 import Symtegration.Symbolic
 import Test.QuickCheck
 
@@ -80,7 +78,7 @@ instance Arbitrary Compound where
 -- | Generates arbitrary expressions with a complete assignment of numbers to symbols.
 -- The assignment of symbols to values will only contain symbols appearing in the expression.
 -- Use the 'assign' function to turn the map into a function.
-data Complete = Complete Expression (Map Text FiniteDouble) deriving (Eq, Show)
+data Complete = Complete Expression (Map Text Double) deriving (Eq, Show)
 
 instance Arbitrary Complete where
   arbitrary = do
@@ -88,11 +86,7 @@ instance Arbitrary Complete where
     vals <- infiniteList
     let symbols = gatherSymbols expr
     let assignment = Map.fromList $ zip (S.toList symbols) vals
-    if not (sensitiveExpression expr (assign assignment))
-      -- Only use expressions where slight divergences do not result in huge errors.
-      then return $ Complete expr (Map.map FiniteDouble assignment)
-      -- If we do not have such an expression, try again.
-      else arbitrary
+    return $ Complete expr assignment
 
   shrink (Complete e m) = [Complete e' (restrict m e') | e' <- shrink e]
     where
