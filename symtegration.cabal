@@ -55,6 +55,7 @@ library
       Symtegration.Integration.Trigonometric
       Symtegration.Numeric
       Symtegration.Polynomial
+      Symtegration.Polynomial.Differential
       Symtegration.Polynomial.Indexed
       Symtegration.Polynomial.Solve
       Symtegration.Polynomial.Symbolic
@@ -119,6 +120,7 @@ test-suite spec
       Symtegration.Integration.TrigonometricSpec
       Symtegration.IntegrationSpec
       Symtegration.NumericSpec
+      Symtegration.Polynomial.DifferentialSpec
       Symtegration.Polynomial.Indexed.Arbitrary
       Symtegration.Polynomial.IndexedSpec
       Symtegration.Polynomial.SolveSpec
