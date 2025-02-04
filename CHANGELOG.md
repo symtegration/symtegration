@@ -8,6 +8,10 @@ and this project adheres to the
 
 ## Unreleased
 
+*   Revamp of how expressions are compared using floating-point computations.
+
+    *   Extended computation domain to complex numbers.
+
 ### 0.6.1 - 2025-01-30
 
 *   Do not set `-Werror` by default in preparation for upload to Hackage.
