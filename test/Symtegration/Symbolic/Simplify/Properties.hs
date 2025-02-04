@@ -18,6 +18,6 @@ equivalentProperty simplify (Complete e m) =
       v = evaluate e (fmap approximate . assign m)
       v' = evaluate e' (fmap approximate . assign m)
    in maybe False isFinite v && maybe False isFinite v' ==>
-      counterexample ("e = " <> show (toHaskell e)) $
-        counterexample ("simplify e = " <> show (toHaskell e')) $
-          v `shouldBe` v'
+        counterexample ("e = " <> show (toHaskell e)) $
+          counterexample ("simplify e = " <> show (toHaskell e')) $
+            v `shouldBe` v'

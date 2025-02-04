@@ -1,8 +1,38 @@
 -- |
 -- Description: Numbers used for testing whether two expressions may be semantically equivalent.
--- Copyright: Copyright 2024 Yoo Chung
+-- Copyright: Copyright 2025 Yoo Chung
 -- License: Apache-2.0
 -- Maintainer: dev@chungyc.org
+--
+-- When trying to compare two expressions as to whether they are semantically equivalent,
+-- actually computing a value with concrete numbers should result in similar results.
+-- This is much easier than trying to semantically prove that two symbolic representations
+-- are equivalent, unless one has high confidence that the prover is correct and complete.
+-- Many tests for Symtegration uses this approach to test that two mathematical expressions
+-- are at least not semantically different.
+--
+-- There are a number of caveats with this approach.  One is that we use floating-point
+-- computations to reliably compare the computation results when evaluating expressions,
+-- and this involves floating-point error.  For this reason, we include estimated error
+-- bounds in our computations.
+--
+-- Some computations involve infinities or "not a number", and to prevent certain operations
+-- turning them back into finite numbers, such results will always be "not a number".
+-- This avoids situations such as positive zeros becoming positive infinities
+-- and negative zeroes becoming negative infinities, resulting in huge divergences
+-- despite starting out with practically the same values.  Tests should use 'isFinite'
+-- to check that an approximation is finite and meaningfully comparable before
+-- using it in tests.
+--
+-- For some operators or functions, slight changes can have massive divergences in results.
+-- In other cases, being forced to have a single result when mathematically there are many
+-- results can result in significant divergences in results as well.  In these cases,
+-- we force the computation to return a "not a number", so that tests can avoid
+-- these cases when testing the equivalence between two symbolic representations of
+-- mathematical expressions.
+--
+-- Complex numbers are algebraically closed, so it is not anticipated that further
+-- extensions into what number domain is used for computations will be needed.
 module Symtegration.Approximate
   ( Approximate,
     approximate,
@@ -17,30 +47,44 @@ import Data.Foldable1 qualified as Foldable1
 import Data.List.NonEmpty (NonEmpty (..))
 import Test.QuickCheck
 
+-- | Number type approximating a number with a central point and an estimated error bound.
+-- Only real numbers may be approximated explicitly,
+-- but computations will be done on the complex number domain.
 data Approximate = Approximate (Complex Double) Double
   deriving (Show)
 
+-- | Approximate a real number with some error.
 approximate :: Double -> Approximate
 approximate 0 = Approximate 0 implicitError
 approximate x = Approximate (x :+ 0) (implicitError * abs x)
 
+-- | Implicit error to include when approximating real numbers.
 implicitError :: Double
 implicitError = 1e-5
 
+-- | Approximate a real number with an explicitly specified error.
 approximateWithError :: Double -> Double -> Approximate
 approximateWithError x = Approximate (x :+ 0)
 
+-- | Return the central point of the approximated number.
+-- I.e., discards the estimated error bound.
 center :: Approximate -> Complex Double
 center (Approximate z _) = z
 
+-- | Returns whether the number is a concrete finite number.
+-- I.e., not infinite and not "not a number".
 isFinite :: Approximate -> Bool
 isFinite (Approximate (x :+ y) err) = finite x && finite y && finite err
   where
     finite z = not (isNaN x || isInfinite z)
 
+-- | "Not A Number".
 notNumber :: Approximate
 notNumber = Approximate (0 / 0) (0 / 0)
 
+-- | Candidate complex numbers to use in complex number operations for
+-- estimating error bounds.  The distance to the complex number result farthest
+-- from the computed central point will be used as the estimated error bound.
 candidates :: Approximate -> [Complex Double]
 -- Keep it real if it is a real number.
 candidates (Approximate (x :+ 0) err) = [x :+ 0, (x - err) :+ 0, (x + err) :+ 0]
@@ -73,11 +117,19 @@ binaryOp op x@(Approximate u@(ux :+ uy) _) y@(Approximate v@(vx :+ vy) _)
     w@(r :+ s) = op u v
     err = Foldable1.maximum $ 0 :| [magnitude (w' - w) | x' <- candidates x, y' <- candidates y, let w' = op x' y']
 
+-- | Two 'Approximate' values are considered equal if they are one of:
+--
+-- * both practically zero by having zero within their estimated bounds
+--
+-- * the central point of one value is within the other's estimated bounds
+--
+-- * either is "not a number"
 instance Eq Approximate where
   (Approximate x xerr) == (Approximate y yerr)
     | magnitude x <= xerr && magnitude y <= yerr = True -- both practically zero
     | otherwise = not diffx || not diffy
     where
+      -- The converses will return true if any value is "not a number".
       diffx = difference > xerr * tolerance
       diffy = difference > yerr * tolerance
       difference = magnitude $ x - y
@@ -127,6 +179,9 @@ instance Floating Approximate where
   sin = unaryOp sin
   cos = unaryOp cos
   tan = unaryOp tan
+
+  -- Avoid issues with multiple results by restricting inverse trigonometric functions
+  -- to using real number arguments with real number results.
 
   asin z@(Approximate (x :+ 0) _)
     | -1 <= x, x <= 1 = unaryOp asin z
