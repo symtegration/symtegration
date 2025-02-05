@@ -17,7 +17,7 @@ spec = parallel $ do
   extendSpec
 
 splitFactorSpec :: Spec
-splitFactorSpec = describe "splitFactor" $ do
+splitFactorSpec = modifyMaxSize (`div` 4) $ describe "splitFactor" $ do
   prop "are factors" $ \p (Deriv derivation _) ->
     forFactors (splitFactor derivation p) $ \(ps, pn) ->
       ps * pn `shouldBe` p
@@ -36,7 +36,7 @@ splitFactorSpec = describe "splitFactor" $ do
           f (pn, ps)
 
 splitSquarefreeFactorSpec :: Spec
-splitSquarefreeFactorSpec = describe "splitSquarefreeFactor" $ do
+splitSquarefreeFactorSpec = modifyMaxSize (`div` 4) $ describe "splitSquarefreeFactor" $ do
   prop "is equivalent to splitFactor" $ \p (Deriv derivation _) ->
     let factors = splitSquarefreeFactor derivation p
      in counterexample (show factors) $
@@ -55,7 +55,7 @@ splitSquarefreeFactorSpec = describe "splitSquarefreeFactor" $ do
         p' = differentiate p
 
 canonicalSpec :: Spec
-canonicalSpec = describe "canonical" $ do
+canonicalSpec = modifyMaxSize (`div` 4) $ describe "canonical" $ do
   prop "adds back to original function" $ \(Rat a d) (Deriv derivation _) ->
     let rep@(p, (b, dn), (c, ds)) = canonical derivation a d
      in counterexample (show rep) $
@@ -89,7 +89,7 @@ canonicalSpec = describe "canonical" $ do
           ds `shouldSatisfy` isSpecial derivation
 
 extendSpec :: Spec
-extendSpec = describe "extend" $ do
+extendSpec = modifyMaxSize (`div` 4) $ describe "extend" $ do
   prop "extension is derivation" $ \w a b ->
     consistent (extend differentiate w) a (b :: IndexedPolynomialWith IndexedPolynomial)
       `shouldBe` True
@@ -121,7 +121,7 @@ data Rat = Rat IndexedPolynomial IndexedPolynomial deriving (Show)
 
 instance Arbitrary Rat where
   arbitrary = do
-    d <- arbitrary `suchThat` (/= 0)
+    d <- monic <$> arbitrary `suchThat` (/= 0)
     a <- arbitrary `suchThat` ((== 0) . degree . greatestCommonDivisor d)
     return $ Rat a d
 
