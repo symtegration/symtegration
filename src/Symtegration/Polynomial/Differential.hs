@@ -227,9 +227,7 @@ consistent derivation a b = additive && productive
 -- >>> derivation' $ scale (power 2) (power 1)
 -- [(0,x^2),(1,2x),(2,x^2)]
 extend :: (Polynomial p e c, Num (p e c), Eq c, Num c) => (c -> c) -> p e c -> p e c -> p e c
-extend derivation w p
-  | degree p == 0 = scale (derivation $ coefficient p 0) (power 0)
-  | otherwise = getSum $ foldTerms (\e c -> Sum $ derive e c) p
+extend derivation w p = getSum $ foldTerms (\e c -> Sum $ derive e c) p
   where
     -- D(ct^e) = t^e Dc + c D(t^e) = t^e Dc + c e t^(e-1) Dt
     derive e c = scale (derivation c) (power e) + scale (c * fromIntegral e) (power $ e - 1) * w
