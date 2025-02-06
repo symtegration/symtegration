@@ -55,12 +55,17 @@ data Approximate = Approximate (Complex Double) Double
 
 -- | Approximate a real number with some error.
 approximate :: Double -> Approximate
-approximate 0 = Approximate 0 implicitError
-approximate x = Approximate (x :+ 0) (implicitError * abs x)
+approximate x
+  | abs x <= zeroThreshold = Approximate (x :+ 0) implicitError
+  | otherwise = Approximate (x :+ 0) (implicitError * abs x)
 
 -- | Implicit error to include when approximating real numbers.
 implicitError :: Double
 implicitError = 1e-5
+
+-- | Threshold to be considered practically zero.
+zeroThreshold :: Double
+zeroThreshold = 1e-8
 
 -- | Approximate a real number with an explicitly specified error.
 approximateWithError :: Double -> Double -> Approximate
@@ -104,7 +109,13 @@ unaryOp op v@(Approximate z@(zx :+ zy) _)
   | otherwise = Approximate w err
   where
     w@(x :+ y) = op z
-    err = Foldable1.maximum $ 0 :| [magnitude (w' - w) | z' <- candidates v, let w' = op z']
+    err = Foldable1.maximum $ minimal :| [magnitude (w' - w) | z' <- candidates v, let w' = op z']
+
+    -- Some minimal error to prevent error bounds from whithering away.
+    -- E.g., with exp (-10000).
+    minimal
+      | magnitude w <= zeroThreshold = implicitError
+      | otherwise = magnitude w * implicitError
 
 binaryOp :: (Complex Double -> Complex Double -> Complex Double) -> Approximate -> Approximate -> Approximate
 binaryOp op x@(Approximate u@(ux :+ uy) _) y@(Approximate v@(vx :+ vy) _)
@@ -115,7 +126,14 @@ binaryOp op x@(Approximate u@(ux :+ uy) _) y@(Approximate v@(vx :+ vy) _)
   | otherwise = Approximate w err
   where
     w@(r :+ s) = op u v
-    err = Foldable1.maximum $ 0 :| [magnitude (w' - w) | x' <- candidates x, y' <- candidates y, let w' = op x' y']
+    errors = [magnitude (w' - w) | x' <- candidates x, y' <- candidates y, let w' = op x' y']
+    err = Foldable1.maximum $ minimal :| errors
+
+    -- Some minimal error to prevent error bounds from whithering away.
+    -- E.g., with 0.1 ** 10000.
+    minimal
+      | magnitude w <= zeroThreshold = implicitError
+      | otherwise = magnitude w * implicitError
 
 -- | Two 'Approximate' values are considered equal if they are one of:
 --
