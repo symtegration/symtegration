@@ -119,7 +119,10 @@ integrate v e
 
 -- | Represents the ratio of two polynomials with rational number coefficients.
 data RationalFunction = RationalFunction IndexedPolynomial IndexedPolynomial
-  deriving (Eq, Generic, NFData)
+  deriving (Generic, NFData)
+
+instance Eq RationalFunction where
+  (RationalFunction x y) == (RationalFunction u v) = x * v == y * u
 
 instance Show RationalFunction where
   show (RationalFunction n d) = "(" <> show n <> ") / (" <> show d <> ")"

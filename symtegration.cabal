@@ -46,6 +46,7 @@ library
       Symtegration.Integration
       Symtegration.Integration.Exponential
       Symtegration.Integration.Factor
+      Symtegration.Integration.Monomial
       Symtegration.Integration.Parts
       Symtegration.Integration.Powers
       Symtegration.Integration.Rational
@@ -112,6 +113,7 @@ test-suite spec
       Symtegration.Approximate
       Symtegration.Integration.ExponentialSpec
       Symtegration.Integration.FactorSpec
+      Symtegration.Integration.MonomialSpec
       Symtegration.Integration.PartsSpec
       Symtegration.Integration.PowersSpec
       Symtegration.Integration.Properties
