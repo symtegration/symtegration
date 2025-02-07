@@ -136,6 +136,7 @@ test-suite spec
       Symtegration.Symbolic.Simplify.SymbolicFoldingSpec
       Symtegration.Symbolic.Simplify.TidySpec
       Symtegration.SymbolicSpec
+      SymtegrationSpec
       Paths_symtegration
   hs-source-dirs:
       test
