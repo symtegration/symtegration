@@ -3,6 +3,3 @@ contact_links:
   - name: Discuss ideas or ask questions
     url: https://github.com/symtegration/symtegration/discussions
     about: Please ask and answer questions in discussions
-  - name: Report a security vulnerability
-    url: https://github.com/symtegration/symtegration/security/policy
-    about: Please review our security policy for more details
