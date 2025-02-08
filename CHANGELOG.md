@@ -12,6 +12,8 @@ and this project adheres to the
 
     *   Extended computation domain to complex numbers.
 
+*   Make various types instances of `NFData`.
+
 ### 0.6.1 - 2025-01-30
 
 *   Do not set `-Werror` by default in preparation for upload to Hackage.

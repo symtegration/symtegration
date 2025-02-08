@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveAnyClass #-}
+
 -- |
 -- Module: Symtegration.Integration.Rational
 -- Description: Integration of rational functions.
@@ -28,10 +30,12 @@ module Symtegration.Integration.Rational
   )
 where
 
+import Control.DeepSeq (NFData)
 import Data.Foldable (asum)
 import Data.List (find, intersect)
 import Data.Monoid (Sum (..))
 import Data.Text (Text)
+import GHC.Generics (Generic)
 import Symtegration.Polynomial hiding (integrate)
 import Symtegration.Polynomial qualified as Polynomial
 import Symtegration.Polynomial.Indexed
@@ -115,7 +119,7 @@ integrate v e
 
 -- | Represents the ratio of two polynomials with rational number coefficients.
 data RationalFunction = RationalFunction IndexedPolynomial IndexedPolynomial
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 instance Show RationalFunction where
   show (RationalFunction n d) = "(" <> show n <> ") / (" <> show d <> ")"

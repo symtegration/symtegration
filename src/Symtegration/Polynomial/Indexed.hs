@@ -11,12 +11,14 @@ module Symtegration.Polynomial.Indexed
   )
 where
 
+import Control.DeepSeq (NFData)
 import Data.IntMap (IntMap)
 import Data.IntMap qualified as IntMap
 import Data.List (intersperse)
 import Data.Maybe (fromMaybe)
 import Data.Ratio (denominator, numerator)
 import Data.Text (unpack)
+import GHC.Generics (Generic)
 import Symtegration.Polynomial
 import Symtegration.Symbolic
 import TextShow
@@ -39,7 +41,7 @@ type IndexedPolynomialWith a = P Int a
 -- | Type with two type parameters so that it can be an instance of 'Polynomial'.
 -- The first type parameter is not involved in the data constructor;
 -- it is used to set the exponent type for 'Polynomial'.
-newtype P a b = P (IntMap b) deriving (Eq)
+newtype P a b = P (IntMap b) deriving (Eq, Generic, NFData)
 
 instance Show (P Int Rational) where
   show = unpack . showt

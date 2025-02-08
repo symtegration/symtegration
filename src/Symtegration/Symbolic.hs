@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE PatternSynonyms #-}
 
@@ -60,6 +61,7 @@ module Symtegration.Symbolic
   )
 where
 
+import Control.DeepSeq (NFData)
 import Data.Ratio
 import Data.String (IsString, fromString)
 import Data.Text
@@ -104,7 +106,8 @@ data Expression
       Eq,
       Show,
       Read,
-      Generic
+      Generic,
+      NFData
     )
   deriving (TextShow) via FromGeneric Expression
 
@@ -149,7 +152,7 @@ data UnaryFunction
     Acosh
   | -- | 'atanh'
     Atanh
-  deriving (Eq, Enum, Bounded, Show, Read, Generic)
+  deriving (Eq, Enum, Bounded, Show, Read, Generic, NFData)
   deriving (TextShow) via FromGeneric UnaryFunction
 
 pattern Negate', Abs', Signum', Exp', Log', Sqrt', Sin', Cos', Tan', Asin', Acos', Atan', Sinh', Cosh', Tanh', Asinh', Acosh', Atanh' :: Expression -> Expression
@@ -186,7 +189,7 @@ data BinaryFunction
     Power
   | -- | 'logBase'
     LogBase
-  deriving (Eq, Enum, Bounded, Show, Read, Generic)
+  deriving (Eq, Enum, Bounded, Show, Read, Generic, NFData)
   deriving (TextShow) via FromGeneric BinaryFunction
 
 pattern (:+:), (:*:), (:-:), (:/:), (:**:), LogBase' :: Expression -> Expression -> Expression
