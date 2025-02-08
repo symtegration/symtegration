@@ -18,8 +18,8 @@ spec = parallel $ do
     prop "is zero for zero" $
       monic 0 `shouldBe` (0 :: IndexedPolynomial)
 
-    prop "has leading coefficient of one" $ \p ->
-      p /= 0 ==> leadingCoefficient (monic p :: IndexedPolynomial) `shouldBe` 1
+    prop "has leading coefficient of one" $ \(NonZero p) ->
+      leadingCoefficient (monic p :: IndexedPolynomial) `shouldBe` 1
 
     prop "is rational multiple of original polynomial" $ \p ->
       let p' = monic p :: IndexedPolynomial
@@ -28,13 +28,12 @@ spec = parallel $ do
             conjoin [r `shouldBe` 0, degree q `shouldBe` 0]
 
   describe "mapCoefficients" $ do
-    prop "scales" $ \p x ->
-      p /= 0 && x /= 0 ==>
-        let q = mapCoefficients (* x) p :: IndexedPolynomial
-         in conjoin
-              [ monic p === monic q,
-                leadingCoefficient p * x === leadingCoefficient q
-              ]
+    prop "scales" $ \(NonZero p) (NonZero x) ->
+      let q = mapCoefficients (* x) p :: IndexedPolynomial
+       in conjoin
+            [ monic p === monic q,
+              leadingCoefficient p * x === leadingCoefficient q
+            ]
 
   describe "mapCoefficientsM" $ do
     prop "with Maybe" $ \p (Fun _ f) ->
@@ -46,7 +45,7 @@ spec = parallel $ do
   describe "polynomial algorithms" $ do
     describe "division" $ do
       prop "matches multiplication" $ \a b ->
-        degree b /= 0 ==>
+        degree b > 0 ==>
           let (q, r) = divide a b
            in b * q + r `shouldBe` (a :: IndexedPolynomial)
 
@@ -56,11 +55,10 @@ spec = parallel $ do
            in degree r `shouldSatisfy` (< degree (b :: IndexedPolynomial))
 
     describe "pseudo-division" $ do
-      prop "matches division for integer coefficients" $ \a b ->
-        b /= 0 ==>
-          let delta = max (-1) (degree a - degree b)
-              x = leadingCoefficient b ^ (1 + delta)
-           in pseudoDivide a b `shouldBe` divide (scale x a) (b :: IndexedPolynomial)
+      prop "matches division for integer coefficients" $ \a (NonZero b) ->
+        let delta = max (-1) (degree a - degree b)
+            x = leadingCoefficient b ^ (1 + delta)
+         in pseudoDivide a b `shouldBe` divide (scale x a) (b :: IndexedPolynomial)
 
     describe "extended Euclidean algorithm" $ do
       prop "gets common divisor" $ \a b ->
@@ -96,10 +94,9 @@ spec = parallel $ do
          in greatestCommonDivisor a b `shouldBe` g
 
     describe "subresultant polynomial remainder sequence" $ do
-      prop "resultant is zero iff gcd has non-zero degree" $ \a b ->
-        b /= 0 ==>
-          let (resultant, _) = subresultant a (b :: IndexedPolynomial)
-           in resultant == 0 `shouldBe` degree (greatestCommonDivisor a b) > 0
+      prop "resultant is zero iff gcd has non-zero degree" $ \a (NonZero b) ->
+        let (resultant, _) = subresultant a (b :: IndexedPolynomial)
+         in resultant == 0 `shouldBe` degree (greatestCommonDivisor a b) > 0
 
       modifyMaxSize (const 25) $
         prop "resultant has expected value" $
