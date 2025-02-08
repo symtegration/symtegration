@@ -165,3 +165,28 @@ spec = parallel $ do
             prod k (x : xs) = x ^ k * prod (k + 1) xs
          in counterexample (show qs) $
               prod 1 qs `shouldBe` p
+
+  describe "with symbolic coefficients" $ modifyMaxSize (`div` 10) $ do
+    prop "divide is total" $ \a (NonZero b) ->
+      total $ divide a (b :: IndexedSymbolicPolynomial)
+
+    prop "pseudoDivide is total" $ \a (NonZero b) ->
+      total $ pseudoDivide a (b :: IndexedSymbolicPolynomial)
+
+    prop "extendedEuclidean is total" $ \a b ->
+      total $ extendedEuclidean a (b :: IndexedSymbolicPolynomial)
+
+    prop "diophantineEuclidean is total" $ \a b c ->
+      total $ diophantineEuclidean a b (c :: IndexedSymbolicPolynomial)
+
+    prop "greatestCommonDivisor is total" $ \a b ->
+      total $ greatestCommonDivisor a (b :: IndexedSymbolicPolynomial)
+
+    prop "subresultant is total" $ \a b ->
+      total $ subresultant a (b :: IndexedSymbolicPolynomial)
+
+    prop "differentiate is total" $ \p ->
+      total $ differentiate (p :: IndexedSymbolicPolynomial)
+
+    prop "integrate is total" $ \p ->
+      total $ integrate (p :: IndexedSymbolicPolynomial)
