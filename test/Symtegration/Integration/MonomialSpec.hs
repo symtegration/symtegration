@@ -17,27 +17,31 @@ import Test.QuickCheck hiding (scale)
 
 spec :: Spec
 spec = parallel $ do
-  describe "hermiteReduce" $ do
-    prop "adds back to derivative of original function" $ \(D d _) p (NonZero q) ->
-      forReduction (hermiteReduce d p q) $ \(gs, (r, s), (f, (u, v))) ->
-        let dg' = sum [toRationalFunction (gd * d gn - gn * d gd) (gd * gd) | (gn, gd) <- gs]
-            h' = toRationalFunction r s
-            r' = toRationalFunction f 1 + toRationalFunction u v
-         in dg' + h' + r' `shouldBe` toRationalFunction p q
+  hermiteReduceSpec
+  polynomialReduceSpec
 
-    prop "denominators divide denominator of original function" $ \(D d _) p (NonZero q) ->
-      forReduction (hermiteReduce d p q) $ \(gs, (_, s), (_, (_, v))) -> do
-        [gd | (_, gd) <- gs] `shouldSatisfy` all (`divides` q)
-        s `shouldSatisfy` (`divides` q)
-        v `shouldSatisfy` (`divides` q)
+hermiteReduceSpec :: Spec
+hermiteReduceSpec = describe "hermiteReduce" $ do
+  prop "adds back to original function" $ \(D d _) p (NonZero q) ->
+    forReduction (hermiteReduce d p q) $ \(gs, (r, s), (f, (u, v))) ->
+      let dg' = sum [toRationalFunction (gd * d gn - gn * d gd) (gd * gd) | (gn, gd) <- gs]
+          h' = toRationalFunction r s
+          r' = toRationalFunction f 1 + toRationalFunction u v
+       in dg' + h' + r' `shouldBe` toRationalFunction p q
 
-    prop "denominator for h is simple" $ \(D d _) p (NonZero q) ->
-      forReduction (hermiteReduce d p q) $ \(_, (_, s), (_, (_, _))) -> do
-        degree (greatestCommonDivisor s $ d s) `shouldBe` 0
+  prop "denominators divide denominator of original function" $ \(D d _) p (NonZero q) ->
+    forReduction (hermiteReduce d p q) $ \(gs, (_, s), (_, (_, v))) -> do
+      [gd | (_, gd) <- gs] `shouldSatisfy` all (`divides` q)
+      s `shouldSatisfy` (`divides` q)
+      v `shouldSatisfy` (`divides` q)
 
-    prop "denominator for r is reduced" $ \(D d _) p (NonZero q) ->
-      forReduction (hermiteReduce d p q) $ \(_, (_, _), (_, (_, v))) -> do
-        monic (greatestCommonDivisor v $ d v) `shouldBe` monic v
+  prop "denominator for h is simple" $ \(D d _) p (NonZero q) ->
+    forReduction (hermiteReduce d p q) $ \(_, (_, s), (_, (_, _))) -> do
+      degree (greatestCommonDivisor s $ d s) `shouldBe` 0
+
+  prop "denominator for r is reduced" $ \(D d _) p (NonZero q) ->
+    forReduction (hermiteReduce d p q) $ \(_, (_, _), (_, (_, v))) -> do
+      monic (greatestCommonDivisor v $ d v) `shouldBe` monic v
   where
     forReduction (g, h, r@(rp, rr)) f = labels $ counterexamples $ f (g, h, r)
       where
@@ -53,6 +57,18 @@ spec = parallel $ do
     divides q p = case p `divide` q of
       (_, 0) -> True
       _ -> False
+
+polynomialReduceSpec :: Spec
+polynomialReduceSpec = describe "polynomialReduce" $ do
+  prop "adds back to original function" $ \(D d _) p ->
+    let (q, r) = polynomialReduce d p
+     in counterexample (show (q, r)) $ d q + r `shouldBe` p
+
+  prop "degree r < D-degree" $ \(D d _) p ->
+    let (q, r) = polynomialReduce d p
+        delta = degree $ d $ power 1
+     in counterexample (show (q, r)) $
+          degree r `shouldSatisfy` (\x -> x < delta || delta == 0)
 
 -- | Generate an arbitrary derivation for a polynomial with rational number coefficients.
 -- The string is a description of the derivation.

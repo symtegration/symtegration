@@ -23,7 +23,11 @@
 -- a denominator \(d\) which is normal, i.e., \(\gcd(d, Dd) = 1\).
 -- A function is /reduced/ with respect to a derivation \(D\) if it has
 -- a denominator \(d\) which is special, i.e., \(\gcd(d, Dd) = d\).
-module Symtegration.Integration.Monomial (hermiteReduce) where
+module Symtegration.Integration.Monomial
+  ( hermiteReduce,
+    polynomialReduce,
+  )
+where
 
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Differential
@@ -115,3 +119,39 @@ hermiteReduce' derivation x y
           let g' = (b, d) : g
           reduce a' g' d'
       | otherwise = Just (g, (a, divisor))
+
+-- | Polynomial reduction in a monomial extension with the given derivation and polynomial.
+-- Specifically, for derivation \(D\) and polynomial \(p\),
+-- returns polynomials \(g\) and \(h\) such that
+--
+-- \[ p = Dg + h \]
+--
+-- where the degree of \(h\) is less than the degree of \(Dt\),
+-- if the latter is larger than 0.
+--
+-- For example, with derivation \(D\) such that \(Dt = t^2 + 1\),
+-- it is the case that \(3t^4 + 3t^3 + 4 = D\left( t^3 + \frac{3}{2}t^2 - 3t \right) - 3t + 7\).
+--
+-- >>> let derivation = extend (const 0) (power 2 + 1 :: IndexedPolynomial)
+-- >>> polynomialReduce derivation $ 3 * power 4 + 3 * power 3 + 4
+-- (x^3 + (3 % 2)x^2 + (-3)x,(-3)x + 7)
+polynomialReduce ::
+  (Polynomial p e c, Num (p e c), Fractional c) =>
+  -- | Derivation \(D\).
+  (p e c -> p e c) ->
+  -- | Polynomial \(p\).
+  p e c ->
+  -- | Polynomial reduction \((g, h)\).
+  (p e c, p e c)
+polynomialReduce derivation p
+  | delta == 0 = (0, p)
+  | degree p < delta = (0, p)
+  | otherwise = (q0 + q, r)
+  where
+    delta = degree $ derivation $ power 1
+    lambda = leadingCoefficient $ derivation $ power 1
+    m = degree p - delta + 1
+    q0 = scale (leadingCoefficient p / (fromIntegral m * lambda)) (power m)
+
+    -- Explicitly delete leading terms so that they are canceled out even for symbolic coefficients.
+    (q, r) = polynomialReduce derivation $ deleteLeadingTerm p - deleteLeadingTerm (derivation q0)
