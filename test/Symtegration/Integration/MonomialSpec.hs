@@ -11,6 +11,7 @@ import Symtegration.Polynomial.Differential
 import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Indexed.Arbitrary ()
 import Symtegration.Polynomial.Rational
+import Symtegration.Polynomial.Rational.Arbitrary ()
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (scale)
@@ -22,37 +23,37 @@ spec = parallel $ do
 
 hermiteReduceSpec :: Spec
 hermiteReduceSpec = describe "hermiteReduce" $ do
-  prop "adds back to original function" $ \(D d _) p (NonZero q) ->
-    forReduction (hermiteReduce d p q) $ \(gs, (r, s), (f, (u, v))) ->
-      let dg' = sum [fromPolynomials (gd * d gn - gn * d gd) (gd * gd) | (gn, gd) <- gs]
-          h' = fromPolynomials r s
-          r' = fromPolynomial f + fromPolynomials u v
-       in dg' + h' + r' `shouldBe` fromPolynomials p q
+  prop "adds back to original function" $ \(D d _) f ->
+    forReduction (hermiteReduce d f) $ \(gs, h, (rp, rr)) ->
+      let dg = sum [fromPolynomials (gd * d gn - gn * d gd) (gd * gd) | Function gn gd <- gs]
+          r = fromPolynomial rp + rr
+       in dg + h + r `shouldBe` f
 
   prop "denominators divide denominator of original function" $ \(D d _) p (NonZero q) ->
-    forReduction (hermiteReduce d p q) $ \(gs, (_, s), (_, (_, v))) -> do
-      [gd | (_, gd) <- gs] `shouldSatisfy` all (`divides` q)
-      s `shouldSatisfy` (`divides` q)
-      v `shouldSatisfy` (`divides` q)
+    forReduction (hermiteReduce d $ fromPolynomials p q) $
+      \(gs, Function _ s, (_, Function _ v)) -> do
+        [gd | Function _ gd <- gs] `shouldSatisfy` all (`divides` q)
+        s `shouldSatisfy` (`divides` q)
+        v `shouldSatisfy` (`divides` q)
 
-  prop "denominator for h is simple" $ \(D d _) p (NonZero q) ->
-    forReduction (hermiteReduce d p q) $ \(_, (_, s), (_, (_, _))) -> do
+  prop "denominator for h is simple" $ \(D d _) f ->
+    forReduction (hermiteReduce d f) $ \(_, Function _ s, (_, _)) -> do
       degree (greatestCommonDivisor s $ d s) `shouldBe` 0
 
-  prop "denominator for r is reduced" $ \(D d _) p (NonZero q) ->
-    forReduction (hermiteReduce d p q) $ \(_, (_, _), (_, (_, v))) -> do
+  prop "denominator for r is reduced" $ \(D d _) f ->
+    forReduction (hermiteReduce d f) $ \(_, _, (_, Function _ v)) -> do
       monic (greatestCommonDivisor v $ d v) `shouldBe` monic v
   where
-    forReduction (g, h, r@(rp, rr)) f = labels $ counterexamples $ f (g, h, r)
+    forReduction (g, h, r) f = labels $ counterexamples $ f (g, h, r)
       where
         counterexamples =
           counterexample ("g = " <> show g)
             . counterexample ("h = " <> show h)
-            . counterexample ("r = " <> show (rp, rr))
+            . counterexample ("r = " <> show r)
         labels = label deriv . label simple . label reduced
         deriv | [] <- g = "zero derivative" | otherwise = "non-zero derivative"
-        simple | (0, _) <- h = "zero simple" | otherwise = "non-zero simple"
-        reduced | (0, (0, _)) <- r = "zero reduced" | otherwise = "non-zero reduced"
+        simple | 0 <- h = "zero simple" | otherwise = "non-zero simple"
+        reduced | (0, 0) <- r = "zero reduced" | otherwise = "non-zero reduced"
 
     divides q p = case p `divide` q of
       (_, 0) -> True

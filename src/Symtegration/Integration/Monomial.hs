@@ -37,12 +37,13 @@ import Symtegration.Polynomial.Rational
 -- >>> import Symtegration.Polynomial
 -- >>> import Symtegration.Polynomial.Differential
 -- >>> import Symtegration.Polynomial.Indexed
+-- >>> import Symtegration.Polynomial.Rational
 -- >>> import Symtegration.Symbolic.Haskell
 
 -- | Hermite reduction for a function in a monomial extension.
 --
--- Specifically, for a derivation \(D\) and function \(f = \frac{a}{d}\),
--- returns \(g\), \(h = \frac{h_n}{h_d}\), and \(r = r_p + \frac{r_n}{r_d}\) such that
+-- Specifically, for derivation \(D\) and function \(f\),
+-- returns \(g\), \(h\), and \(r = r_p + r_r\) such that
 --
 -- \[ f = Dg + h + r \]
 --
@@ -53,8 +54,8 @@ import Symtegration.Polynomial.Rational
 -- where \(g = -\frac{1}{t}\), \(h = \frac{1}{t}\), and \(r = t^2 - 1\).
 --
 -- >>> let deriv = extend (const 0) (power 2 + 1 :: IndexedPolynomial)
--- >>> hermiteReduce deriv (power 4 + power 1 + 1) (power 2)
--- ([((-1),x)],(1,x),(x^2 + (-1),(0,1)))
+-- >>> hermiteReduce deriv $ fromPolynomials (power 4 + power 1 + 1) (power 2)
+-- ([Function ((-1)) (x)],Function (1) (x),(x^2 + (-1),Function (0) (1)))
 --
 -- Since it is the case that \(\frac{dt}{dx} = t^2 + 1\) for \(t = \tan x\),
 -- this implies that
@@ -71,14 +72,12 @@ hermiteReduce ::
   (Polynomial p e c, Eq (p e c), Num (p e c), Eq c, Fractional c) =>
   -- | Derivation \(D\).
   (p e c -> p e c) ->
-  -- | Numerator \(a\).
-  p e c ->
-  -- | Denominator \(d\).
-  p e c ->
-  -- | Hermite reduction \((g, (h_n, h_d), (r_p, (r_n, r_d)))\) of \(f\).
-  ([(p e c, p e c)], (p e c, p e c), (p e c, (p e c, p e c)))
-hermiteReduce _ a 0 = ([], (0, 1), (0, (a, 0)))
-hermiteReduce derivation a d = (g, h, (q + p, (spn, spd)))
+  -- | Function \(f\).
+  Function (p e c) ->
+  -- | Hermite reduction \((g, h, (r_p, r_r))\) of \(f\).
+  ([Function (p e c)], Function (p e c), (p e c, Function (p e c)))
+hermiteReduce _ r@(Function _ 0) = ([], 0, (0, r))
+hermiteReduce derivation (Function a d) = (map (uncurry fromPolynomials) g, uncurry fromPolynomials h, (q + p, fromPolynomials spn spd))
   where
     (p, Function b n, Function spn spd) = canonical derivation $ fromPolynomials a d
     (g, h, q) = hermiteReduce' derivation b'' n''
