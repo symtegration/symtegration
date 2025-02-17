@@ -1,3 +1,8 @@
+-- |
+-- Description: Tests "Symtegration.Polynomial.Differential".
+-- Copyright: Copyright 2025 Yoo Chung
+-- License: Apache-2.0
+-- Maintainer: dev@chungyc.org
 module Symtegration.Polynomial.DifferentialSpec (spec) where
 
 import Symtegration.Polynomial

@@ -58,6 +58,7 @@ library
       Symtegration.Polynomial
       Symtegration.Polynomial.Differential
       Symtegration.Polynomial.Indexed
+      Symtegration.Polynomial.Rational
       Symtegration.Polynomial.Solve
       Symtegration.Polynomial.Symbolic
       Symtegration.Symbolic
@@ -127,6 +128,8 @@ test-suite spec
       Symtegration.Polynomial.DifferentialSpec
       Symtegration.Polynomial.Indexed.Arbitrary
       Symtegration.Polynomial.IndexedSpec
+      Symtegration.Polynomial.Rational.Arbitrary
+      Symtegration.Polynomial.RationalSpec
       Symtegration.Polynomial.SolveSpec
       Symtegration.Polynomial.SymbolicSpec
       Symtegration.PolynomialSpec
