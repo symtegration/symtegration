@@ -99,12 +99,12 @@ integrate v e
 
         -- Try to integrate into real functions first.
         realLogs
-          | (Just terms) <- logTerms = sum <$> toMaybeList (map (complexLogTermToRealExpression v) terms)
+          | (Just terms) <- logTerms = sum <$> mapM (complexLogTermToRealExpression v) terms
           | otherwise = Nothing
 
         -- If it cannot be integrated into real functions, allow complex logarithms.
         complexLogs
-          | (Just terms) <- logTerms = sum <$> toMaybeList (map (complexLogTermToComplexExpression v) terms)
+          | (Just terms) <- logTerms = sum <$> mapM (complexLogTermToComplexExpression v) terms
           | otherwise = Nothing
 
         fromRationalFunction (Rational.Function u w) = u' / w'
@@ -215,7 +215,7 @@ rationalIntegralLogTerms (Rational.Function a d) = do
   -- When the preconditions are satisfied, these should all be polynomials.
   sd' <- mapCoefficientsM toPolynomial sd
   resultant' <- toPolynomial resultant
-  prs' <- toMaybeList $ map (mapCoefficientsM toPolynomial) prs :: Maybe [IndexedPolynomialWith IndexedPolynomial]
+  prs' <- mapM (mapCoefficientsM toPolynomial) prs :: Maybe [IndexedPolynomialWith IndexedPolynomial]
 
   -- Derive what make up the log terms in the integral.
   let qs = squarefree resultant' :: [IndexedPolynomial]
@@ -430,7 +430,7 @@ complexLogTermToRealExpression v (r, s)
     ((p, q), (a, b)) = complexLogTermToRealTerm (r, s)
 
     f :: [(Rational, Rational)] -> Maybe [Expression]
-    f xys = toMaybeList $ do
+    f xys = sequence $ do
       (x, y) <- filter ((> 0) . snd) xys
       let flatten'' = mapCoefficients (toExpr (fromRational y) fromRational) -- v-polynomials into Expressions.
       let flatten' = mapCoefficients (toExpr (fromRational x) id . flatten'') -- u-polynomials into Expressions.
@@ -466,7 +466,7 @@ complexLogTermToRealExpression v (r, s)
 
     -- Convert polynomial with Expression coefficients into a polynomial with rational number coefficients.
     convertCoefficients :: IndexedPolynomialWith Expression -> Maybe IndexedPolynomial
-    convertCoefficients x = sum . map (\(e, c) -> scale c (power e)) <$> toMaybeList (foldTerms (\e c -> [(e,) <$> convert (simplify c)]) x)
+    convertCoefficients x = sum . map (\(e, c) -> scale c (power e)) <$> sequence (foldTerms (\e c -> [(e,) <$> convert (simplify c)]) x)
 
     -- Turns a polynomial into an Expression.
     -- Function h is used to turn the coefficient into an Expression.
@@ -514,8 +514,8 @@ solveBivariatePolynomials p q = do
   let q' = toRationalFunctionCoefficients q
   resultant <- toPolynomial $ fst $ subresultant p' q'
   vs' <- solve resultant
-  vs <- toMaybeList $ map (convert . simplify) vs'
-  concat <$> toMaybeList (map solveForU vs)
+  vs <- mapM (convert . simplify) vs'
+  concat <$> mapM solveForU vs
   where
     toRationalFunctionCoefficients = mapCoefficients fromPolynomial
 
@@ -525,16 +525,16 @@ solveBivariatePolynomials p q = do
       | 0 <- p' = do
           -- Any u will make p'=0 true, so we only need to solve p'.
           u <- map (convert . simplify) <$> solve q'
-          map (,v) <$> toMaybeList u
+          map (,v) <$> sequence u
       | 0 <- q' = do
           -- Any u will make q'=0 true, so we only need to solve p'.
           u <- map (convert . simplify) <$> solve p'
-          map (,v) <$> toMaybeList u
+          map (,v) <$> sequence u
       | otherwise = do
           up <- map (convert . simplify) <$> solve p'
           uq <- map (convert . simplify) <$> solve q'
-          up' <- toMaybeList up
-          uq' <- toMaybeList uq
+          up' <- sequence up
+          uq' <- sequence uq
           return $ map (,v) $ up' `intersect` uq'
       where
         p' = mapCoefficients (getSum . foldTerms (\e c -> Sum $ c * v ^ e)) p
@@ -545,12 +545,3 @@ solveBivariatePolynomials p q = do
     convert (Number n) = Just $ fromIntegral n
     convert (Number n :/: Number m) = Just $ fromIntegral n / fromIntegral m
     convert _ = Nothing
-
--- | If there are any nothings, then turn the list into nothing.
--- Otherwise, turn it into the list of just the elements.
-toMaybeList :: [Maybe a] -> Maybe [a]
-toMaybeList [] = Just []
-toMaybeList (Nothing : _) = Nothing
-toMaybeList (Just x : xs)
-  | (Just xs') <- toMaybeList xs = Just (x : xs')
-  | otherwise = Nothing
