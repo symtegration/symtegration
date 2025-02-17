@@ -77,34 +77,23 @@ hermiteReduce ::
   -- | Hermite reduction \((g, h, (r_p, r_r))\) of \(f\).
   ([Function (p e c)], Function (p e c), (p e c, Function (p e c)))
 hermiteReduce _ r@(Function _ 0) = ([], 0, (0, r))
-hermiteReduce derivation (Function a d) = (map (uncurry fromPolynomials) g, uncurry fromPolynomials h, (q + p, fromPolynomials spn spd))
+hermiteReduce derivation f = (g, h, (q + p, s))
   where
-    (p, Function b n, Function spn spd) = canonical derivation $ fromPolynomials a d
-    (g, h, q) = hermiteReduce' derivation b'' n''
-
-    -- Compute form of b/n where denominator is monic
-    -- and has coprime numerator and denominator.
-    e = greatestCommonDivisor b n
-    (b', _) = b `divide` e
-    (n', _) = n `divide` e
-    c = 1 / leadingCoefficient n'
-    b'' = scale c b'
-    n'' = scale c n'
+    (p, n, s) = canonical derivation f
+    (g, h, q) = hermiteReduce' derivation n
 
 -- | Hermite reduction on the normal part of a canonical representation.
--- This does the main work for 'hermiteReduce', and assumes that the
--- numerator and denominator given are coprime and that the latter is monic.
+-- This does the main work for 'hermiteReduce'.
 hermiteReduce' ::
   (Polynomial p e c, Eq (p e c), Num (p e c), Eq c, Fractional c) =>
   (p e c -> p e c) ->
-  p e c ->
-  p e c ->
-  ([(p e c, p e c)], (p e c, p e c), p e c)
-hermiteReduce' derivation x y
+  Function (p e c) ->
+  ([Function (p e c)], Function (p e c), p e c)
+hermiteReduce' derivation f@(Function x y)
   | (Just (g, (a, d))) <- reduce x [] common =
       let (q, r) = a `divide` d
-       in (g, (r, d), q)
-  | otherwise = ([], (x, y), 0) -- Should not be possible.
+       in (g, fromPolynomials r d, q)
+  | otherwise = ([], f, 0) -- Should not be possible.
   where
     common = monic $ greatestCommonDivisor y $ derivation y
     (divisor, _) = y `divide` common
@@ -116,7 +105,7 @@ hermiteReduce' derivation x y
           (b, c) <- diophantineEuclidean (-d''') d'' a
           let (b', _) = (derivation b * divisor) `divide` d''
           let a' = c - b'
-          let g' = (b, d) : g
+          let g' = fromPolynomials b d : g
           reduce a' g' d'
       | otherwise = Just (g, (a, divisor))
 
