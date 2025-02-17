@@ -20,6 +20,7 @@ spec :: Spec
 spec = parallel $ do
   hermiteReduceSpec
   polynomialReduceSpec
+  residueReduceSpec
 
 hermiteReduceSpec :: Spec
 hermiteReduceSpec = describe "hermiteReduce" $ do
@@ -69,6 +70,20 @@ polynomialReduceSpec = describe "polynomialReduce" $ do
         delta = degree $ d $ power 1
      in counterexample (show (q, r)) $
           degree r `shouldSatisfy` (\x -> x < delta || delta == 0)
+
+residueReduceSpec :: Spec
+residueReduceSpec = focus $ describe "residueReduce" $ do
+  prop "for simple f, (f - Dg) is polynomial" $ verbose $ \(D d _) f' ->
+    getSimpleFrom d f' $ \f ->
+      let g = residueReduce d f
+       in counterexample (show g) $ case g of
+            Nothing -> error "failed reduction"
+            Just (_, True) -> label "has elementary integral" pending
+            Just (_, False) -> label "does not have elementary integral" pending
+  where
+    getSimpleFrom d f' p = p f
+      where
+        (_, f, _) = hermiteReduce d f'
 
 -- | Generate an arbitrary derivation for a polynomial with rational number coefficients.
 -- The string is a description of the derivation.
