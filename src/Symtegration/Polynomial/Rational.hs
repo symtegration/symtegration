@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE PatternSynonyms #-}
 
 -- |
@@ -19,7 +20,9 @@ module Symtegration.Polynomial.Rational
   )
 where
 
+import Control.DeepSeq (NFData)
 import Data.Text (unpack)
+import GHC.Generics (Generic)
 import Symtegration.Polynomial
 import TextShow
 
@@ -64,7 +67,7 @@ import TextShow
 -- >>> import Symtegration.Polynomial.Rational as Rational
 -- >>> fromPolynomials (power 1) (power 2 + 1) :: Rational.Function IndexedPolynomial
 -- Function (x) (x^2 + 1)
-data Function a = F a a
+data Function a = F a a deriving (Generic, NFData)
 
 {-# COMPLETE Function #-}
 
