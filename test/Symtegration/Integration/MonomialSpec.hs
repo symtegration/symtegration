@@ -6,11 +6,11 @@
 module Symtegration.Integration.MonomialSpec where
 
 import Symtegration.Integration.Monomial
-import Symtegration.Integration.Rational (toRationalFunction)
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Differential
 import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Indexed.Arbitrary ()
+import Symtegration.Polynomial.Rational
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (scale)
@@ -24,10 +24,10 @@ hermiteReduceSpec :: Spec
 hermiteReduceSpec = describe "hermiteReduce" $ do
   prop "adds back to original function" $ \(D d _) p (NonZero q) ->
     forReduction (hermiteReduce d p q) $ \(gs, (r, s), (f, (u, v))) ->
-      let dg' = sum [toRationalFunction (gd * d gn - gn * d gd) (gd * gd) | (gn, gd) <- gs]
-          h' = toRationalFunction r s
-          r' = toRationalFunction f 1 + toRationalFunction u v
-       in dg' + h' + r' `shouldBe` toRationalFunction p q
+      let dg' = sum [fromPolynomials (gd * d gn - gn * d gd) (gd * gd) | (gn, gd) <- gs]
+          h' = fromPolynomials r s
+          r' = fromPolynomial f + fromPolynomials u v
+       in dg' + h' + r' `shouldBe` fromPolynomials p q
 
   prop "denominators divide denominator of original function" $ \(D d _) p (NonZero q) ->
     forReduction (hermiteReduce d p q) $ \(gs, (_, s), (_, (_, v))) -> do

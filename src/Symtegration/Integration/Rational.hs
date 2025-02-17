@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveAnyClass #-}
-
 -- |
 -- Module: Symtegration.Integration.Rational
 -- Description: Integration of rational functions.
@@ -22,23 +20,19 @@ module Symtegration.Integration.Rational
     complexLogTermToAtan,
     complexLogTermToRealTerm,
 
-    -- * Support
-
-    -- | Functions and types useful when integrating rational functions.
-    toRationalFunction,
-    RationalFunction (..),
+    -- * Types
+    RationalFunction,
   )
 where
 
-import Control.DeepSeq (NFData)
 import Data.Foldable (asum)
 import Data.List (find, intersect)
 import Data.Monoid (Sum (..))
 import Data.Text (Text)
-import GHC.Generics (Generic)
 import Symtegration.Polynomial hiding (integrate)
 import Symtegration.Polynomial qualified as Polynomial
 import Symtegration.Polynomial.Indexed
+import Symtegration.Polynomial.Rational as Rational
 import Symtegration.Polynomial.Solve
 import Symtegration.Polynomial.Symbolic
 import Symtegration.Symbolic
@@ -48,6 +42,7 @@ import Symtegration.Symbolic.Simplify
 -- >>> :set -w
 -- >>> import Symtegration.Polynomial hiding (integrate)
 -- >>> import Symtegration.Polynomial.Indexed
+-- >>> import Symtegration.Polynomial.Rational
 -- >>> import Symtegration.Symbolic.Haskell
 -- >>> import Symtegration.Symbolic.Simplify
 
@@ -89,16 +84,16 @@ integrate v e
     integrate' n d = (+) reduced . (+) poly <$> logs
       where
         -- Integrals directly from Hermite reduction.
-        (g, h) = hermiteReduce $ toRationalFunction n d
+        (g, h) = hermiteReduce $ fromPolynomials n d
         reduced = sum $ map fromRationalFunction g
 
         -- Integrate polynomials left over from the Hermite reduction.
-        RationalFunction numer denom = h
+        Rational.Function numer denom = h
         (q, r) = numer `divide` denom
         poly = toExpression v toRationalCoefficient $ Polynomial.integrate q
 
         -- Derive the log terms in the integral.
-        h' = toRationalFunction r denom
+        h' = fromPolynomials r denom
         logTerms = rationalIntegralLogTerms h'
         logs = asum [realLogs, complexLogs] :: Maybe Expression
 
@@ -112,58 +107,13 @@ integrate v e
           | (Just terms) <- logTerms = sum <$> toMaybeList (map (complexLogTermToComplexExpression v) terms)
           | otherwise = Nothing
 
-        fromRationalFunction (RationalFunction u w) = u' / w'
+        fromRationalFunction (Rational.Function u w) = u' / w'
           where
             u' = toExpression v toRationalCoefficient u
             w' = toExpression v toRationalCoefficient w
 
--- | Represents the ratio of two polynomials with rational number coefficients.
-data RationalFunction = RationalFunction IndexedPolynomial IndexedPolynomial
-  deriving (Generic, NFData)
-
-instance Eq RationalFunction where
-  (RationalFunction x y) == (RationalFunction u v) = x * v == y * u
-
-instance Show RationalFunction where
-  show (RationalFunction n d) = "(" <> show n <> ") / (" <> show d <> ")"
-
--- | The numerator and denominator in the results
--- for '(+)', '(-)', '(*)', and 'negate' will be coprime.
-instance Num RationalFunction where
-  (RationalFunction x y) + (RationalFunction u v) =
-    toRationalFunction (x * v + u * y) (y * v)
-
-  (RationalFunction x y) - (RationalFunction u v) =
-    toRationalFunction (x * v - u * y) (y * v)
-
-  (RationalFunction x y) * (RationalFunction u v) =
-    toRationalFunction (x * u) (y * v)
-
-  abs = id
-
-  signum 0 = 0
-  signum _ = 1
-
-  fromInteger n = RationalFunction (fromInteger n) 1
-
-instance Fractional RationalFunction where
-  fromRational q = RationalFunction (scale q 1) 1
-  recip (RationalFunction p q) = RationalFunction q p
-
--- | Form a rational function from two polynomials.
--- The polynomials will be reduced so that the numerator and denominator are coprime.
-toRationalFunction ::
-  -- | Numerator.
-  IndexedPolynomial ->
-  -- | Denominator.
-  IndexedPolynomial ->
-  RationalFunction
-toRationalFunction x 0 = RationalFunction x 0
-toRationalFunction x y = RationalFunction x' y'
-  where
-    g = monic $ greatestCommonDivisor x y
-    (x', _) = x `divide` g
-    (y', _) = y `divide` g
+-- | Rational functions which can be integrated by this module.
+type RationalFunction = Rational.Function IndexedPolynomial
 
 -- | Applies Hermite reduction to a rational function.
 -- Returns a list of rational functions whose sums add up to the integral
@@ -188,8 +138,8 @@ toRationalFunction x y = RationalFunction x' y'
 --
 -- >>> let p = power 7 - 24 * power 4 - 4 * power 2 + 8 * power 1 - 8 :: IndexedPolynomial
 -- >>> let q = power 8 + 6 * power 6 + 12 * power 4 + 8 * power 2 :: IndexedPolynomial
--- >>> hermiteReduce $ toRationalFunction p q
--- ([(3) / (x^2 + 2),(8x^2 + 4) / (x^5 + 4x^3 + 4x)],(1) / (x))
+-- >>> hermiteReduce $ fromPolynomials p q
+-- ([Function (3) (x^2 + 2),Function (8x^2 + 4) (x^5 + 4x^3 + 4x)],Function (1) (x))
 --
 -- so that
 --
@@ -199,8 +149,8 @@ toRationalFunction x y = RationalFunction x' y'
 -- instead of a single rational function, because the former could sometimes
 -- be simpler to read.
 hermiteReduce :: RationalFunction -> ([RationalFunction], RationalFunction)
-hermiteReduce h@(RationalFunction _ 0) = ([], h)
-hermiteReduce h@(RationalFunction x y)
+hermiteReduce h@(Rational.Function _ 0) = ([], h)
+hermiteReduce h@(Rational.Function x y)
   | (Just z) <- reduce x [] common = z
   | otherwise = ([], h) -- Should never happen, but a fallback if it does.
   where
@@ -214,9 +164,9 @@ hermiteReduce h@(RationalFunction x y)
           (b, c) <- diophantineEuclidean (-d''') d'' a
           let (b', _) = (differentiate b * divisor) `divide` d''
           let a' = c - b'
-          let g' = toRationalFunction b d : g
+          let g' = fromPolynomials b d : g
           reduce a' g' d'
-      | otherwise = Just (g, toRationalFunction a divisor)
+      | otherwise = Just (g, fromPolynomials a divisor)
 
 -- | For rational function \(\frac{A}{D}\), where \(\deg(A) < \deg(D)\),
 -- and \(D\) is non-zero, squarefree, and coprime with \(A\),
@@ -233,7 +183,7 @@ hermiteReduce h@(RationalFunction x y)
 --
 -- >>> let p = power 4 - 3 * power 2 + 6 :: IndexedPolynomial
 -- >>> let q = power 6 - 5 * power 4 + 5 * power 2 + 4 :: IndexedPolynomial
--- >>> let f = toRationalFunction p q
+-- >>> let f = fromPolynomials p q
 -- >>> let gs = rationalIntegralLogTerms f
 -- >>> length <$> gs
 -- Just 1
@@ -253,19 +203,19 @@ hermiteReduce h@(RationalFunction x y)
 rationalIntegralLogTerms ::
   RationalFunction ->
   Maybe [(IndexedPolynomial, IndexedPolynomialWith IndexedPolynomial)]
-rationalIntegralLogTerms (RationalFunction a d) = do
+rationalIntegralLogTerms (Rational.Function a d) = do
   -- For A/D, get the resultant and subresultant polynomial remainder sequence
   -- for D and (A - t * D').
   let sa = mapCoefficients fromRational a
   let sd = mapCoefficients fromRational d
-  let t = RationalFunction (power 1) 1
+  let t = fromPolynomial $ power 1
   let (resultant, prs) = subresultant sd $ sa - scale t (differentiate sd)
 
   -- Turn rational functions into polynomials if possible.
   -- When the preconditions are satisfied, these should all be polynomials.
-  sd' <- mapCoefficientsM toPoly sd
-  resultant' <- toPoly resultant
-  prs' <- toMaybeList $ map (mapCoefficientsM toPoly) prs :: Maybe [IndexedPolynomialWith IndexedPolynomial]
+  sd' <- mapCoefficientsM toPolynomial sd
+  resultant' <- toPolynomial resultant
+  prs' <- toMaybeList $ map (mapCoefficientsM toPolynomial) prs :: Maybe [IndexedPolynomialWith IndexedPolynomial]
 
   -- Derive what make up the log terms in the integral.
   let qs = squarefree resultant' :: [IndexedPolynomial]
@@ -562,12 +512,12 @@ solveBivariatePolynomials ::
 solveBivariatePolynomials p q = do
   let p' = toRationalFunctionCoefficients p
   let q' = toRationalFunctionCoefficients q
-  resultant <- toPoly $ fst $ subresultant p' q'
+  resultant <- toPolynomial $ fst $ subresultant p' q'
   vs' <- solve resultant
   vs <- toMaybeList $ map (convert . simplify) vs'
   concat <$> toMaybeList (map solveForU vs)
   where
-    toRationalFunctionCoefficients = mapCoefficients (`toRationalFunction` 1)
+    toRationalFunctionCoefficients = mapCoefficients fromPolynomial
 
     -- For each v, returns list of (u,v) such that P(u,v)=Q(u,v)=0.
     solveForU :: Rational -> Maybe [(Rational, Rational)]
@@ -595,14 +545,6 @@ solveBivariatePolynomials p q = do
     convert (Number n) = Just $ fromIntegral n
     convert (Number n :/: Number m) = Just $ fromIntegral n / fromIntegral m
     convert _ = Nothing
-
--- | Turn the rational function into a polynomial if possible.
-toPoly :: RationalFunction -> Maybe IndexedPolynomial
-toPoly (RationalFunction p q)
-  | degree q == 0, q /= 0 = Just p'
-  | otherwise = Nothing
-  where
-    p' = scale (1 / leadingCoefficient q) p
 
 -- | If there are any nothings, then turn the list into nothing.
 -- Otherwise, turn it into the list of just the elements.

@@ -12,6 +12,7 @@ import Symtegration.Integration.Rational
 import Symtegration.Polynomial hiding (integrate)
 import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Indexed.Arbitrary ()
+import Symtegration.Polynomial.Rational as Rational
 import Symtegration.Polynomial.Symbolic
 import Symtegration.Symbolic
 import Test.Hspec
@@ -24,33 +25,27 @@ spec = parallel $ do
     prop "consistent with derivative of integral" $ \(Rat e) x ->
       antiderivativeProperty integrate (Map.singleton var x) e x
 
-  describe "toRationalFunction" $ do
-    prop "has coprime numerator and denominator" $ \(NonZero p) (NonZero q) ->
-      let coprime (RationalFunction p' q') =
-            degree (greatestCommonDivisor p' q') == 0
-       in toRationalFunction p q `shouldSatisfy` coprime
-
   describe "hermiteReduce" $ do
     prop "h has squarefree denominator" $ \(NonZero p) (NonZero q) ->
-      let r@(_, h) = hermiteReduce $ toRationalFunction p q
-          RationalFunction _ d = h
+      let r@(_, h) = hermiteReduce $ fromPolynomials p q
+          Rational.Function _ d = h
        in counterexample (show r) $
             greatestCommonDivisor d (differentiate d) `shouldSatisfy` ((==) 0 . degree)
 
     prop "adds back to original rational function" $ \(NonZero p) (NonZero q) ->
-      let f = toRationalFunction p q
-          r@(gs, h) = hermiteReduce $ toRationalFunction p q
+      let f = fromPolynomials p q
+          r@(gs, h) = hermiteReduce $ fromPolynomials p q
 
           -- Manually derive derivative of g = sum gs.
-          RationalFunction x y = sum gs
+          Rational.Function x y = sum gs
           x' = y * differentiate x - x * differentiate y
           y' = y * y
-          g' = toRationalFunction x' y'
+          g' = fromPolynomials x' y'
 
           -- With leading coefficients factored out and numerator and denominator coprime,
           -- the representation of a rational function should be unique.
-          rep (RationalFunction u v) =
-            (leadingCoefficient u / leadingCoefficient v, RationalFunction (monic u) (monic v))
+          rep (Rational.Function u v) =
+            (leadingCoefficient u / leadingCoefficient v, fromPolynomials (monic u) (monic v))
        in counterexample (show r) $ rep (g' + h) `shouldBe` rep f
 
 -- | For generating arbitrary rational functions with rational number coefficients.

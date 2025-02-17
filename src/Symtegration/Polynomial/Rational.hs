@@ -151,5 +151,5 @@ fromPolynomials x y = F x'' y''
 toPolynomial :: (Polynomial p e c, Eq (p e c), Num (p e c), Fractional c) => Function (p e c) -> Maybe (p e c)
 toPolynomial (F x 1) = Just x
 toPolynomial (F x y)
-  | 0 <- degree y = Just $ scale (1 / leadingCoefficient y) x
+  | 0 <- degree y, y /= 0 = Just $ scale (1 / leadingCoefficient y) x
   | otherwise = Nothing

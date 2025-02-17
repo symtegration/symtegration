@@ -91,3 +91,7 @@ spec = parallel $ do
   describe "fromPolynomial" $ do
     prop "is inverse of toPolynomial" $ \p ->
       toPolynomial (fromPolynomial p) `shouldBe` Just (p :: IndexedPolynomial)
+
+  describe "toPolynomial" $ do
+    prop "is nothing with zero denominator" $ \x ->
+      toPolynomial (fromPolynomials x (0 :: IndexedPolynomial)) `shouldBe` Nothing
