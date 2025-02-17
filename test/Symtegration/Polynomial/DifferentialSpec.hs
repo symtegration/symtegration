@@ -9,6 +9,8 @@ import Symtegration.Polynomial
 import Symtegration.Polynomial.Differential
 import Symtegration.Polynomial.Indexed
 import Symtegration.Polynomial.Indexed.Arbitrary ()
+import Symtegration.Polynomial.Rational
+import Symtegration.Polynomial.Rational.Arbitrary ()
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
@@ -61,21 +63,21 @@ splitSquarefreeFactorSpec = modifyMaxSize (`div` 4) $ describe "splitSquarefreeF
 
 canonicalSpec :: Spec
 canonicalSpec = modifyMaxSize (`div` 4) $ describe "canonical" $ do
-  prop "adds back to original function" $ \(Rat a d) (Deriv derivation _) ->
-    let rep@(p, (b, dn), (c, ds)) = canonical derivation a d
+  prop "adds back to original function" $ \f (Deriv derivation _) ->
+    let rep@(p, normal, special) = canonical derivation f
      in counterexample (show rep) $
-          (p * dn * ds + b * ds + c * dn, dn * ds) `shouldBe` (a, d)
+          fromPolynomial p + normal + special `shouldBe` f
 
-  prop "numerator has smaller degree in normal part" $ \(Rat a d) (Deriv derivation _) ->
-    let rep@(_, (b, dn), _) = canonical derivation a d
+  prop "numerator has smaller degree in normal part" $ \f (Deriv derivation _) ->
+    let rep@(_, Function b dn, _) = canonical derivation f
      in counterexample (show rep) $
           disjoin
             [ degree b == 0 && degree dn == 0,
               degree b < degree dn
             ]
 
-  prop "numerator has smaller degree in special part" $ \(Rat a d) (Deriv derivation _) ->
-    let rep@(_, _, (c, ds)) = canonical derivation a d
+  prop "numerator has smaller degree in special part" $ \f (Deriv derivation _) ->
+    let rep@(_, _, Function c ds) = canonical derivation f
      in counterexample (show rep) $
           disjoin
             [ degree c == 0 && degree ds == 0,
@@ -83,13 +85,13 @@ canonicalSpec = modifyMaxSize (`div` 4) $ describe "canonical" $ do
             ]
 
   prop "denominator for normal part has squarefree factors which are normal" $
-    \(Rat a d) (Deriv derivation _) ->
-      let rep@(_, (_, dn), _) = canonical derivation a d
+    \f (Deriv derivation _) ->
+      let rep@(_, Function _ dn, _) = canonical derivation f
        in counterexample (show rep) $
             squarefree dn `shouldSatisfy` all (isNormal derivation)
 
-  prop "denominator for special part is special" $ \(Rat a d) (Deriv derivation _) ->
-    let rep@(_, _, (_, ds)) = canonical derivation a d
+  prop "denominator for special part is special" $ \f (Deriv derivation _) ->
+    let rep@(_, _, Function _ ds) = canonical derivation f
      in counterexample (show rep) $
           ds `shouldSatisfy` isSpecial derivation
 

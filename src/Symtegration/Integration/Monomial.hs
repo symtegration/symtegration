@@ -31,6 +31,7 @@ where
 
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Differential
+import Symtegration.Polynomial.Rational
 
 -- $setup
 -- >>> import Symtegration.Polynomial
@@ -77,9 +78,9 @@ hermiteReduce ::
   -- | Hermite reduction \((g, (h_n, h_d), (r_p, (r_n, r_d)))\) of \(f\).
   ([(p e c, p e c)], (p e c, p e c), (p e c, (p e c, p e c)))
 hermiteReduce _ a 0 = ([], (0, 1), (0, (a, 0)))
-hermiteReduce derivation a d = (g, h, (q + p, special))
+hermiteReduce derivation a d = (g, h, (q + p, (spn, spd)))
   where
-    (p, (b, n), special) = canonical derivation a d
+    (p, Function b n, Function spn spd) = canonical derivation $ fromPolynomials a d
     (g, h, q) = hermiteReduce' derivation b'' n''
 
     -- Compute form of b/n where denominator is monic

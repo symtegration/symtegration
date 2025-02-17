@@ -43,10 +43,12 @@ where
 
 import Data.Monoid (Sum (..))
 import Symtegration.Polynomial
+import Symtegration.Polynomial.Rational
 
 -- $setup
 -- >>> import Symtegration.Polynomial
 -- >>> import Symtegration.Polynomial.Indexed
+-- >>> import Symtegration.Polynomial.Rational
 
 -- | Returns the squarefree factors in the splitting factorization of a given polynomial
 -- with respect to a given derivation.  Specifically, with derivation \(D\) and polynomial \(p\),
@@ -136,14 +138,14 @@ splitFactor derivation p = compose (1, 1) factors (1 :: Int)
 --
 -- >>> let a = power 5 + power 2 + 1 :: IndexedPolynomial
 -- >>> let d = power 3 - 3 * power 2 + 4 :: IndexedPolynomial
--- >>> canonical differentiate a d
--- (x^2 + 3x + 9,(24x^2 + (-12)x + (-35),x^3 + (-3)x^2 + 4),(0,1))
+-- >>> canonical differentiate $ fromPolynomials a d
+-- (x^2 + 3x + 9,Function (24x^2 + (-12)x + (-35)) (x^3 + (-3)x^2 + 4),Function (0) (1))
 --
 -- In comparison, given the derivation \(Dx = x + 1\), the canonical representation
 -- is \((x^2+3x+9) + \frac{215x-319}{9x^2-36x+36} + \frac{1}{9x+9}\).
 --
--- >>> canonical (extend (const 0) (power 1 + 1)) a d
--- (x^2 + 3x + 9,((215 % 81)x + ((-319) % 81),(1 % 9)x^2 + ((-4) % 9)x + (4 % 9)),(1,9x + 9))
+-- >>> canonical (extend (const 0) (power 1 + 1)) $ fromPolynomials a d
+-- (x^2 + 3x + 9,Function ((215 % 9)x + ((-319) % 9)) (x^2 + (-4)x + 4),Function ((1 % 9)) (x + 1))
 --
 -- ==== __Note for readers of Symbolic Integration I: Transcendental Functions__
 --
@@ -154,13 +156,12 @@ splitFactor derivation p = compose (1, 1) factors (1 :: Int)
 canonical ::
   (Polynomial p e c, Eq (p e c), Num (p e c), Eq c, Fractional c) =>
   (p e c -> p e c) ->
-  p e c ->
-  p e c ->
-  (p e c, (p e c, p e c), (p e c, p e c))
-canonical _ a 0 = (0, (0, 1), (a, 0))
-canonical derivation a d
-  | Just (b, c) <- xs = (q, (c, dn), (b, ds))
-  | otherwise = (q, (0, 1), (r, d))
+  Function (p e c) ->
+  (p e c, Function (p e c), Function (p e c))
+canonical _ x@(Function _ 0) = (0, 0, x)
+canonical derivation (Function a d)
+  | Just (b, c) <- xs = (q, fromPolynomials c dn, fromPolynomials b ds)
+  | otherwise = (q, 0, fromPolynomials r d)
   where
     a' = scale (1 / leadingCoefficient d) a
     d' = scale (1 / leadingCoefficient d) d
