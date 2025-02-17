@@ -26,9 +26,12 @@
 module Symtegration.Integration.Monomial
   ( hermiteReduce,
     polynomialReduce,
+    residueReduce,
   )
 where
 
+import Data.List (find)
+import Data.Monoid (Sum (..))
 import Symtegration.Polynomial
 import Symtegration.Polynomial.Differential
 import Symtegration.Polynomial.Rational
@@ -144,3 +147,130 @@ polynomialReduce derivation p
 
     -- Explicitly delete leading terms so that they are canceled out even for symbolic coefficients.
     (q, r) = polynomialReduce derivation $ deleteLeadingTerm p - deleteLeadingTerm (derivation q0)
+
+-- | Resultant reduction of a simple function in a monomial extension.
+--
+-- Specifically, for a derivation \(D\) on \(k(t)\) and a simple function \(f \in k(t)\),
+-- returns logarithmic terms \((s_i, S_i)\) such that
+--
+-- \[ g = \sum_i \sum_{\alpha \mid s_i(\alpha) = 0} \alpha \log S_i(\alpha, t) \]
+--
+-- and also whether \(f\) has an elemantary integral.  If \(f\) has an elementary integral,
+-- then there is a polynomial \(h\) of the monomial \(t\) such that \(f - Dg = h\).
+--
+-- For example, for derivation \(D=\frac{d}{dx}\) and simple function \(f = \frac{t^2+2t+1}{t^2-t+1}\),
+--
+-- >>> residueReduce differentiate $ fromPolynomials (power 2 + 2 * power 1 + 1) (2 * power 2 - 2 * power 1 - 1 :: IndexedPolynomial)
+-- Just ([(x^2 + ((-3) % 2)x + ((-3) % 16),[(0,(4 % 9)x + (1 % 3)),(1,((-8) % 9)x + (2 % 3))])],True)
+--
+-- so that
+--
+-- \[ g = \sum_{\alpha \mid \alpha^2-\frac{3}{2}\alpha-\frac{3}{16} = 0} \log \left( (\frac{2}{3}-\frac{8}{9}\alpha)t + \frac{4}{9}\alpha+\frac{1}{3} \right) \]
+--
+-- and \(\int f \, dx\) has an elementary integral, which happens to be
+--
+-- \[ \int f \, dx = g + \int h \, dx \]
+--
+-- where \(h = f-Dg\) is a polynomial of the monomial \(t\).
+residueReduce ::
+  ( Polynomial p e c,
+    Eq (p e c),
+    Num (p e c),
+    Polynomial p e (p e c),
+    Eq (p e (p e c)),
+    Num (p e (p e c)),
+    Polynomial p e (Function (p e c)),
+    Eq (p e (Function (p e c))),
+    Num (p e (Function (p e c))),
+    Eq c,
+    Fractional c
+  ) =>
+  -- | Derivation \(D\).
+  (p e c -> p e c) ->
+  -- | Function \(f\).
+  Function (p e c) ->
+  -- | Logarithmic terms \((s_i, S_i)\) and whether an elementary integral for \(\int f \, dx\) exists.
+  Maybe ([(p e c, p e (p e c))], Bool)
+residueReduce derivation (Function e d) = do
+  -- Polynomials of monomial t.
+  let (_, a) = e `divide` d
+
+  -- Coefficients are polynomials of z in rational function form.
+  let d' = mapCoefficients (\c -> fromPolynomial $ scale c 1) d
+  let a' = mapCoefficients (\c -> fromPolynomial $ scale c 1) a
+  let zd' = mapCoefficients (\c -> fromPolynomial $ scale c $ power 1) (derivation d)
+
+  let (r', rs')
+        | degree (derivation d) <= degree d = subresultant d' (a' - zd')
+        | otherwise = subresultant (a' - zd') d'
+
+  -- Polynomial of z.
+  r <- toPolynomial r'
+
+  -- Polynomials of t with coefficients which are polynomials of z.
+  rs <- mapM (mapCoefficientsM toPolynomial) rs'
+
+  -- Splitting factorization with respect to coefficient lifting.
+  -- Polynomials of z with coefficients which are polynomials of t.
+  let kderiv = getSum . foldTerms (\ex c -> Sum $ derivation (scale c 1) * power ex)
+  let factors = splitSquarefreeFactor kderiv r
+
+  -- Whether there exists an elementary integral for the function of t in field c.
+  let elementary = all ((==) 0 . degree . fst) factors
+
+  -- Derive g.  For each term (s, S), each s is a polynomial of z,
+  -- and each S is a polynomial of t with coefficients which are polynomials of z.
+  let specials = map snd factors
+  terms' <- mapM (toTerm rs specials) $ zip [1 ..] specials
+
+  -- Remove terms which will be equal to zero.
+  let terms = filter ((/= 1) . snd) terms'
+
+  return (terms, elementary)
+  where
+    -- Return the logarithmic term corresponding to the given special factor.
+    toTerm prs specials (i, s)
+      | degree s == 0 = Just (monic s, 1)
+      | degree d == i = Just (monic s, mapCoefficients (`scale` 1) d)
+      | Just pr <- find ((==) i . degree) prs = derive s pr specials
+      | otherwise = Nothing -- Should not be possible.
+
+    -- Derive the logarithmic term given the polynomial remaindder.
+    derive s pr specials = do
+      -- Switch to a polynomial of z with coefficients which are polynomials of t.
+      let pr' = mapCoefficients fromPolynomial $ switchVars pr
+
+      let (logArg', _) = pr' `divide` divisor
+      logArg <- mapCoefficientsM toPolynomial logArg'
+
+      -- Return the logarithmic term,
+      -- with the argument switched back to a polynomial of t with coefficients of z.
+      return (monic s, switchVars logArg)
+      where
+        -- Polynomials of z.
+        factors = squarefree $ leadingCoefficient pr
+
+        -- Polynomial of z with coefficients which are polynomials of t.
+        divisor = mapCoefficients (fromPolynomial . flip scale 1) divisor'
+          where
+            divisor' = product $ map toDivisor $ zip3 [1 ..] factors specials
+            toDivisor (j, factor, special) = greatestCommonDivisor factor special ^ (j :: Int)
+
+-- | Given a polynomial with coefficients which are polynomials of a different variable,
+-- return an equivalent polynomial of the different variable with coefficients
+-- which are polynomials of the original variable.
+--
+-- For example, a polynomial such as
+--
+-- \[ (y^2+1)x^3 + (2y^2-y)x + 2y - 1 \]
+--
+-- would be turned into
+--
+-- \[ (x^3 + 2x) y^2 - (x-2)y + x^3 - 1 \]
+switchVars ::
+  (Polynomial p e (p e c), Polynomial p e c, Num (p e (p e c))) =>
+  -- | Polynomial of \(v_1\) with coefficients which are polynomials of \(v_2\).
+  p e (p e c) ->
+  -- | Polynomial of \(v_2\) with coefficients which are polynomials of \(v_1\).
+  p e (p e c)
+switchVars p = getSum $ foldTerms (\e c -> Sum $ mapCoefficients (\c' -> scale c' $ power e) c) p
