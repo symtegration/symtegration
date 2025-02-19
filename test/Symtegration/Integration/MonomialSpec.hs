@@ -24,24 +24,23 @@ spec = parallel $ do
 hermiteReduceSpec :: Spec
 hermiteReduceSpec = describe "hermiteReduce" $ do
   prop "adds back to original function" $ \(D d _) f ->
-    forReduction (hermiteReduce d f) $ \(gs, h, (rp, rr)) ->
+    forReduction (hermiteReduce d f) $ \(gs, h, r) ->
       let dg = sum [fromPolynomials (gd * d gn - gn * d gd) (gd * gd) | Function gn gd <- gs]
-          r = fromPolynomial rp + rr
        in dg + h + r `shouldBe` f
 
   prop "denominators divide denominator of original function" $ \(D d _) p (NonZero q) ->
     forReduction (hermiteReduce d $ fromPolynomials p q) $
-      \(gs, Function _ s, (_, Function _ v)) -> do
+      \(gs, Function _ s, Function _ v) -> do
         [gd | Function _ gd <- gs] `shouldSatisfy` all (`divides` q)
         s `shouldSatisfy` (`divides` q)
         v `shouldSatisfy` (`divides` q)
 
   prop "denominator for h is simple" $ \(D d _) f ->
-    forReduction (hermiteReduce d f) $ \(_, Function _ s, (_, _)) -> do
+    forReduction (hermiteReduce d f) $ \(_, Function _ s, _) -> do
       degree (greatestCommonDivisor s $ d s) `shouldBe` 0
 
   prop "denominator for r is reduced" $ \(D d _) f ->
-    forReduction (hermiteReduce d f) $ \(_, _, (_, Function _ v)) -> do
+    forReduction (hermiteReduce d f) $ \(_, _, Function _ v) -> do
       monic (greatestCommonDivisor v $ d v) `shouldBe` monic v
   where
     forReduction (g, h, r) f = labels $ counterexamples $ f (g, h, r)
@@ -53,7 +52,7 @@ hermiteReduceSpec = describe "hermiteReduce" $ do
         labels = label deriv . label simple . label reduced
         deriv | [] <- g = "zero derivative" | otherwise = "non-zero derivative"
         simple | 0 <- h = "zero simple" | otherwise = "non-zero simple"
-        reduced | (0, 0) <- r = "zero reduced" | otherwise = "non-zero reduced"
+        reduced | 0 <- r = "zero reduced" | otherwise = "non-zero reduced"
 
     divides q p = case p `divide` q of
       (_, 0) -> True

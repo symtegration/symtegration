@@ -43,7 +43,7 @@ import Symtegration.Polynomial.Rational
 -- | Hermite reduction for a function in a monomial extension.
 --
 -- Specifically, for derivation \(D\) and function \(f\),
--- returns \(g\), \(h\), and \(r = r_p + r_r\) such that
+-- returns \(g\), \(h\), and \(r\) such that
 --
 -- \[ f = Dg + h + r \]
 --
@@ -55,7 +55,7 @@ import Symtegration.Polynomial.Rational
 --
 -- >>> let deriv = extend (const 0) (power 2 + 1 :: IndexedPolynomial)
 -- >>> hermiteReduce deriv $ fromPolynomials (power 4 + power 1 + 1) (power 2)
--- ([Function ((-1)) (x)],Function (1) (x),(x^2 + (-1),Function (0) (1)))
+-- ([Function ((-1)) (x)],Function (1) (x),Function (x^2 + (-1)) (1))
 --
 -- Since it is the case that \(\frac{dt}{dx} = t^2 + 1\) for \(t = \tan x\),
 -- this implies that
@@ -65,8 +65,8 @@ import Symtegration.Polynomial.Rational
 --   -\frac{1}{\tan x} + \int \left( \frac{1}{\tan x} + \tan^2 x - 1\right) \, dx
 -- \]
 --
--- \(g\) is returned as a list of rational functions which sum to \(g\)
--- instead of a single rational function, because the former could sometimes
+-- \(g\) is returned as a list of functions which sum to \(g\)
+-- instead of a single function, because the former could sometimes
 -- be simpler to read.
 hermiteReduce ::
   (Polynomial p e c, Eq (p e c), Num (p e c), Eq c, Fractional c) =>
@@ -74,10 +74,10 @@ hermiteReduce ::
   (p e c -> p e c) ->
   -- | Function \(f\).
   Function (p e c) ->
-  -- | Hermite reduction \((g, h, (r_p, r_r))\) of \(f\).
-  ([Function (p e c)], Function (p e c), (p e c, Function (p e c)))
-hermiteReduce _ r@(Function _ 0) = ([], 0, (0, r))
-hermiteReduce derivation f = (g, h, (q + p, s))
+  -- | Hermite reduction \((g, h, r)\) of \(f\).
+  ([Function (p e c)], Function (p e c), Function (p e c))
+hermiteReduce _ r@(Function _ 0) = ([], 0, r)
+hermiteReduce derivation f = (g, h, fromPolynomial (q + p) + s)
   where
     (p, n, s) = canonical derivation f
     (g, h, q) = hermiteReduce' derivation n
