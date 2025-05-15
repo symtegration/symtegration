@@ -14,6 +14,8 @@ on:
       - '**.hs'
       - '.github/workflows/build.yaml'
 
+  workflow_dispatch:
+
 jobs:
   cabal:
     strategy:
