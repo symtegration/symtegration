@@ -96,7 +96,7 @@ jobs:
         timeout-minutes: 10
 
       - name: Generate coverage report
-        uses: 8c6794b6/hpc-codecov-action@0baa5bacbd3ed4103ca4e25495e6e9cf0469912b # v4.1.0
+        uses: 8c6794b6/hpc-codecov-action@99cd60d788cb04eeba9da1550a7c753ec44f2c66 # v4.2.0
         with:
           target: stack:spec
 
