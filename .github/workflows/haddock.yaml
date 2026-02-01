@@ -34,7 +34,7 @@ jobs:
           restore-keys: haddock-
 
       - name: Setup Haskell
-        uses: haskell-actions/setup@82e8b5066385702e477d9dc98f287070493e8abd # v2.8.2
+        uses: haskell-actions/setup@f9150cb1d140e9a9271700670baa38991e6fa25c # v2.10.3
         with:
           enable-stack: true
 
