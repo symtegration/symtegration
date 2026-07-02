@@ -18,4 +18,4 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: haskell-actions/run-ormolu@c5eec49879ee294be01c787bcbf7b5a373a37060 # v17
+      - uses: haskell-actions/run-ormolu@dc3c1636ad35ac1a3c7a1be974563297da23ef43 # v19
